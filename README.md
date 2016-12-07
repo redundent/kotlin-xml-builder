@@ -19,7 +19,7 @@ Usage
 val people = xml("people") {
     xmlns = "http://example.com/people"
     element("person") {
-        attribute("id", "1")
+        attribute("id", 1)
         element("firstName") {
             -"John"
         }
