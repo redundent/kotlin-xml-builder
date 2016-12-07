@@ -1,6 +1,3 @@
-group 'org.redundent'
-version '1.0'
-
 buildscript {
 	ext.kotlin_version = '1.0.5-2'
 
@@ -12,10 +9,20 @@ buildscript {
 	}
 }
 
+plugins {
+	id "com.jfrog.bintray" version "1.5"
+}
+
+group 'org.redundent'
+version '1.0'
+
 apply plugin: 'kotlin'
+apply plugin: 'maven-publish'
+apply plugin: "com.jfrog.bintray"
 
 repositories {
 	mavenCentral()
+	maven { url "http://dl.bintray.com/redundent/maven" }
 }
 
 dependencies {
@@ -24,4 +31,39 @@ dependencies {
 
 	testCompile 'junit:junit:4.12'
 	testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
+}
+
+
+task sourceJar(type: Jar) {
+	from sourceSets.main.allSource
+}
+
+artifacts {
+	archives sourceJar
+}
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			from components.java
+			artifact sourceJar {
+				classifier "sources"
+			}
+		}
+	}
+}
+
+if (rootProject.hasProperty("bintrayUser")) {
+	bintray {
+		user = getProperty('bintrayUser')
+		key = getProperty('bintrayApiKey')
+		publications = ['mavenJava']
+		pkg {
+			repo = 'maven'
+			name = 'kotlin-xml-builder'
+			userOrg = getProperty('bintrayUser')
+			licenses = ['Apache-2.0']
+			vcsUrl = 'https://github.com/redundent/kotlin-xml-builder.git'
+		}
+	}
 }
