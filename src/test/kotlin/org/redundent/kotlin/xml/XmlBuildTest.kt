@@ -135,7 +135,8 @@ class XmlBuildTest {
 	}
 
 	private fun validate(actual: String) {
-		assertEquals(TestUtils.getExpectedXml(testName.methodName), actual, "actual xml matches what is expected")
+		//Doing a replace to cater for different line endings.
+		assertEquals(TestUtils.getExpectedXml(testName.methodName), actual.replace(System.lineSeparator(), "\n"), "actual xml matches what is expected")
 
 		validateXml(actual)
 	}
