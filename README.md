@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/redundent/kotlin-xml-builder.svg?branch=master)](https://travis-ci.org/redundent/kotlin-xml-builder)
 Kotlin XML Builder
 =
 
