@@ -14,7 +14,23 @@ Apache 2.0
 
 Usage
 =
+The binaries can be downloaded here: http://dl.bintray.com/redundent/maven
 
+To use in Gradle, simply add the following repository and dependency
+```gradle
+repositories {
+    maven {
+        url "http://dl.bintray.com/redundent/maven"
+    }
+}
+
+dependencies {
+    compile 'org.redundent:kotlin-xml-builder:[VERSION]'
+}
+```
+
+Example
+=
 ```kotlin
 val people = xml("people") {
     xmlns = "http://example.com/people"
