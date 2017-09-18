@@ -14,14 +14,10 @@ Apache 2.0
 
 Usage
 =
-The binaries can be downloaded here: http://dl.bintray.com/redundent/maven
-
-To use in Gradle, simply add the following repository and dependency
+To use in Gradle, simply add the jcenter repository and then add the following dependency.
 ```gradle
 repositories {
-    maven {
-        url "http://dl.bintray.com/redundent/maven"
-    }
+    jcenter()
 }
 
 dependencies {
