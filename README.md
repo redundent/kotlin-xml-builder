@@ -14,12 +14,24 @@ Apache 2.0
 
 Usage
 =
+To use in Gradle, simply add the jcenter repository and then add the following dependency.
+```gradle
+repositories {
+    jcenter()
+}
 
+dependencies {
+    compile 'org.redundent:kotlin-xml-builder:[VERSION]'
+}
+```
+
+Example
+=
 ```kotlin
 val people = xml("people") {
     xmlns = "http://example.com/people"
     element("person") {
-        attribute("id", "1")
+        attribute("id", 1)
         element("firstName") {
             -"John"
         }

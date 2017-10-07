@@ -36,7 +36,7 @@ class CDATAElement(text: String, prettyFormat: Boolean = true) : TextElement(tex
 }
 
 /**
- * Base type for all elements. This is what handles pretty much all the redereing and building.
+ * Base type for all elements. This is what handles pretty much all the rendering and building.
  */
 open class Node(private val name: String, private val prettyFormat: Boolean = true) : Element {
 	/**
