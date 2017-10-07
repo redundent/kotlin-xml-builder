@@ -57,13 +57,13 @@ publishing {
 
 if (rootProject.hasProperty("bintrayUser")) {
 	bintray {
-		user = getProperty("bintrayUser").toString()
-		key = getProperty("bintrayApiKey").toString()
-		setPublications("mavenJava")
+		user = rootProject.property("bintrayUser").toString()
+		key = rootProject.property("bintrayApiKey").toString()
+		setPublications("maven")
 		pkg(closureOf<BintrayExtension.PackageConfig> {
 			repo = "maven"
 			name = "kotlin-xml-builder"
-			userOrg = getProperty("bintrayUser").toString()
+			userOrg = rootProject.property("bintrayUser").toString()
 			setLicenses("Apache-2.0")
 			vcsUrl = "https://github.com/redundent/kotlin-xml-builder.git"
 		})
