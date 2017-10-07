@@ -4,14 +4,12 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestName
 import org.xml.sax.SAXException
-import java.io.ByteArrayInputStream
 import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.test.assertEquals
 
 class XmlBuildTest {
+	@get:Rule
 	val testName = TestName()
-	@Rule
-	fun testName(): TestName = testName
 
 	@Test
 	fun basicTest() {
@@ -118,6 +116,15 @@ class XmlBuildTest {
 		validate(root.toString())
 	}
 
+	@Test
+	fun elementValue() {
+		val root = xml("root") {
+			element("name", "value")
+		}
+
+		validate(root.toString())
+	}
+
 	@Test(expected = SAXException::class)
 	fun invalidElementName() {
 		val root = xml("invalid root")
@@ -142,7 +149,7 @@ class XmlBuildTest {
 	}
 
 	private fun validateXml(actual: String) {
-		ByteArrayInputStream(actual.toByteArray()).use {
+		actual.byteInputStream().use {
 			DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it)
 		}
 	}

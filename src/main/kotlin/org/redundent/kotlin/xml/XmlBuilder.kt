@@ -6,7 +6,7 @@ import java.util.*
 /**
  * Base interface for all elements. You shouldn't have to interact with this interface directly.
  */
-interface Element {
+internal interface Element {
 	/**
 	 * This method handles creating the xml. Used internally
 	 */
@@ -61,7 +61,7 @@ open class Node(private val name: String, private val prettyFormat: Boolean = tr
 	var attributes = LinkedHashMap<String, Any>()
 	private val lineEnding = if (prettyFormat) System.lineSeparator() else ""
 
-	protected fun <T : Element> initTag(tag: T, init: (T.() -> Unit)?): T {
+	private fun <T : Element> initTag(tag: T, init: (T.() -> Unit)?): T {
 		if (init != null) {
 			tag.init()
 		}
@@ -146,6 +146,21 @@ open class Node(private val name: String, private val prettyFormat: Boolean = tr
 	fun element(name: String, init: (Node.() -> Unit)?): Node = initTag(Node(name, prettyFormat), init)
 
 	/**
+	 * Adds a basic element with the specific name and value to the parent. This cannot be used for complex elements.
+	 * <code>
+	 *     element("url", "https://google.com")
+	 * </code>
+	 *
+	 * @param name The name of the element.
+	 * @param value The inner text of the element
+	 */
+	fun element(name: String, value: String): Node {
+		return initTag(Node(name, prettyFormat)) {
+			-value
+		}
+	}
+
+	/**
 	 * Adds an attribute to the current element
 	 * <code>
 	 *     elenmet("url") {
@@ -201,16 +216,6 @@ open class Node(private val name: String, private val prettyFormat: Boolean = tr
 	 */
 	fun namespace(name: String, value: String) {
 		attributes["xmlns:$name"] = value
-	}
-
-	/**
-	 * Shorter alias for [namespace]
-	 *
-	 * @param name The name of the namespace.
-	 * @param value The url or descriptor of the namespace
-	 */
-	fun ns(name: String, value: String) {
-		namespace(name, value)
 	}
 }
 

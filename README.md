@@ -88,3 +88,11 @@ produces
     </person>
 </people>
 ```
+
+Release Notes
+=
+Version 1.1
+-
+* Added convenience method for elements with just a name and value. `element("name", "value")`
+* Removed `ns` method. Please use `namespace(...)` instead.
+* Upgraded Gradle version
