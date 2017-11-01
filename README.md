@@ -30,15 +30,15 @@ Example
 ```kotlin
 val people = xml("people") {
     xmlns = "http://example.com/people"
-    element("person") {
+    "person" {
         attribute("id", 1)
-        element("firstName") {
+        "firstName" {
             -"John"
         }
-        element("lastName") {
+        "lastName" {
             -"Doe"
         }
-        element("phone") {
+        "phone" {
             -"555-555-5555"
         }
     }
@@ -68,15 +68,15 @@ val listOfPeople = listOf(
 val people = xml("people") {
     xmlns = "http://example.com/people"
     for (person in listOfPeople) {
-        element("person") {
+        "person" {
             attribute("id", person.id)
-            element("firstName") {
+            "firstName" {
                 -person.firstName
             }
-            element("lastName") {
+            "lastName" {
                 -person.lastName
             }
-            element("phone") {
+            "phone" {
                 -person.phone
             }
         }
@@ -103,6 +103,13 @@ produces
 
 Release Notes
 =
+Version 1.2
+-
+* Added a `sitemap` method to allow for easy generation of sitemaps (which is what this project was created for in the first place).
+* Added `String.invoke` for elements allowing you to specify elements by just their name (see docs above)
+* Added some searching methods to search child nodes. `filter`, `first`, `firstOrNull`, and `exists`.
+* Added some mutation methods to allow you to add/remove/replace nodes in an element. 
+
 Version 1.1
 -
 * Added convenience method for elements with just a name and value. `element("name", "value")`

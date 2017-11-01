@@ -5,16 +5,16 @@ plugins {
 	kotlin("jvm", "1.1.51")
 	`maven-publish`
 	id("com.jfrog.bintray") version "1.5"
+	jacoco
 }
 
 group = "org.redundent"
-version = "1.1"
+version = "1.2"
 
 val kotlinVersion = "1.1.51"
 
 repositories {
 	jcenter()
-	maven("http://dl.bintray.com/redundent/maven")
 }
 
 tasks {

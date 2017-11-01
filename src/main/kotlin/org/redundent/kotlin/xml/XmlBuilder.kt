@@ -5,8 +5,9 @@ import java.util.*
 
 /**
  * Base interface for all elements. You shouldn't have to interact with this interface directly.
+ * @author Jason Blackwell
  */
-internal interface Element {
+private interface Element {
 	/**
 	 * This method handles creating the xml. Used internally
 	 */
@@ -16,9 +17,9 @@ internal interface Element {
 /**
  * An element type that has some text in it.
  * For example:
- * <loc>http://google.com</loc>
+ * <loc>http://blog.redundent.org</loc>
  */
-open class TextElement(val text: String, prettyFormat: Boolean = true) : Element {
+open class TextElement internal constructor(val text: String, prettyFormat: Boolean = true) : Element {
 	protected val lineEnding: String = if (prettyFormat) System.lineSeparator() else ""
 
 	override fun render(builder: StringBuilder, indent: String) {
@@ -29,7 +30,7 @@ open class TextElement(val text: String, prettyFormat: Boolean = true) : Element
 /**
  * Similar to a [TextElement] except that the inner text is wrapped inside a <![CDATA[]]> tag.
  */
-class CDATAElement(text: String, prettyFormat: Boolean = true) : TextElement(text, prettyFormat) {
+class CDATAElement internal constructor(text: String, prettyFormat: Boolean = true) : TextElement(text, prettyFormat) {
 	override fun render(builder: StringBuilder, indent: String) {
 		builder.append("$indent<![CDATA[$lineEnding$text$lineEnding]]>$lineEnding")
 	}
@@ -38,27 +39,23 @@ class CDATAElement(text: String, prettyFormat: Boolean = true) : TextElement(tex
 /**
  * Base type for all elements. This is what handles pretty much all the rendering and building.
  */
-open class Node(private val name: String, private val prettyFormat: Boolean = true) : Element {
+open class Node(val name: String, private val prettyFormat: Boolean = true) : Element {
 	/**
 	 * The default xmlns for the document. To add other namespaces, use the [namespace] method
 	 */
 	var xmlns: String?
-		get() = attributes["xmlns"] as? String
+		get() = this["xmlns"]
 		set(value) {
-			if (value == null) {
-				attributes.remove("xmlns")
-			} else {
-				attributes["xmlns"] = value
-			}
+			this["xmlns"] = value
 		}
-
-	private val children = ArrayList<Element>()
 
 	/**
 	 * Any attributes that belong to this element. You can either interact with this property directly or use the [get] and [set] operators
 	 * @sample [set]
 	 */
-	var attributes = LinkedHashMap<String, Any>()
+	val attributes = LinkedHashMap<String, Any>()
+
+	private val children = ArrayList<Element>()
 	private val lineEnding = if (prettyFormat) System.lineSeparator() else ""
 
 	private fun <T : Element> initTag(tag: T, init: (T.() -> Unit)?): T {
@@ -78,7 +75,7 @@ open class Node(private val name: String, private val prettyFormat: Boolean = tr
 	 */
 	operator fun <T> get(attributeName: String): T? {
 		@Suppress("UNCHECKED_CAST")
-		return attributes[attributeName] as? T?
+		return attributes[attributeName] as T?
 	}
 
 	/**
@@ -88,8 +85,12 @@ open class Node(private val name: String, private val prettyFormat: Boolean = tr
 	 *     element["key"] = "value"
 	 * </code>
 	 */
-	operator fun set(attributeName: String, value: Any) {
-		attributes[attributeName] = value
+	operator fun set(attributeName: String, value: Any?) {
+		if (value == null) {
+			attributes.remove(attributeName)
+		} else {
+			attributes[attributeName] = value
+		}
 	}
 
 	override fun render(builder: StringBuilder, indent: String) {
@@ -107,26 +108,20 @@ open class Node(private val name: String, private val prettyFormat: Boolean = tr
 	}
 
 	private fun renderAttributes(): String {
-		val builder = StringBuilder()
-		for (a in attributes.keys) {
-			builder.append(" $a=\"${attributes[a]}\"")
-		}
-		return builder.toString()
-	}
-
-	private fun getIndent(indent: String): String {
-		if (!prettyFormat) {
+		if (attributes.isEmpty()) {
 			return ""
 		}
 
-		return "$indent\t"
+		return " " + attributes.map {
+			"${it.key}=\"${it.value}\""
+		}.joinToString(" ")
 	}
 
-	override fun toString(): String {
-		val builder = StringBuilder()
-		render(builder, "")
-		return builder.toString().trim()
-	}
+	private fun getIndent(indent: String): String = if (!prettyFormat) "" else "$indent\t"
+
+	override fun toString(): String = StringBuilder().apply {
+		render(this, "")
+	}.toString().trim()
 
 	operator fun String.unaryMinus() {
 		children.add(TextElement(this, prettyFormat))
@@ -143,7 +138,7 @@ open class Node(private val name: String, private val prettyFormat: Boolean = tr
 	 * @param name The name of the element.
 	 * @param init The block that defines the content of the element.
 	 */
-	fun element(name: String, init: (Node.() -> Unit)?): Node = initTag(Node(name, prettyFormat), init)
+	fun element(name: String, init: (Node.() -> Unit)? = null): Node = initTag(Node(name, prettyFormat), init)
 
 	/**
 	 * Adds a basic element with the specific name and value to the parent. This cannot be used for complex elements.
@@ -154,16 +149,50 @@ open class Node(private val name: String, private val prettyFormat: Boolean = tr
 	 * @param name The name of the element.
 	 * @param value The inner text of the element
 	 */
-	fun element(name: String, value: String): Node {
-		return initTag(Node(name, prettyFormat)) {
-			-value
+	fun element(name: String, value: String): Node = initTag(Node(name, prettyFormat)) {
+		-value
+	}
+
+	/**
+	 * Adds a basic element with the specific name and value to the parent. This cannot be used for complex elements.
+	 * <code>
+	 *     "url"("https://google.com")
+	 * </code>
+	 *
+	 * @receiver The name of the element.
+	 * @param value The inner text of the element
+	 */
+	operator fun String.invoke(value: String): Node = element(this, value)
+
+	/**
+	 * Adds a basic element with the specific name to the parent. This method
+	 * allows you to specify optional attributes and content
+	 * <code>
+	 *     "url"("key" to "value") {
+	 *     		...
+	 *     }
+	 * </code>
+	 *
+	 * @receiver The name of the element.
+	 * @param attributes Any attributes to add to this element. Can be omited.
+	 * @param init The block that defines the content of the element.
+	 */
+	operator fun String.invoke(vararg attributes: Pair<String, Any>, init: (Node.() -> Unit)? = null): Node {
+		val e = element(this) {
+			attributes(*attributes)
 		}
+
+		if (init != null) {
+			e.apply(init)
+		}
+
+		return e
 	}
 
 	/**
 	 * Adds an attribute to the current element
 	 * <code>
-	 *     elenmet("url") {
+	 *     "url" {
 	 *         attribute("key", "value")
 	 *     }
 	 * </code>
@@ -180,7 +209,7 @@ open class Node(private val name: String, private val prettyFormat: Boolean = tr
 	 * @see [attribute]
 	 *
 	 * <code>
-	 *     element("url") {
+	 *     "url" {
 	 *         attributes(
 	 *             "key" to "value",
 	 *             "id" to "1"
@@ -206,7 +235,7 @@ open class Node(private val name: String, private val prettyFormat: Boolean = tr
 	/**
 	 * Adds the specified namespace to the element.
 	 * <code>
-	 *     element("url") {
+	 *     "url" {
 	 *         namespace("t", "http://someurl.org")
 	 *     }
 	 * </code>
@@ -217,12 +246,120 @@ open class Node(private val name: String, private val prettyFormat: Boolean = tr
 	fun namespace(name: String, value: String) {
 		attributes["xmlns:$name"] = value
 	}
-}
 
-/**
- * Root element for all xml structures. Don't access this class directly. You should use [xml] instead.
- */
-class Xml(root: String, prettyFormat: Boolean) : Node(root, prettyFormat)
+	/**
+	 * Adds a node to the element.
+	 * @param node The node to append.
+	 */
+	fun addNode(node: Node) {
+		children.add(node)
+	}
+
+	/**
+	 * Adds a node to the element after the specific node.
+	 * @param node The node to add
+	 * @param after The node to add [node] after
+	 *
+	 * @throws IllegalArgumentException If [after] can't be found
+	 */
+	fun addNodeAfter(node: Node, after: Node) {
+		val index = findIndex(after)
+		if (index + 1 == children.size) {
+			children.add(node)
+		} else {
+			children.add(index + 1, node)
+		}
+	}
+
+	/**
+	 * Adds a node to the element before the specific node.
+	 * @param node The node to add
+	 * @param before The node to add [node] before
+	 *
+	 * @throws IllegalArgumentException If [before] can't be found
+	 */
+	fun addNodeBefore(node: Node, before: Node) {
+		children.add(findIndex(before), node)
+	}
+
+	/**
+	 * Removes a node from the element
+	 * @param node The node to remove
+	 *
+	 * @throws IllegalArgumentException If [node] can't be found
+	 */
+	fun removeNode(node: Node) {
+		val index = findIndex(node)
+		children.removeAt(index)
+	}
+
+	/**
+	 * Replaces a node with a different node
+	 * @param existing The existing node to replace
+	 * @param newNode The node to replace [existing] with
+	 *
+	 * @throws IllegalArgumentException If [existing] can't be found
+	 */
+	fun replaceNode(existing: Node, newNode: Node) {
+		val index = findIndex(existing)
+
+		children.removeAt(index)
+		children.add(index, newNode)
+	}
+
+	/**
+	 * Returns a list containing only elements whose name matches [name].
+	 */
+	fun filter(name: String): List<Node> = filter { it.name == name }
+
+	/**
+	 * Returns a list containing only elements matching the given [predicate].
+	 */
+	fun filter(predicate: (Node) -> Boolean): List<Node> = filterChildrenToNodes().filter(predicate)
+
+	/**
+	 * Returns the first element whose name matches [name].
+	 * @throws [NoSuchElementException] if no such element is found.
+	 */
+	fun first(name: String): Node = first { it.name == name }
+
+	/**
+	 * Returns the first element matching the given [predicate].
+	 * @throws [NoSuchElementException] if no such element is found.
+	 */
+	fun first(predicate: (Node) -> Boolean): Node = filterChildrenToNodes().first(predicate)
+
+	/**
+	 * Returns the first element whose name matches [name], or `null` if element was not found.
+	 */
+	fun firstOrNull(name: String): Node? = firstOrNull { it.name == name }
+
+	/**
+	 * Returns the first element matching the given [predicate], or `null` if element was not found.
+	 */
+	fun firstOrNull(predicate: (Node) -> Boolean): Node? = filterChildrenToNodes().firstOrNull(predicate)
+
+	/**
+	 * Returns `true` if at least one element's name matches [name].
+	 */
+	fun exists(name: String): Boolean = exists { it.name == name }
+
+	/**
+	 * Returns `true` if at least one element matches the given [predicate].
+	 */
+	fun exists(predicate: (Node) -> Boolean): Boolean = filterChildrenToNodes().any(predicate)
+
+	private fun filterChildrenToNodes(): List<Node> = children.filterIsInstance(Node::class.java)
+
+	private fun findIndex(node: Node): Int {
+		val index = children.indexOf(node)
+		if (index == -1) {
+			throw IllegalArgumentException("Node with name '${node.name}' is not a child of '$name'")
+		}
+
+		return index
+	}
+}
 
 /**
  * Creates a new xml document with the specified root element name
@@ -230,10 +367,24 @@ class Xml(root: String, prettyFormat: Boolean) : Node(root, prettyFormat)
  * @param root The root element name
  * @param init The block that defines the content of the xml
  */
-fun xml(root: String, prettyFormat: Boolean = true, init: (Xml.() -> Unit)? = null): Xml {
-	val xml = Xml(root, prettyFormat)
+fun xml(root: String, prettyFormat: Boolean = true, init: (Node.() -> Unit)? = null): Node {
+	val node = Node(root, prettyFormat)
 	if (init != null) {
-		xml.init()
+		node.init()
 	}
-	return xml
+	return node
+}
+
+/**
+ * Creates a new xml document with the specified root element name
+ *
+ * @param name The name of the element
+ * @param init The block that defines the content of the xml
+ */
+fun node(name: String, prettyFormat: Boolean = true, init: (Node.() -> Unit)? = null): Node {
+	val node = Node(name, prettyFormat)
+	if (init != null) {
+		node.init()
+	}
+	return node
 }
