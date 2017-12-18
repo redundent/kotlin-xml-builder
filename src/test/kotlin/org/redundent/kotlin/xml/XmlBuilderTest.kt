@@ -2,6 +2,7 @@ package org.redundent.kotlin.xml
 
 import org.junit.Test
 import org.xml.sax.SAXException
+import java.io.ByteArrayInputStream
 import kotlin.test.*
 
 class XmlBuilderTest : XmlBuilderTestBase() {
@@ -314,5 +315,47 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 		root.replaceNode(root.first("b"), node("c"))
 
 		validate(root)
+	}
+
+	@Test
+	fun parseAndVerify() {
+		val xmlns = "http://blog.redundent.org"
+		val value = "value"
+		val input = ByteArrayInputStream("<root xmlns=\"$xmlns\"><child>$value</child></root>".toByteArray())
+
+		val root = parse(input)
+
+		assertEquals("root", root.name, "root element name is correct")
+		assertEquals(xmlns, root.xmlns, "root xmlns is correct")
+
+		val children = root.children
+		assertEquals(1, children.size, "root has 1 child")
+		assertTrue(children[0] is Node, "child is a node")
+
+		val child = children.first() as Node
+		assertTrue(child.children[0] is TextElement, "element is text")
+		assertEquals(value, (child.children[0] as TextElement).text)
+	}
+
+	@Test
+	fun parseCData() = parseTest()
+
+	@Test
+	fun parseCustomNamespaces() = parseTest()
+
+	@Test
+	fun praseMultipleAttributes() = parseTest()
+
+	@Test
+	fun parseBasicTest() = parseTest()
+
+	@Test
+	fun parseXmlEncode() = parseTest()
+
+	private fun parseTest() {
+		val input = getInputStream()
+		val xml = parse(input)
+
+		validateTest(xml)
 	}
 }

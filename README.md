@@ -103,6 +103,11 @@ produces
 
 Release Notes
 =
+Version 1.3
+-
+* Added ability to parse an xml document into a builder object using the new `parse` method.
+* Upgrading Gradle and Kotlin versions.
+
 Version 1.2
 -
 * Added a `sitemap` method to allow for easy generation of sitemaps (which is what this project was created for in the first place).

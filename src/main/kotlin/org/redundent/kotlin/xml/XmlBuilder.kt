@@ -1,13 +1,20 @@
 package org.redundent.kotlin.xml
 
 import org.apache.commons.lang3.StringEscapeUtils
+import org.w3c.dom.Document
+import org.xml.sax.InputSource
+import java.io.File
+import java.io.InputStream
 import java.util.*
+import javax.xml.parsers.DocumentBuilderFactory
+
+import org.w3c.dom.Node as W3CNode
 
 /**
  * Base interface for all elements. You shouldn't have to interact with this interface directly.
  * @author Jason Blackwell
  */
-private interface Element {
+interface Element {
 	/**
 	 * This method handles creating the xml. Used internally
 	 */
@@ -55,14 +62,18 @@ open class Node(val name: String, private val prettyFormat: Boolean = true) : El
 	 */
 	val attributes = LinkedHashMap<String, Any>()
 
-	private val children = ArrayList<Element>()
+	private val _children = ArrayList<Element>()
+
+	val children: List<Element>
+		get() = _children
+
 	private val lineEnding = if (prettyFormat) System.lineSeparator() else ""
 
 	private fun <T : Element> initTag(tag: T, init: (T.() -> Unit)?): T {
 		if (init != null) {
 			tag.init()
 		}
-		children.add(tag)
+		_children.add(tag)
 		return tag
 	}
 
@@ -96,9 +107,9 @@ open class Node(val name: String, private val prettyFormat: Boolean = true) : El
 	override fun render(builder: StringBuilder, indent: String) {
 		builder.append("$indent<$name${renderAttributes()}")
 
-		if (children.isNotEmpty()) {
+		if (_children.isNotEmpty()) {
 			builder.append(">$lineEnding")
-			for (c in children) {
+			for (c in _children) {
 				c.render(builder, getIndent(indent))
 			}
 			builder.append("$indent</$name>$lineEnding")
@@ -123,8 +134,10 @@ open class Node(val name: String, private val prettyFormat: Boolean = true) : El
 		render(this, "")
 	}.toString().trim()
 
-	operator fun String.unaryMinus() {
-		children.add(TextElement(this, prettyFormat))
+	operator fun String.unaryMinus() = text(this)
+
+	fun text(text: String) {
+		_children.add(TextElement(text, prettyFormat))
 	}
 
 	/**
@@ -229,7 +242,7 @@ open class Node(val name: String, private val prettyFormat: Boolean = true) : El
 	 * @param text The inner text of the CDATA element.
 	 */
 	fun cdata(text: String) {
-		children.add(CDATAElement(text, prettyFormat))
+		_children.add(CDATAElement(text, prettyFormat))
 	}
 
 	/**
@@ -252,7 +265,7 @@ open class Node(val name: String, private val prettyFormat: Boolean = true) : El
 	 * @param node The node to append.
 	 */
 	fun addNode(node: Node) {
-		children.add(node)
+		_children.add(node)
 	}
 
 	/**
@@ -264,10 +277,10 @@ open class Node(val name: String, private val prettyFormat: Boolean = true) : El
 	 */
 	fun addNodeAfter(node: Node, after: Node) {
 		val index = findIndex(after)
-		if (index + 1 == children.size) {
-			children.add(node)
+		if (index + 1 == _children.size) {
+			_children.add(node)
 		} else {
-			children.add(index + 1, node)
+			_children.add(index + 1, node)
 		}
 	}
 
@@ -279,7 +292,7 @@ open class Node(val name: String, private val prettyFormat: Boolean = true) : El
 	 * @throws IllegalArgumentException If [before] can't be found
 	 */
 	fun addNodeBefore(node: Node, before: Node) {
-		children.add(findIndex(before), node)
+		_children.add(findIndex(before), node)
 	}
 
 	/**
@@ -290,7 +303,7 @@ open class Node(val name: String, private val prettyFormat: Boolean = true) : El
 	 */
 	fun removeNode(node: Node) {
 		val index = findIndex(node)
-		children.removeAt(index)
+		_children.removeAt(index)
 	}
 
 	/**
@@ -303,8 +316,8 @@ open class Node(val name: String, private val prettyFormat: Boolean = true) : El
 	fun replaceNode(existing: Node, newNode: Node) {
 		val index = findIndex(existing)
 
-		children.removeAt(index)
-		children.add(index, newNode)
+		_children.removeAt(index)
+		_children.add(index, newNode)
 	}
 
 	/**
@@ -349,10 +362,10 @@ open class Node(val name: String, private val prettyFormat: Boolean = true) : El
 	 */
 	fun exists(predicate: (Node) -> Boolean): Boolean = filterChildrenToNodes().any(predicate)
 
-	private fun filterChildrenToNodes(): List<Node> = children.filterIsInstance(Node::class.java)
+	private fun filterChildrenToNodes(): List<Node> = _children.filterIsInstance(Node::class.java)
 
 	private fun findIndex(node: Node): Int {
-		val index = children.indexOf(node)
+		val index = _children.indexOf(node)
 		if (index == -1) {
 			throw IllegalArgumentException("Node with name '${node.name}' is not a child of '$name'")
 		}
@@ -387,4 +400,57 @@ fun node(name: String, prettyFormat: Boolean = true, init: (Node.() -> Unit)? = 
 		node.init()
 	}
 	return node
+}
+
+fun parse(f: File): Node = parse(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(f))
+fun parse(uri: String): Node = parse(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(uri))
+fun parse(`is`: InputSource): Node = parse(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(`is`))
+fun parse(`is`: InputStream): Node = parse(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(`is`))
+fun parse(`is`: InputStream, systemId: String): Node = parse(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(`is`, systemId))
+
+private fun parse(document: Document): Node {
+	val root = document.documentElement
+
+	val result = xml(root.tagName, prettyFormat = false)
+
+	copyAttributes(root, result)
+
+	val children = root.childNodes
+	(0 until children.length)
+			.map(children::item)
+			.forEach { copy(it, result) }
+
+	return result
+}
+
+private fun copy(source: W3CNode, dest: Node) {
+	when (source.nodeType) {
+		W3CNode.ELEMENT_NODE -> {
+			val cur = dest.element(source.nodeName)
+
+			copyAttributes(source, cur)
+
+			val children = source.childNodes
+			(0 until children.length)
+					.map(children::item)
+					.forEach { copy(it, cur) }
+		}
+		W3CNode.CDATA_SECTION_NODE -> {
+			dest.cdata(source.nodeValue)
+		}
+		W3CNode.TEXT_NODE -> {
+			dest.text(source.nodeValue)
+		}
+	}
+}
+
+private fun copyAttributes(source: W3CNode, dest: Node) {
+	val attributes = source.attributes
+	if (attributes == null || attributes.length == 0) {
+		return
+	}
+
+	(0 until attributes.length)
+			.map(attributes::item)
+			.forEach { dest.attribute(it.nodeName, it.nodeValue) }
 }

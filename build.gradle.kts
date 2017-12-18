@@ -2,16 +2,16 @@ import com.jfrog.bintray.gradle.BintrayExtension
 import org.gradle.jvm.tasks.Jar
 
 plugins {
-	kotlin("jvm", "1.1.51")
+	kotlin("jvm") version "1.2.0"
 	`maven-publish`
 	id("com.jfrog.bintray") version "1.5"
 	jacoco
 }
 
 group = "org.redundent"
-version = "1.2"
+version = "1.3"
 
-val kotlinVersion = "1.1.51"
+val kotlinVersion = "1.2.0"
 
 repositories {
 	jcenter()
@@ -27,7 +27,7 @@ tasks {
 	}
 
 	"wrapper"(Wrapper::class) {
-		gradleVersion = "4.2.1"
+		gradleVersion = "4.4"
 	}
 }
 
