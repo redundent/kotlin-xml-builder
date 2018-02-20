@@ -1,3 +1,4 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.kotlin.dsl.get
 import com.jfrog.bintray.gradle.BintrayExtension
 
@@ -16,6 +17,10 @@ tasks {
 		manifest {
 			attributes(mapOf("Main-Class" to "org.redundent.kotlin.xml.gen.DslGeneratorKt"))
 		}
+	}
+
+	val shadowJar by getting(ShadowJar::class) {
+		classifier = null
 	}
 }
 
