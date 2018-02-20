@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			elementFormDefault="qualified">
+	<xsd:complexType name="Type1" />
+	<xsd:complexType name="Type2" />
+	<xsd:complexType name="Type3" />
+
+	<xsd:element name="Method-Name">
+		<xsd:complexType>
+			<xsd:choice maxOccurs="unbounded">
+				<xsd:element name="type1" type="Type1"/>
+				<xsd:element name="type2" type="Type2"/>
+				<xsd:element name="type3" type="Type3"/>
+			</xsd:choice>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

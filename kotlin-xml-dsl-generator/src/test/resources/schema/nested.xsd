@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			elementFormDefault="qualified">
+	<xsd:element name="top">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="first">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="second">
+								<xsd:complexType>
+									<xsd:attribute name="Name" type="xsd:string"/>
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:sequence>
+
+						<xsd:attribute name="Id" type="xsd:long" use="required"/>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>
