@@ -1,3 +1,5 @@
+[ ![Download](https://api.bintray.com/packages/redundent/maven/kotlin-xml-dsl-generator/images/download.svg) ](https://bintray.com/redundent/maven/kotlin-xml-dsl-generator/_latestVersion)
+
 Kotlin XML Builder DSL Generator
 =
 
