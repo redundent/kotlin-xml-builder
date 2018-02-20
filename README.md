@@ -107,7 +107,7 @@ Release Notes
 =
 Version 1.4
 -
-#####BREAKING CHANGES
+**BREAKING CHANGES**
 * `org.redundent.kotlin.xml.Node.name` has been renamed to `org.redundent.kotlin.xml.Node.nodeName` to avoid clashes with attributes called `name`.
 ---
 * Adding DSL generator project to generate kotlin-xml-builder DSL from a schema file.
