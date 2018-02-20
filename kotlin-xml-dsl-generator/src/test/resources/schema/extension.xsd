@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			elementFormDefault="qualified">
+	<xsd:element name="a">
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="BaseType">
+					<xsd:attribute name="Top" type="xsd:string"/>
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="b">
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="BaseType">
+					<xsd:attribute name="Middle" type="xsd:string"/>
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:complexType name="BaseType" abstract="true">
+		<xsd:attribute name="Name" type="xsd:string"/>
+	</xsd:complexType>
+</xsd:schema>

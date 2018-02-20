@@ -105,6 +105,14 @@ produces
 
 Release Notes
 =
+Version 1.4
+-
+**BREAKING CHANGES**
+* `org.redundent.kotlin.xml.Node.name` has been renamed to `org.redundent.kotlin.xml.Node.nodeName` to avoid clashes with attributes called `name`.
+---
+* Adding DSL generator project to generate kotlin-xml-builder DSL from a schema file.
+See [kotlin-xml-dsl-generator](./kotlin-xml-dsl-generator) for details
+
 Version 1.3
 -
 * Added ability to parse an xml document into a builder object using the new `parse` method.

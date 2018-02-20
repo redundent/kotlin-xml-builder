@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			targetNamespace="http://code.redundent.org/schemas"
+			xmlns="http://code.redundent.org/schemas"
+			elementFormDefault="qualified">
+	<xsd:element name="code">
+		<xsd:complexType>
+			<xsd:attribute name="id" type="xsd:long"/>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

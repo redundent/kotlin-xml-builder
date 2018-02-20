@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			elementFormDefault="qualified">
+	<xsd:element name="attributes">
+		<xsd:complexType>
+			<xsd:attribute name="uri" type="xsd:anyURI"/>
+			<xsd:attribute name="base64Binary" type="xsd:base64Binary"/>
+			<xsd:attribute name="boolean" type="xsd:boolean"/>
+			<xsd:attribute name="byte" type="xsd:byte"/>
+			<xsd:attribute name="date" type="xsd:date"/>
+			<xsd:attribute name="dateTime" type="xsd:dateTime"/>
+			<xsd:attribute name="decimal" type="xsd:decimal"/>
+			<xsd:attribute name="double" type="xsd:double"/>
+			<xsd:attribute name="duration" type="xsd:duration"/>
+			<xsd:attribute name="float" type="xsd:float"/>
+			<xsd:attribute name="gDay" type="xsd:gDay"/>
+			<xsd:attribute name="gMonth" type="xsd:gMonth"/>
+			<xsd:attribute name="gMonthDay" type="xsd:gMonthDay"/>
+			<xsd:attribute name="gYear" type="xsd:gYear"/>
+			<xsd:attribute name="gYearMonth" type="xsd:gYearMonth"/>
+			<xsd:attribute name="hexBinary" type="xsd:hexBinary"/>
+			<xsd:attribute name="int" type="xsd:int"/>
+			<xsd:attribute name="integer" type="xsd:integer"/>
+			<xsd:attribute name="long" type="xsd:long"/>
+			<xsd:attribute name="negativeInteger" type="xsd:negativeInteger"/>
+			<xsd:attribute name="nonNegativeInteger" type="xsd:nonNegativeInteger"/>
+			<xsd:attribute name="nonPositiveInteger" type="xsd:nonPositiveInteger"/>
+			<xsd:attribute name="positiveInteger" type="xsd:positiveInteger"/>
+			<xsd:attribute name="string" type="xsd:string"/>
+			<xsd:attribute name="short" type="xsd:short"/>
+			<xsd:attribute name="time" type="xsd:time"/>
+			<xsd:attribute name="token" type="xsd:token"/>
+			<xsd:attribute name="unsignedByte" type="xsd:unsignedByte"/>
+			<xsd:attribute name="unsignedInt" type="xsd:unsignedInt"/>
+			<xsd:attribute name="unsignedLong" type="xsd:unsignedLong"/>
+			<xsd:attribute name="unsignedShort" type="xsd:unsignedShort"/>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

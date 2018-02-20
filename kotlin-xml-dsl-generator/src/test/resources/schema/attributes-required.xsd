@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			elementFormDefault="qualified">
+	<xsd:element name="attributesRequired">
+		<xsd:complexType>
+			<xsd:attribute name="uri" type="xsd:anyURI" use="required"/>
+			<xsd:attribute name="base64Binary" type="xsd:base64Binary" use="required"/>
+			<xsd:attribute name="boolean" type="xsd:boolean" use="required"/>
+			<xsd:attribute name="byte" type="xsd:byte" use="required"/>
+			<xsd:attribute name="date" type="xsd:date" use="required"/>
+			<xsd:attribute name="dateTime" type="xsd:dateTime" use="required"/>
+			<xsd:attribute name="decimal" type="xsd:decimal" use="required"/>
+			<xsd:attribute name="double" type="xsd:double" use="required"/>
+			<xsd:attribute name="duration" type="xsd:duration" use="required"/>
+			<xsd:attribute name="float" type="xsd:float" use="required"/>
+			<xsd:attribute name="gDay" type="xsd:gDay" use="required"/>
+			<xsd:attribute name="gMonth" type="xsd:gMonth" use="required"/>
+			<xsd:attribute name="gMonthDay" type="xsd:gMonthDay" use="required"/>
+			<xsd:attribute name="gYear" type="xsd:gYear" use="required"/>
+			<xsd:attribute name="gYearMonth" type="xsd:gYearMonth" use="required"/>
+			<xsd:attribute name="hexBinary" type="xsd:hexBinary" use="required"/>
+			<xsd:attribute name="int" type="xsd:int" use="required"/>
+			<xsd:attribute name="integer" type="xsd:integer" use="required"/>
+			<xsd:attribute name="long" type="xsd:long" use="required"/>
+			<xsd:attribute name="negativeInteger" type="xsd:negativeInteger" use="required"/>
+			<xsd:attribute name="nonNegativeInteger" type="xsd:nonNegativeInteger" use="required"/>
+			<xsd:attribute name="nonPositiveInteger" type="xsd:nonPositiveInteger" use="required"/>
+			<xsd:attribute name="positiveInteger" type="xsd:positiveInteger" use="required"/>
+			<xsd:attribute name="string" type="xsd:string" use="required"/>
+			<xsd:attribute name="short" type="xsd:short" use="required"/>
+			<xsd:attribute name="time" type="xsd:time" use="required"/>
+			<xsd:attribute name="token" type="xsd:token" use="required"/>
+			<xsd:attribute name="unsignedByte" type="xsd:unsignedByte" use="required"/>
+			<xsd:attribute name="unsignedInt" type="xsd:unsignedInt" use="required"/>
+			<xsd:attribute name="unsignedLong" type="xsd:unsignedLong" use="required"/>
+			<xsd:attribute name="unsignedShort" type="xsd:unsignedShort" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>
