@@ -50,11 +50,12 @@ Options:
 
 class DslGenerator(private val opts: Options) {
 	fun generate(): String {
-		val model = ModelLoader.load(opts, JCodeModel(), ErrReceiver())
+		val model = ModelLoader.load(opts, JCodeModel(), ErrReceiver()) ?: throw BadCommandLineException("Something failed generating the code model")
+
 		val outline = BeanGenerator.generate(model, ErrReceiver())
 
 		val codeWriter = CodeWriter(outline)
-		codeWriter.writeln("@file:Suppress(\"PropertyName\", \"ReplaceArrayOfWithLiteral\", \"LocalVariableName\")\n")
+		codeWriter.writeln("@file:Suppress(\"PropertyName\", \"ReplaceArrayOfWithLiteral\", \"LocalVariableName\", \"FunctionName\", \"RemoveEmptyClassBody\")\n")
 		codeWriter.writePackage(opts.defaultPackage)
 		codeWriter.writeImport("org.redundent.kotlin.xml.*\n")
 
@@ -67,14 +68,15 @@ class DslGenerator(private val opts: Options) {
 }
 
 class ErrReceiver : ErrorReceiver() {
-	override fun warning(exception: SAXParseException?) {
+	override fun warning(exception: SAXParseException) {
 		println(exception)
 	}
 
-	override fun info(exception: SAXParseException?) {
+	override fun info(exception: SAXParseException) {
 		println(exception)
 	}
 
 	override fun error(exception: SAXParseException) = throw exception
 	override fun fatalError(exception: SAXParseException) = throw exception
+
 }

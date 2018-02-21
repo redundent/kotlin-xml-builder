@@ -1,40 +1,40 @@
-@file:Suppress("PropertyName", "ReplaceArrayOfWithLiteral", "LocalVariableName")
+@file:Suppress("PropertyName", "ReplaceArrayOfWithLiteral", "LocalVariableName", "FunctionName", "RemoveEmptyClassBody")
 
 package org.redundent.generated
 
 import org.redundent.kotlin.xml.*
 
 open class `Top`(nodeName: String) : Node(nodeName) {
+	inner class `First` : Node("First") {
+		var `Id`: kotlin.Long by attributes
+		inner class `Second` : Node("Second") {
+			var `Name`: kotlin.String? by attributes
+		}
+
+	}
+
+	fun `First`.`second`(`Name`: kotlin.String? = null,
+						 __block__: `First`.`Second`.() -> Unit) {
+		val `second` = `Second`()
+		`second`.apply {
+			if (`Name` != null) {
+				this.`Name` = `Name`
+			}
+		}
+		`second`.apply(__block__)
+		this.addNode(`second`)
+	}
+
 }
 
 fun `Top`.`first`(`Id`: kotlin.Long,
-				  __block__: `First`.() -> Unit) {
-	val `first` = `First`("first")
+				  __block__: `Top`.`First`.() -> Unit) {
+	val `first` = `First`()
 	`first`.apply {
 		this.`Id` = `Id`
 	}
 	`first`.apply(__block__)
 	this.addNode(`first`)
-}
-
-open class `First`(nodeName: String) : Node(nodeName) {
-	var `Id`: kotlin.Long by attributes
-}
-
-fun `First`.`second`(`Name`: kotlin.String? = null,
-					 __block__: `Second`.() -> Unit) {
-	val `second` = `Second`("second")
-	`second`.apply {
-		if (`Name` != null) {
-			this.`Name` = `Name`
-		}
-	}
-	`second`.apply(__block__)
-	this.addNode(`second`)
-}
-
-open class `Second`(nodeName: String) : Node(nodeName) {
-	var `Name`: kotlin.String? by attributes
 }
 
 fun `top`(__block__: `Top`.() -> Unit): `Top` {

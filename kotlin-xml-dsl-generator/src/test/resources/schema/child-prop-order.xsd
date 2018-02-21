@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			elementFormDefault="qualified">
+	<xsd:element name="ChildPropOrder">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="Child1" type="xsd:string"/>
+				<xsd:element name="child2" type="xsd:string"/>
+				<xsd:element name="CHILD3" type="xsd:string"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

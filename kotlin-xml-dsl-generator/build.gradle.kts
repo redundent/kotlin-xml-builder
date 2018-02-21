@@ -49,7 +49,7 @@ if (rootProject.hasProperty("bintrayUser")) {
 		setPublications("maven")
 		pkg(closureOf<BintrayExtension.PackageConfig> {
 			repo = "maven"
-			name = "kotlin-xml-builder"
+			name = "kotlin-xml-dsl-generator"
 			userOrg = rootProject.property("bintrayUser").toString()
 			setLicenses("Apache-2.0")
 			vcsUrl = "https://github.com/redundent/kotlin-xml-builder.git"

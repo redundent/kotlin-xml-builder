@@ -33,4 +33,10 @@ class SimpleSchemGen : AbstractGenTest() {
 
 	@Test
 	fun choice() = run()
+
+	@Test
+	fun `duplicate-names`() = run()
+
+	@Test
+	fun `child-prop-order`() = run()
 }

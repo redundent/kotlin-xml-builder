@@ -20,11 +20,17 @@ class CodeWriter(private val outline: Outline) {
 		writeln("import $importStatement")
 	}
 
-	private fun writeClass(clazz: ClassOutline, block: () -> Unit) {
+	private fun writeClass(clazz: ClassOutline, innerClass: Boolean, block: () -> Unit) {
 		val target = clazz.target
-		val modifier = if (target.isAbstract) "abstract" else "open"
-		val superClass = clazz.superClass?.target?.shortName ?: "Node"
-		writeln("$modifier class `${target.shortName}`(nodeName: String) : $superClass(nodeName) {")
+		val modifier = if (target.isAbstract)
+			"abstract"
+		else if (innerClass)
+			"inner"
+		else
+			"open"
+
+		val superClass = (clazz.superClass?.target?.let { "${it.ownerPackage.name()}.`${it.shortName}`" } ?: "Node")
+		writeln("$modifier class `${target.shortName}`${if (!innerClass) "(nodeName: String)" else ""} : $superClass(${if (innerClass) "\"${target.shortName}\"" else "nodeName"}) {")
 		indent()
 
 		block()
@@ -74,33 +80,45 @@ class CodeWriter(private val outline: Outline) {
 	}
 
 	fun writeClasses() {
-		outline.classes.sortedBy { if (it.target.isAbstract) 0 else 1 }.forEach { clazz ->
-			writeKotlinDoc(clazz.target.documentation)
+		val sortedClasses = outline.classes
+				//Only get root classes, no inner classes
+				.filter { it.target.parent() is CClassInfoParent.Package }
+				.sortedBy { if (it.target.isAbstract) 0 else 1 }
 
-			if (clazz.target.isOrdered && clazz.target.elements.size > 1) {
-				writeln("@XmlType(childOrder = arrayOf(${clazz.target.elements.joinToString(",\n\t\t") { "\"${it.getName(false)}\"" }}))")
-			}
+		val parentMap = outline.classes.filter { it.target.parent() is CClassInfo }.groupBy { it.target.parent() as CClassInfo }
 
-			writeClass(clazz) {
-				if (clazz.target.isElement) {
-					val ns = clazz.target.elementName.namespaceURI
-					if (ns != null && ns.isNotEmpty()) {
-						writeln("init {")
-						writeln("\txmlns = \"$ns\"")
-						writeln("}\n")
-					}
-				}
-
-				appendAttributes(clazz.target)
-			}
-
-			processElements(clazz.target)
-		}
+		sortedClasses.forEach { writeClass(it, parentMap) }
 
 		outline.classes.filter { it.target.isElement }.forEach { element ->
 			val name = element.target.elementName.localPart
 			processElement("`$name`", name, element.target, element.target.documentation, true)
 		}
+	}
+
+	private fun writeClass(clazz: ClassOutline, parentMap: Map<CClassInfo, List<ClassOutline>>, innerClass: Boolean = false) {
+		writeKotlinDoc(clazz.target.documentation)
+
+		if (clazz.target.isOrdered && clazz.target.elements.size > 1) {
+			writeln("@XmlType(childOrder = arrayOf(${clazz.target.elements.joinToString(",\n\t\t") { "\"${it.types.first().tagName.localPart}\"" }}))")
+		}
+
+		writeClass(clazz, innerClass) {
+			if (clazz.target.isElement) {
+				val ns = clazz.target.elementName.namespaceURI
+				if (ns != null && ns.isNotEmpty()) {
+					writeln("init {")
+					writeln("\txmlns = \"$ns\"")
+					writeln("}\n")
+				}
+			}
+
+			appendAttributes(clazz.target)
+
+			val innerClasses = parentMap[clazz.target]
+			innerClasses?.forEach { writeClass(it, parentMap, true) }
+		}
+
+		processElements(clazz.target)
 	}
 
 	private fun processElements(clazz: CClassInfo) {
@@ -120,10 +138,11 @@ class CodeWriter(private val outline: Outline) {
 		write(funLine)
 
 		if (type is CClassInfo) {
-			writeln("(${type.attributesAsParameters(funLine.length + 1)}__block__: `${type.shortName}`.() -> Unit)${if (rootElement) ": `${type.shortName}`" else ""} {")
+			val blockParamType = "${((type.parent() as? CClassInfo)?.let { "`${it.shortName}`." } ?: "")}`${type.shortName}`"
+			writeln("(${type.attributesAsParameters(funLine.length + (currentIndex * 4) + 1)}__block__: $blockParamType.() -> Unit)${if (rootElement) ": `${type.shortName}`" else ""} {", false)
 			indent()
-			writeln("val `$tagName` = `${type.shortName}`(\"$tagName\")")
-			if (type.attributes.isNotEmpty()) {
+			writeln("val `$tagName` = `${type.shortName}`(${if (type.parent() is CClassInfo) "" else "\"$tagName\""})")
+			if (type.allAttributes.isNotEmpty()) {
 				writeln("`$tagName`.apply {")
 				indent()
 				for (attr in type.allAttributes) {

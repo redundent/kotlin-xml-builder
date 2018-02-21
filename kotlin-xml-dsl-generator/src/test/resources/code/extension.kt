@@ -1,4 +1,4 @@
-@file:Suppress("PropertyName", "ReplaceArrayOfWithLiteral", "LocalVariableName")
+@file:Suppress("PropertyName", "ReplaceArrayOfWithLiteral", "LocalVariableName", "FunctionName", "RemoveEmptyClassBody")
 
 package org.redundent.generated
 
@@ -8,11 +8,11 @@ abstract class `BaseType`(nodeName: String) : Node(nodeName) {
 	var `Name`: kotlin.String? by attributes
 }
 
-open class `A`(nodeName: String) : BaseType(nodeName) {
+open class `A`(nodeName: String) : org.redundent.generated.`BaseType`(nodeName) {
 	var `Top`: kotlin.String? by attributes
 }
 
-open class `B`(nodeName: String) : BaseType(nodeName) {
+open class `B`(nodeName: String) : org.redundent.generated.`BaseType`(nodeName) {
 	var `Middle`: kotlin.String? by attributes
 }
 

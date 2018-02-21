@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			elementFormDefault="qualified">
+	<xsd:complexType name="DuplicateName"/>
+
+	<xsd:complexType name="DuplicateNameContainer">
+		<xsd:choice maxOccurs="unbounded">
+			<xsd:element name="DuplicateName">
+				<xsd:complexType>
+					<xsd:complexContent>
+						<xsd:extension base="DuplicateName"/>
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:choice>
+	</xsd:complexType>
+
+	<xsd:element name="DuplicateNames">
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="DuplicateNameContainer"/>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>
