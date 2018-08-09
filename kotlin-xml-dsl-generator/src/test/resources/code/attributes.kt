@@ -1,4 +1,4 @@
-@file:Suppress("PropertyName", "ReplaceArrayOfWithLiteral", "LocalVariableName", "FunctionName", "RemoveEmptyClassBody")
+@file:Suppress("PropertyName", "ReplaceArrayOfWithLiteral", "LocalVariableName", "FunctionName")
 
 package org.redundent.generated
 
@@ -38,6 +38,7 @@ open class `Attributes`(nodeName: String) : Node(nodeName) {
 	var `unsignedShort`: kotlin.Int? by attributes
 }
 
+@JvmOverloads
 fun `attributes`(`uri`: kotlin.String? = null,
 				 `base64Binary`: kotlin.ByteArray? = null,
 				 `boolean`: kotlin.Boolean? = null,

@@ -1,16 +1,21 @@
 package org.redundent.kotlin.xml.gen.writer
 
-import com.sun.tools.xjc.model.*
-import com.sun.tools.xjc.outline.ClassOutline
+import com.sun.tools.xjc.model.CAttributePropertyInfo
+import com.sun.tools.xjc.model.CClassInfo
+import com.sun.tools.xjc.model.CElementPropertyInfo
+import com.sun.tools.xjc.model.CPropertyInfo
+import com.sun.tools.xjc.model.CTypeInfo
 import com.sun.tools.xjc.outline.Outline
 import com.sun.tools.xjc.reader.xmlschema.bindinfo.BindInfo
 import com.sun.xml.xsom.XSComponent
-import java.util.*
+import java.util.Comparator
+import java.util.Date
 
 class CodeWriter(private val outline: Outline) {
-	private val output = StringBuilder()
+	private var output = StringBuilder()
 
-	private var currentIndex = 0
+	var currentIndex = 0
+		private set
 
 	fun writePackage(packageName: String) {
 		writeln("package $packageName\n")
@@ -20,26 +25,7 @@ class CodeWriter(private val outline: Outline) {
 		writeln("import $importStatement")
 	}
 
-	private fun writeClass(clazz: ClassOutline, innerClass: Boolean, block: () -> Unit) {
-		val target = clazz.target
-		val modifier = if (target.isAbstract)
-			"abstract"
-		else if (innerClass)
-			"inner"
-		else
-			"open"
-
-		val superClass = (clazz.superClass?.target?.let { "${it.ownerPackage.name()}.`${it.shortName}`" } ?: "Node")
-		writeln("$modifier class `${target.shortName}`${if (!innerClass) "(nodeName: String)" else ""} : $superClass(${if (innerClass) "\"${target.shortName}\"" else "nodeName"}) {")
-		indent()
-
-		block()
-
-		dedent()
-		writeln("}\n")
-	}
-
-	private fun writeKotlinDoc(doc: String?) {
+	fun writeKotlinDoc(doc: String?) {
 		if (doc == null || doc.isBlank()) {
 			return
 		}
@@ -49,144 +35,46 @@ class CodeWriter(private val outline: Outline) {
 		writeln(" */")
 	}
 
-	private fun indent() = currentIndex++
+	fun indent() = currentIndex++
 
-	private fun dedent() = currentIndex--
+	fun dedent() = currentIndex--
 
-	private fun write(text: String, writeIndex: Boolean = true) {
+	fun write(text: String, writeIndex: Boolean = true) {
 		if (writeIndex) {
 			output.append((0 until currentIndex).joinToString("") { "\t" })
 		}
 		output.append(text)
 	}
 
-	fun writeln(text: String, writeIndex: Boolean = true) {
-		write(text, writeIndex)
+	fun writeSuppress(block: MutableList<String>.() -> Unit) {
+		val list = ArrayList<String>()
+		list.block()
+
+		writeln("@file:Suppress(${list.joinToString(", ") { "\"$it\"" }})")
+		writeln()
+	}
+
+	fun writeln(text: String = "", writeIndex: Boolean = true) {
+		if (text.isNotEmpty()) {
+			write(text, writeIndex)
+		}
 		output.append("\n")
+	}
+
+	fun writeBlock(block: () -> String) {
+		val text = block().trimStart()
+		text.split("\n").forEach { writeln(it) }
 	}
 
 	fun asText(): String = output.toString().trim()
 
-	fun writeSimpleTypes() {
-		outline.enums.forEach { simpleType ->
-			writeKotlinDoc(simpleType.target.documentation)
-			writeln("enum class `${simpleType.target.shortName}` {")
-			indent()
-
-			writeln(simpleType.constants.joinToString(",\n\t") { "`${it.target.lexicalValue}`" })
-			dedent()
-			writeln("}\n")
+	fun trimLastNewLine() {
+		if (output.endsWith('\n')) {
+			output = StringBuilder(output.substring(0, output.lastIndex))
 		}
 	}
 
-	fun writeClasses() {
-		val sortedClasses = outline.classes
-				//Only get root classes, no inner classes
-				.filter { it.target.parent() is CClassInfoParent.Package }
-				.sortedBy { if (it.target.isAbstract) 0 else 1 }
-
-		val parentMap = outline.classes.filter { it.target.parent() is CClassInfo }.groupBy { it.target.parent() as CClassInfo }
-
-		sortedClasses.forEach { writeClass(it, parentMap) }
-
-		outline.classes.filter { it.target.isElement }.forEach { element ->
-			val name = element.target.elementName.localPart
-			processElement("`$name`", name, element.target, element.target.documentation, true)
-		}
-	}
-
-	private fun writeClass(clazz: ClassOutline, parentMap: Map<CClassInfo, List<ClassOutline>>, innerClass: Boolean = false) {
-		writeKotlinDoc(clazz.target.documentation)
-
-		if (clazz.target.isOrdered && clazz.target.elements.size > 1) {
-			writeln("@XmlType(childOrder = arrayOf(${clazz.target.elements.joinToString(",\n\t\t") { "\"${it.types.first().tagName.localPart}\"" }}))")
-		}
-
-		writeClass(clazz, innerClass) {
-			if (clazz.target.isElement) {
-				val ns = clazz.target.elementName.namespaceURI
-				if (ns != null && ns.isNotEmpty()) {
-					writeln("init {")
-					writeln("\txmlns = \"$ns\"")
-					writeln("}\n")
-				}
-			}
-
-			appendAttributes(clazz.target)
-
-			val innerClasses = parentMap[clazz.target]
-			innerClasses?.forEach { writeClass(it, parentMap, true) }
-		}
-
-		processElements(clazz.target)
-	}
-
-	private fun processElements(clazz: CClassInfo) {
-		clazz.elements.forEach { element ->
-			element.types.forEach { type ->
-				processElement("`${clazz.shortName}`.`${type.tagName.localPart}`", type.tagName.localPart,
-						type.target, element.documentation)
-			}
-		}
-	}
-
-	private fun processElement(functionName: String, tagName: String, type: CNonElement,
-							   documentation: String?, rootElement: Boolean = false) {
-		writeKotlinDoc(documentation)
-
-		val funLine = "fun $functionName"
-		write(funLine)
-
-		if (type is CClassInfo) {
-			val blockParamType = "${((type.parent() as? CClassInfo)?.let { "`${it.shortName}`." } ?: "")}`${type.shortName}`"
-			writeln("(${type.attributesAsParameters(funLine.length + (currentIndex * 4) + 1)}__block__: $blockParamType.() -> Unit)${if (rootElement) ": `${type.shortName}`" else ""} {", false)
-			indent()
-			writeln("val `$tagName` = `${type.shortName}`(${if (type.parent() is CClassInfo) "" else "\"$tagName\""})")
-			if (type.allAttributes.isNotEmpty()) {
-				writeln("`$tagName`.apply {")
-				indent()
-				for (attr in type.allAttributes) {
-					val attrName = attr.xmlName.localPart
-					if (!attr.isRequired) {
-						writeln("if (`$attrName` != null) {")
-						writeln("\tthis.`$attrName` = `$attrName`")
-						writeln("}")
-					} else {
-						writeln("this.`$attrName` = `$attrName`")
-					}
-				}
-				dedent()
-				writeln("}")
-			}
-
-			writeln("`$tagName`.apply(__block__)")
-			if (rootElement) {
-				writeln("return `$tagName`")
-			} else {
-				writeln("this.addNode(`$tagName`)")
-			}
-
-			dedent()
-			writeln("}\n")
-		} else {
-			val t = mapType(type.type.fullName())
-			writeln("(value: $t) {\n\t\"$tagName\"(value${if (t != String::class.qualifiedName) ".toString()" else ""})\n}\n")
-		}
-	}
-
-	private fun appendAttributes(clazz: CClassInfo) {
-		val attributeNodes = clazz.attributes
-		for (an in attributeNodes) {
-			val field = outline.getField(an)
-			val kotlinType = "${mapType(field.rawType.fullName())}${if (!an.isRequired) "?" else ""}"
-			val kotlinName = "`${an.xmlName.localPart}`"
-
-			writeKotlinDoc(an.documentation)
-			writeln("var $kotlinName: $kotlinType by attributes")
-		}
-	}
-
-	private fun CClassInfo.attributesAsParameters(indentLength: Int): String {
+	fun CClassInfo.attributesAsParameters(indentLength: Int): String {
 		if (allAttributes.isEmpty()) {
 			return ""
 		}
@@ -204,36 +92,40 @@ class CodeWriter(private val outline: Outline) {
 		} + delimiter
 	}
 
-	private fun mapType(type: String): String {
-		return when (type) {
-			"int",
-			java.lang.Integer::class.java.name,
-			java.math.BigInteger::class.java.name -> Int::class.qualifiedName
-			"long",
-			java.lang.Long::class.java.name -> Long::class.qualifiedName
-			"boolean",
-			java.lang.Boolean::class.java.name -> Boolean::class.qualifiedName
-			"double",
-			java.lang.Double::class.java.name -> Double::class.qualifiedName
-			"float",
-			java.lang.Float::class.java.name -> Float::class.qualifiedName
-			java.lang.String::class.java.name,
-			javax.xml.namespace.QName::class.java.name -> String::class.qualifiedName
-			"byte",
-			java.lang.Byte::class.java.name -> Byte::class.qualifiedName
-			"short",
-			java.lang.Short::class.java.name -> Short::class.qualifiedName
-			"byte[]" -> ByteArray::class.qualifiedName
-			javax.xml.datatype.XMLGregorianCalendar::class.java.name -> Date::class.qualifiedName
-			else -> type
-		}!!
+	companion object {
+		fun mapType(type: String): String {
+			return when (type) {
+				"int",
+				java.lang.Integer::class.java.name,
+				java.math.BigInteger::class.java.name -> Int::class.qualifiedName
+				"long",
+				java.lang.Long::class.java.name -> Long::class.qualifiedName
+				"boolean",
+				java.lang.Boolean::class.java.name -> Boolean::class.qualifiedName
+				"double",
+				java.lang.Double::class.java.name -> Double::class.qualifiedName
+				"float",
+				java.lang.Float::class.java.name -> Float::class.qualifiedName
+				java.lang.String::class.java.name,
+				javax.xml.namespace.QName::class.java.name -> String::class.qualifiedName
+				"byte",
+				java.lang.Byte::class.java.name -> Byte::class.qualifiedName
+				"short",
+				java.lang.Short::class.java.name -> Short::class.qualifiedName
+				"byte[]" -> ByteArray::class.qualifiedName
+				javax.xml.datatype.XMLGregorianCalendar::class.java.name -> Date::class.qualifiedName
+				else -> type
+			}!!
+		}
 	}
 }
 
 val CClassInfo.attributes: List<CAttributePropertyInfo>
 	get() = properties.mapNotNull { it as? CAttributePropertyInfo }
 val CClassInfo.allAttributes: List<CAttributePropertyInfo>
-	get() = generateSequence(this) { it.baseClass }.toList().flatMap { it.properties.mapNotNull { it as? CAttributePropertyInfo } }
+	get() = generateSequence(this) { it.baseClass }.toList().flatMap { it.properties.mapNotNull { p -> p as? CAttributePropertyInfo } }
+val CClassInfo.hasOptionalAttributes: Boolean
+	get() = allAttributes.any { !it.isRequired }
 val CClassInfo.elements: List<CElementPropertyInfo>
 	get() = properties.mapNotNull { it as? CElementPropertyInfo }
 val CPropertyInfo.documentation: String?

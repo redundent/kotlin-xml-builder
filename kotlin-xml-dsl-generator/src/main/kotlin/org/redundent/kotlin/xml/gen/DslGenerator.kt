@@ -12,7 +12,7 @@ import java.io.File
 
 fun main(args: Array<String>) {
 	try {
-		val opts = Options().apply { parseArguments(args) }
+		val opts = ExOptions().apply { parseArguments(args) }
 		val output = File(opts.targetDir, "${opts.defaultPackage.replace(".", File.separator)}${File.separator}schema.kt")
 
 		println("\nGenerating schema to ${output.absolutePath}")
@@ -48,20 +48,30 @@ Options:
 	)
 }
 
-class DslGenerator(private val opts: Options) {
+class DslGenerator(private val opts: ExOptions) {
 	fun generate(): String {
-		val model = ModelLoader.load(opts, JCodeModel(), ErrReceiver()) ?: throw BadCommandLineException("Something failed generating the code model")
+		val model = ModelLoader.load(opts, JCodeModel(), ErrReceiver())
+				?: throw BadCommandLineException("Something failed generating the code model")
 
 		val outline = BeanGenerator.generate(model, ErrReceiver())
 
 		val codeWriter = CodeWriter(outline)
-		codeWriter.writeln("@file:Suppress(\"PropertyName\", \"ReplaceArrayOfWithLiteral\", \"LocalVariableName\", \"FunctionName\", \"RemoveEmptyClassBody\")\n")
+		val schemaOutline = SchemaOutline(outline, opts)
+
+		codeWriter.writeSuppress {
+			addAll(listOf("PropertyName", "ReplaceArrayOfWithLiteral", "LocalVariableName", "FunctionName"))
+
+			if (schemaOutline.enums.isNotEmpty()) {
+				add("EnumEntryName")
+			}
+		}
+
 		codeWriter.writePackage(opts.defaultPackage)
 		codeWriter.writeImport("org.redundent.kotlin.xml.*\n")
 
-		codeWriter.writeSimpleTypes()
+		schemaOutline.enums.forEach { it.write(codeWriter) }
 
-		codeWriter.writeClasses()
+		schemaOutline.classes.forEach { it.write(codeWriter) }
 
 		return codeWriter.asText()
 	}
@@ -78,5 +88,17 @@ class ErrReceiver : ErrorReceiver() {
 
 	override fun error(exception: SAXParseException) = throw exception
 	override fun fatalError(exception: SAXParseException) = throw exception
+}
 
+class ExOptions : Options() {
+	var useMemberFunctions = false
+
+	override fun parseArgument(args: Array<out String>, i: Int): Int {
+		if (args[i] == "--use-member-functions") {
+			useMemberFunctions = true
+			return 1
+		}
+
+		return super.parseArgument(args, i)
+	}
 }

@@ -105,6 +105,14 @@ produces
 
 Release Notes
 =
+Version 1.4.1
+-
+* Upgrading Gradle to 4.9
+* Upgrading Kotlin to 1.2.60
+* Fix issue #4
+* Tweak generation code to be more concise
+* Add flag to code generation to allow for member functions instead of extension functions
+
 Version 1.4
 -
 **BREAKING CHANGES**

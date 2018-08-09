@@ -1,11 +1,10 @@
-@file:Suppress("PropertyName", "ReplaceArrayOfWithLiteral", "LocalVariableName", "FunctionName", "RemoveEmptyClassBody")
+@file:Suppress("PropertyName", "ReplaceArrayOfWithLiteral", "LocalVariableName", "FunctionName")
 
 package org.redundent.generated
 
 import org.redundent.kotlin.xml.*
 
-open class `Root`(nodeName: String) : Node(nodeName) {
-}
+open class `Root`(nodeName: String) : Node(nodeName)
 
 fun `Root`.`name`(value: kotlin.String) {
 	"name"(value)

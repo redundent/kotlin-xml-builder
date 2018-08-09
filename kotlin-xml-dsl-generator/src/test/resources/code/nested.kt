@@ -1,4 +1,4 @@
-@file:Suppress("PropertyName", "ReplaceArrayOfWithLiteral", "LocalVariableName", "FunctionName", "RemoveEmptyClassBody")
+@file:Suppress("PropertyName", "ReplaceArrayOfWithLiteral", "LocalVariableName", "FunctionName")
 
 package org.redundent.generated
 
@@ -7,12 +7,13 @@ import org.redundent.kotlin.xml.*
 open class `Top`(nodeName: String) : Node(nodeName) {
 	inner class `First` : Node("First") {
 		var `Id`: kotlin.Long by attributes
+
 		inner class `Second` : Node("Second") {
 			var `Name`: kotlin.String? by attributes
 		}
-
 	}
 
+	@JvmOverloads
 	fun `First`.`second`(`Name`: kotlin.String? = null,
 						 __block__: `First`.`Second`.() -> Unit) {
 		val `second` = `Second`()
@@ -24,7 +25,6 @@ open class `Top`(nodeName: String) : Node(nodeName) {
 		`second`.apply(__block__)
 		this.addNode(`second`)
 	}
-
 }
 
 fun `Top`.`first`(`Id`: kotlin.Long,

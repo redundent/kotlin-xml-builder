@@ -3,7 +3,12 @@ package org.redundent.kotlin.xml
 import org.junit.Test
 import org.xml.sax.SAXException
 import java.io.ByteArrayInputStream
-import kotlin.test.*
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class XmlBuilderTest : XmlBuilderTestBase() {
 	@Test
@@ -177,6 +182,15 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 		xml["attr"] = null
 		assertFalse(xml.attributes.containsKey("attr"))
 		assertNull(xml["attr"], "attr value is null")
+	}
+
+	@Test
+	fun quoteInAttribute() {
+		val root = xml("root") {
+			attribute("attr", "My \" Attribute value '")
+		}
+
+		validate(root)
 	}
 
 	@Test(expected = SAXException::class)

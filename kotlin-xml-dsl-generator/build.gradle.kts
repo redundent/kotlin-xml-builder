@@ -22,6 +22,12 @@ tasks {
 	val shadowJar by getting(ShadowJar::class) {
 		classifier = null
 	}
+
+	"sourceJar"(Jar::class) {
+		from(java.sourceSets["main"].allSource)
+		destinationDir = jar.destinationDir
+		classifier = "sources"
+	}
 }
 
 dependencies {
@@ -38,6 +44,10 @@ publishing {
 	(publications) {
 		"maven"(MavenPublication::class) {
 			artifact(tasks["shadowJar"])
+
+			artifact(tasks["sourceJar"]) {
+				classifier = "sources"
+			}
 		}
 	}
 }

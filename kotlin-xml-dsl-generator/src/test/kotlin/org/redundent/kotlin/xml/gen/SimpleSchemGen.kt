@@ -1,7 +1,6 @@
 package org.redundent.kotlin.xml.gen
 
 import org.junit.Test
-import java.io.File
 
 class SimpleSchemGen : AbstractGenTest() {
 	@Test
@@ -39,4 +38,7 @@ class SimpleSchemGen : AbstractGenTest() {
 
 	@Test
 	fun `child-prop-order`() = run()
+
+	@Test
+	fun `member-functions`() = run(additionalArgs = *arrayOf("--use-member-functions"))
 }

@@ -1,4 +1,4 @@
-@file:Suppress("PropertyName", "ReplaceArrayOfWithLiteral", "LocalVariableName", "FunctionName", "RemoveEmptyClassBody")
+@file:Suppress("PropertyName", "ReplaceArrayOfWithLiteral", "LocalVariableName", "FunctionName", "EnumEntryName")
 
 package org.redundent.generated
 
@@ -30,7 +30,6 @@ open class `Urlset`(nodeName: String) : Node(nodeName) {
 	init {
 		xmlns = "http://www.sitemaps.org/schemas/sitemap/0.9"
 	}
-
 }
 
 fun `Urlset`.`url`(__block__: `TUrl`.() -> Unit) {
@@ -40,14 +39,23 @@ fun `Urlset`.`url`(__block__: `TUrl`.() -> Unit) {
 }
 
 /**
+ * Container for a set of up to 50,000 document elements.
+ * This is the root element of the XML file.
+ */
+fun `urlset`(__block__: `Urlset`.() -> Unit): `Urlset` {
+	val `urlset` = `Urlset`("urlset")
+	`urlset`.apply(__block__)
+	return `urlset`
+}
+
+/**
  * Container for the data needed to describe a document to crawl.
  */
 @XmlType(childOrder = arrayOf("loc",
 		"lastmod",
 		"changefreq",
 		"priority"))
-open class `TUrl`(nodeName: String) : Node(nodeName) {
-}
+open class `TUrl`(nodeName: String) : Node(nodeName)
 
 fun `TUrl`.`loc`(value: kotlin.String) {
 	"loc"(value)
@@ -63,14 +71,4 @@ fun `TUrl`.`changefreq`(value: org.redundent.generated.TChangeFreq) {
 
 fun `TUrl`.`priority`(value: java.math.BigDecimal) {
 	"priority"(value.toString())
-}
-
-/**
- * Container for a set of up to 50,000 document elements.
- * This is the root element of the XML file.
- */
-fun `urlset`(__block__: `Urlset`.() -> Unit): `Urlset` {
-	val `urlset` = `Urlset`("urlset")
-	`urlset`.apply(__block__)
-	return `urlset`
 }
