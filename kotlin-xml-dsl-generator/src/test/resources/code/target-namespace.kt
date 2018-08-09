@@ -1,4 +1,4 @@
-@file:Suppress("PropertyName", "ReplaceArrayOfWithLiteral", "LocalVariableName", "FunctionName", "RemoveEmptyClassBody")
+@file:Suppress("PropertyName", "ReplaceArrayOfWithLiteral", "LocalVariableName", "FunctionName")
 
 package org.redundent.generated
 
@@ -12,6 +12,7 @@ open class `Code`(nodeName: String) : Node(nodeName) {
 	var `id`: kotlin.Long? by attributes
 }
 
+@JvmOverloads
 fun `code`(`id`: kotlin.Long? = null,
 		   __block__: `Code`.() -> Unit): `Code` {
 	val `code` = `Code`("code")

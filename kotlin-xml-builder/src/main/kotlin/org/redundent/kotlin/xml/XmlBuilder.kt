@@ -5,9 +5,11 @@ import org.w3c.dom.Document
 import org.xml.sax.InputSource
 import java.io.File
 import java.io.InputStream
-import java.util.*
+import java.util.ArrayList
+import java.util.Comparator
+import java.util.LinkedHashMap
+import java.util.NoSuchElementException
 import javax.xml.parsers.DocumentBuilderFactory
-
 import org.w3c.dom.Node as W3CNode
 
 /**
@@ -146,8 +148,23 @@ open class Node(val nodeName: String, private val prettyFormat: Boolean = true) 
 		}
 
 		return " " + attributes.map {
-			"${it.key}=\"${it.value}\""
+			"${it.key}=\"${escapeQuotes(it.value)}\""
 		}.joinToString(" ")
+	}
+
+	private fun escapeQuotes(value: Any?): String? {
+		val asString = value?.toString() ?: return null
+
+		val sb = StringBuilder()
+		for (c in asString) {
+			sb.append(when (c) {
+				'"' -> "&quot;"
+				'\'' -> "&apos;"
+				else -> c
+			})
+		}
+
+		return sb.toString()
 	}
 
 	private fun getIndent(indent: String): String = if (!prettyFormat) "" else "$indent\t"

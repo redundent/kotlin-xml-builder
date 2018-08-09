@@ -1,4 +1,4 @@
-@file:Suppress("PropertyName", "ReplaceArrayOfWithLiteral", "LocalVariableName", "FunctionName", "RemoveEmptyClassBody")
+@file:Suppress("PropertyName", "ReplaceArrayOfWithLiteral", "LocalVariableName", "FunctionName")
 
 package org.redundent.generated
 
@@ -8,6 +8,7 @@ open class `StringToByteArray`(nodeName: String) : Node(nodeName) {
 	var `value`: kotlin.ByteArray? by attributes
 }
 
+@JvmOverloads
 fun `String-To-ByteArray`(`value`: kotlin.ByteArray? = null,
 						  __block__: `StringToByteArray`.() -> Unit): `StringToByteArray` {
 	val `String-To-ByteArray` = `StringToByteArray`("String-To-ByteArray")

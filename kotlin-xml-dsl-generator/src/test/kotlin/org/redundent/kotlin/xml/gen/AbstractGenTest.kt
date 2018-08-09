@@ -1,6 +1,5 @@
 package org.redundent.kotlin.xml.gen
 
-import com.sun.tools.xjc.Options
 import org.junit.Rule
 import org.junit.rules.TestName
 import java.io.File
@@ -9,10 +8,11 @@ import java.io.InputStreamReader
 import kotlin.test.assertEquals
 
 abstract class AbstractGenTest {
+	@Suppress("MemberVisibilityCanBePrivate")
 	@get:Rule
 	val testName = TestName()
 
-	protected fun run(withBindingFile: Boolean = false) {
+	protected fun run(withBindingFile: Boolean = false, vararg additionalArgs: String) {
 		val schema = javaClass.getResourceAsStream("/schema/${testName.methodName}.xsd")
 		val code = getExpectedClassText()
 
@@ -22,7 +22,7 @@ abstract class AbstractGenTest {
 			}
 		}
 
-		val opts = Options().apply { parseArguments(arrayOf("-p", "org.redundent.generated", file.absolutePath)) }
+		val opts = ExOptions().apply { parseArguments(arrayOf("-p", "org.redundent.generated", file.absolutePath) + additionalArgs) }
 
 		if (withBindingFile) {
 			val binding = javaClass.getResourceAsStream("/schema/${testName.methodName}.jxb")

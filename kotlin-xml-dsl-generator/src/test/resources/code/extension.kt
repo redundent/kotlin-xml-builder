@@ -1,4 +1,4 @@
-@file:Suppress("PropertyName", "ReplaceArrayOfWithLiteral", "LocalVariableName", "FunctionName", "RemoveEmptyClassBody")
+@file:Suppress("PropertyName", "ReplaceArrayOfWithLiteral", "LocalVariableName", "FunctionName")
 
 package org.redundent.generated
 
@@ -12,10 +12,7 @@ open class `A`(nodeName: String) : org.redundent.generated.`BaseType`(nodeName) 
 	var `Top`: kotlin.String? by attributes
 }
 
-open class `B`(nodeName: String) : org.redundent.generated.`BaseType`(nodeName) {
-	var `Middle`: kotlin.String? by attributes
-}
-
+@JvmOverloads
 fun `a`(`Top`: kotlin.String? = null,
 		`Name`: kotlin.String? = null,
 		__block__: `A`.() -> Unit): `A` {
@@ -32,6 +29,11 @@ fun `a`(`Top`: kotlin.String? = null,
 	return `a`
 }
 
+open class `B`(nodeName: String) : org.redundent.generated.`BaseType`(nodeName) {
+	var `Middle`: kotlin.String? by attributes
+}
+
+@JvmOverloads
 fun `b`(`Middle`: kotlin.String? = null,
 		`Name`: kotlin.String? = null,
 		__block__: `B`.() -> Unit): `B` {
