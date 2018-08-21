@@ -5,6 +5,7 @@ import org.w3c.dom.Document
 import org.xml.sax.InputSource
 import java.io.File
 import java.io.InputStream
+import java.nio.charset.StandardCharsets
 import java.util.ArrayList
 import java.util.Comparator
 import java.util.LinkedHashMap
@@ -56,6 +57,20 @@ open class Node(val nodeName: String, private val prettyFormat: Boolean = true) 
 		get() = this["xmlns"]
 		set(value) {
 			this["xmlns"] = value
+		}
+
+	/**
+	 * Whether to include the xml prolog, i.e. <?xml version="1.0" encoding="UTS-8"?>
+	 */
+	var includeXmlProlog = false
+
+	/**
+	 * Sets the encoding on the document. Setting this value will set [includeXmlProlog] to true
+	 */
+	var encoding: String = StandardCharsets.UTF_8.name()
+		set(value) {
+			includeXmlProlog = true
+			field = value
 		}
 
 	/**
@@ -169,9 +184,17 @@ open class Node(val nodeName: String, private val prettyFormat: Boolean = true) 
 
 	private fun getIndent(indent: String): String = if (!prettyFormat) "" else "$indent\t"
 
-	override fun toString(): String = StringBuilder().apply {
-		render(this, "")
-	}.toString().trim()
+	override fun toString(): String {
+		val sb = StringBuilder()
+
+		if (includeXmlProlog) {
+			sb.append("<?xml version=\"1.0\" encoding=\"$encoding\"?>$lineEnding")
+		}
+
+		render(sb, "")
+
+		return sb.toString().trim()
+	}
 
 	operator fun String.unaryMinus() = text(this)
 
@@ -417,10 +440,15 @@ open class Node(val nodeName: String, private val prettyFormat: Boolean = true) 
  * Creates a new xml document with the specified root element name
  *
  * @param root The root element name
+ * @param prettyFormat Whether to format the xml with newlines and tabs or keep it all on a single line
+ * @param encoding The encoding to use for the xml prolog
  * @param init The block that defines the content of the xml
  */
-fun xml(root: String, prettyFormat: Boolean = true, init: (Node.() -> Unit)? = null): Node {
+fun xml(root: String, prettyFormat: Boolean = true, encoding: String? = null, init: (Node.() -> Unit)? = null): Node {
 	val node = Node(root, prettyFormat)
+	if (encoding != null) {
+		node.encoding = encoding
+	}
 	if (init != null) {
 		node.init()
 	}

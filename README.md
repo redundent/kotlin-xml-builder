@@ -104,7 +104,11 @@ produces
 ```
 
 Release Notes
-=
+=============
+Version 1.4.2
+-
+* Fixes issue #6
+
 Version 1.4.1
 -
 * Upgrading Gradle to 4.9

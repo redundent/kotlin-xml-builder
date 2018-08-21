@@ -372,4 +372,20 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 
 		validateTest(xml)
 	}
+
+	@Test
+	fun checkIncludeXmlPrologFlag() {
+		val node = xml("test")
+		assertFalse(node.includeXmlProlog, "prolog is false")
+
+		node.encoding = "UTF-8"
+		assertTrue(node.includeXmlProlog, "prolog is included")
+	}
+
+	@Test
+	fun encoding() {
+		val xml = xml("test", prettyFormat = false, encoding = "UTF-16").toString()
+
+		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-16\"?><test/>", xml)
+	}
 }
