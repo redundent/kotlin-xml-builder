@@ -50,7 +50,7 @@ val asString = people.toString()
 ```
 produces
 ```xml
-<people xmlns="http://github.com/people">
+<people xmlns="http://example.com/people">
     <person id="1">
         <firstName>John</firstName>
         <lastName>Doe</lastName>
@@ -89,7 +89,7 @@ val asString = people.toString()
 ```
 produces
 ```xml
-<people xmlns="http://github.com/people">
+<people xmlns="http://example.com/people">
     <person id="1">
         <firstName>John</firstName>
         <lastName>Doe</lastName>
