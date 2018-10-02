@@ -105,6 +105,11 @@ produces
 
 Release Notes
 =============
+Version 1.4.3
+-
+**BREAKING CHANGES**
+* Moved `prettyFormat` to a parameter of `toString()`. `prettyFormat` in the constructor or util method is no longer available. Fixes issue #7
+
 Version 1.4.2
 -
 * Fixes issue #6

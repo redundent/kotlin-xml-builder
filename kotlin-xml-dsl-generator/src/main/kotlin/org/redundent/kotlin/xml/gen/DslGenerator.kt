@@ -59,7 +59,7 @@ class DslGenerator(private val opts: ExOptions) {
 		val schemaOutline = SchemaOutline(outline, opts)
 
 		codeWriter.writeSuppress {
-			addAll(listOf("PropertyName", "ReplaceArrayOfWithLiteral", "LocalVariableName", "FunctionName"))
+			addAll(listOf("PropertyName", "ReplaceArrayOfWithLiteral", "LocalVariableName", "FunctionName", "RemoveRedundantBackticks"))
 
 			if (schemaOutline.enums.isNotEmpty()) {
 				add("EnumEntryName")

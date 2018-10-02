@@ -1,4 +1,4 @@
-@file:Suppress("PropertyName", "ReplaceArrayOfWithLiteral", "LocalVariableName", "FunctionName", "EnumEntryName")
+@file:Suppress("PropertyName", "ReplaceArrayOfWithLiteral", "LocalVariableName", "FunctionName", "RemoveRedundantBackticks", "EnumEntryName")
 
 package org.redundent.generated
 

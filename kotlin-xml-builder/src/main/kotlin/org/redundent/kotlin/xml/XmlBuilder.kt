@@ -13,6 +13,8 @@ import java.util.NoSuchElementException
 import javax.xml.parsers.DocumentBuilderFactory
 import org.w3c.dom.Node as W3CNode
 
+private fun getLineEnding(prettyFormat: Boolean) = if (prettyFormat) System.lineSeparator() else ""
+
 /**
  * Base interface for all elements. You shouldn't have to interact with this interface directly.
  * @author Jason Blackwell
@@ -21,7 +23,7 @@ interface Element {
 	/**
 	 * This method handles creating the xml. Used internally
 	 */
-	fun render(builder: StringBuilder, indent: String)
+	fun render(builder: StringBuilder, indent: String, prettyFormat: Boolean)
 }
 
 /**
@@ -29,10 +31,16 @@ interface Element {
  * For example:
  * <loc>http://blog.redundent.org</loc>
  */
-open class TextElement internal constructor(val text: String, prettyFormat: Boolean = true) : Element {
-	protected val lineEnding: String = if (prettyFormat) System.lineSeparator() else ""
+open class TextElement internal constructor(val text: String) : Element {
+	internal fun isEmpty() = text.trim('\n', '\r').isBlank()
 
-	override fun render(builder: StringBuilder, indent: String) {
+	override fun render(builder: StringBuilder, indent: String, prettyFormat: Boolean) {
+		if (isEmpty()) {
+			return
+		}
+
+		val lineEnding = getLineEnding(prettyFormat)
+
 		builder.append("$indent${StringEscapeUtils.escapeXml11(text)}$lineEnding")
 	}
 }
@@ -40,8 +48,13 @@ open class TextElement internal constructor(val text: String, prettyFormat: Bool
 /**
  * Similar to a [TextElement] except that the inner text is wrapped inside a <![CDATA[]]> tag.
  */
-class CDATAElement internal constructor(text: String, prettyFormat: Boolean = true) : TextElement(text, prettyFormat) {
-	override fun render(builder: StringBuilder, indent: String) {
+class CDATAElement internal constructor(text: String) : TextElement(text) {
+	override fun render(builder: StringBuilder, indent: String, prettyFormat: Boolean) {
+		if (isEmpty()) {
+			return
+		}
+
+		val lineEnding = getLineEnding(prettyFormat)
 		builder.append("$indent<![CDATA[$lineEnding$text$lineEnding]]>$lineEnding")
 	}
 }
@@ -49,7 +62,7 @@ class CDATAElement internal constructor(text: String, prettyFormat: Boolean = tr
 /**
  * Base type for all elements. This is what handles pretty much all the rendering and building.
  */
-open class Node(val nodeName: String, private val prettyFormat: Boolean = true) : Element {
+open class Node(val nodeName: String) : Element {
 	/**
 	 * The default xmlns for the document. To add other namespaces, use the [namespace] method
 	 */
@@ -91,8 +104,6 @@ open class Node(val nodeName: String, private val prettyFormat: Boolean = true) 
 	val children: List<Element>
 		get() = _children
 
-	private val lineEnding = if (prettyFormat) System.lineSeparator() else ""
-
 	private fun <T : Element> initTag(tag: T, init: (T.() -> Unit)?): T {
 		if (init != null) {
 			tag.init()
@@ -130,13 +141,14 @@ open class Node(val nodeName: String, private val prettyFormat: Boolean = true) 
 
 	fun hasAttribute(attributeName: String): Boolean = attributes.containsKey(attributeName)
 
-	override fun render(builder: StringBuilder, indent: String) {
+	override fun render(builder: StringBuilder, indent: String, prettyFormat: Boolean) {
+		val lineEnding = getLineEnding(prettyFormat)
 		builder.append("$indent<$nodeName${renderAttributes()}")
 
 		if (_children.isNotEmpty()) {
 			builder.append(">$lineEnding")
 			for (c in sortedChildren()) {
-				c.render(builder, getIndent(indent))
+				c.render(builder, getIndent(prettyFormat, indent), prettyFormat)
 			}
 			builder.append("$indent</$nodeName>$lineEnding")
 		} else {
@@ -182,16 +194,28 @@ open class Node(val nodeName: String, private val prettyFormat: Boolean = true) 
 		return sb.toString()
 	}
 
-	private fun getIndent(indent: String): String = if (!prettyFormat) "" else "$indent\t"
+	private fun getIndent(prettyFormat: Boolean, indent: String): String = if (!prettyFormat) "" else "$indent\t"
 
-	override fun toString(): String {
+	/**
+	 * Get the xml representation of this object with prettyFormat = true
+	 */
+	override fun toString() = toString(prettyFormat = true)
+
+	/**
+	 * Get the xml representation of this object
+	 *
+	 * @param [prettyFormat] true to format the xml with newlines and tabs; otherwise no formatting
+	 */
+	fun toString(prettyFormat: Boolean): String {
+		val lineEnding = getLineEnding(prettyFormat)
+
 		val sb = StringBuilder()
 
 		if (includeXmlProlog) {
 			sb.append("<?xml version=\"1.0\" encoding=\"$encoding\"?>$lineEnding")
 		}
 
-		render(sb, "")
+		render(sb, "", prettyFormat)
 
 		return sb.toString().trim()
 	}
@@ -199,7 +223,7 @@ open class Node(val nodeName: String, private val prettyFormat: Boolean = true) 
 	operator fun String.unaryMinus() = text(this)
 
 	fun text(text: String) {
-		_children.add(TextElement(text, prettyFormat))
+		_children.add(TextElement(text))
 	}
 
 	/**
@@ -213,7 +237,7 @@ open class Node(val nodeName: String, private val prettyFormat: Boolean = true) 
 	 * @param name The name of the element.
 	 * @param init The block that defines the content of the element.
 	 */
-	fun element(name: String, init: (Node.() -> Unit)? = null): Node = initTag(Node(name, prettyFormat), init)
+	fun element(name: String, init: (Node.() -> Unit)? = null): Node = initTag(Node(name), init)
 
 	/**
 	 * Adds a basic element with the specific name and value to the parent. This cannot be used for complex elements.
@@ -224,7 +248,7 @@ open class Node(val nodeName: String, private val prettyFormat: Boolean = true) 
 	 * @param name The name of the element.
 	 * @param value The inner text of the element
 	 */
-	fun element(name: String, value: String): Node = initTag(Node(name, prettyFormat)) {
+	fun element(name: String, value: String): Node = initTag(Node(name)) {
 		-value
 	}
 
@@ -304,7 +328,7 @@ open class Node(val nodeName: String, private val prettyFormat: Boolean = true) 
 	 * @param text The inner text of the CDATA element.
 	 */
 	fun cdata(text: String) {
-		_children.add(CDATAElement(text, prettyFormat))
+		_children.add(CDATAElement(text))
 	}
 
 	/**
@@ -444,8 +468,8 @@ open class Node(val nodeName: String, private val prettyFormat: Boolean = true) 
  * @param encoding The encoding to use for the xml prolog
  * @param init The block that defines the content of the xml
  */
-fun xml(root: String, prettyFormat: Boolean = true, encoding: String? = null, init: (Node.() -> Unit)? = null): Node {
-	val node = Node(root, prettyFormat)
+fun xml(root: String, encoding: String? = null, init: (Node.() -> Unit)? = null): Node {
+	val node = Node(root)
 	if (encoding != null) {
 		node.encoding = encoding
 	}
@@ -461,8 +485,8 @@ fun xml(root: String, prettyFormat: Boolean = true, encoding: String? = null, in
  * @param name The name of the element
  * @param init The block that defines the content of the xml
  */
-fun node(name: String, prettyFormat: Boolean = true, init: (Node.() -> Unit)? = null): Node {
-	val node = Node(name, prettyFormat)
+fun node(name: String, init: (Node.() -> Unit)? = null): Node {
+	val node = Node(name)
 	if (init != null) {
 		node.init()
 	}
@@ -478,7 +502,7 @@ fun parse(`is`: InputStream, systemId: String): Node = parse(DocumentBuilderFact
 private fun parse(document: Document): Node {
 	val root = document.documentElement
 
-	val result = xml(root.tagName, prettyFormat = false)
+	val result = xml(root.tagName)
 
 	copyAttributes(root, result)
 
@@ -503,10 +527,10 @@ private fun copy(source: W3CNode, dest: Node) {
 					.forEach { copy(it, cur) }
 		}
 		W3CNode.CDATA_SECTION_NODE -> {
-			dest.cdata(source.nodeValue)
+			dest.cdata(source.nodeValue.trim { it.isWhitespace() || it == '\r' || it == '\n' })
 		}
 		W3CNode.TEXT_NODE -> {
-			dest.text(source.nodeValue)
+ 			dest.text(source.nodeValue.trim { it.isWhitespace() || it == '\r' || it == '\n' })
 		}
 	}
 }

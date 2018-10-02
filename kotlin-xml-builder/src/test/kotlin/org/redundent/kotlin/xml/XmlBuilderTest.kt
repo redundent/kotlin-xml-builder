@@ -52,7 +52,7 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 
 	@Test
 	fun notPrettyFormatting() {
-		val root = xml("root", false) {
+		val root = xml("root") {
 			element("element") {
 				-"Hello"
 			}
@@ -61,7 +61,7 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 			}
 		}
 
-		validate(root)
+		validate(root, prettyFormat = false)
 	}
 
 	@Test
@@ -384,7 +384,7 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 
 	@Test
 	fun encoding() {
-		val xml = xml("test", prettyFormat = false, encoding = "UTF-16").toString()
+		val xml = xml("test", encoding = "UTF-16").toString(prettyFormat = false)
 
 		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-16\"?><test/>", xml)
 	}
