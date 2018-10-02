@@ -29,8 +29,8 @@ open class XmlBuilderTestBase {
 		return javaClass.getResourceAsStream(resName)
 	}
 
-	protected fun validate(xml: Node) {
-		val actual = xml.toString()
+	protected fun validate(xml: Node, prettyFormat: Boolean = true) {
+		val actual = xml.toString(prettyFormat)
 
 		//Doing a replace to cater for different line endings.
 		assertEquals(getExpectedXml(), actual.replace(System.lineSeparator(), "\n"), "actual xml matches what is expected")
