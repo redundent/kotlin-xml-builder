@@ -5,7 +5,6 @@ import org.w3c.dom.Document
 import org.xml.sax.InputSource
 import java.io.File
 import java.io.InputStream
-import java.nio.charset.StandardCharsets
 import java.util.ArrayList
 import java.util.Comparator
 import java.util.LinkedHashMap
@@ -80,7 +79,7 @@ open class Node(val nodeName: String) : Element {
 	/**
 	 * Sets the encoding on the document. Setting this value will set [includeXmlProlog] to true
 	 */
-	var encoding: String = StandardCharsets.UTF_8.name()
+	var encoding: String = Charsets.UTF_8.name()
 		set(value) {
 			includeXmlProlog = true
 			field = value
