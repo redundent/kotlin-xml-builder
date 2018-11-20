@@ -105,6 +105,11 @@ produces
 
 Release Notes
 =============
+Version 1.4.4
+-
+* Switched to Kotlin's `Charsets` instead of using `java.nio.charset.StandardCharsets`. `StandardCharsets` is not available in some versions of Android.\
+Thanks to [@little-fish](https://github.com/little-fish) for submitting and fixing this!
+
 Version 1.4.3
 -
 **BREAKING CHANGES**

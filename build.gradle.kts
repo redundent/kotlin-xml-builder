@@ -10,7 +10,7 @@ extra["kotlinVersion"] = "1.2.60"
 
 allprojects {
 	group = "org.redundent"
-	version = "1.4.3"
+	version = "1.4.4"
 
 	repositories {
 		jcenter()
