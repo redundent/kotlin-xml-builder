@@ -53,8 +53,16 @@ class CDATAElement internal constructor(text: String) : TextElement(text) {
 			return
 		}
 
+		fun String.escapeCData():String {
+			val cdataEnd = """]]>"""
+			val cdataStart = """<![CDATA["""
+			return this
+					// split cdataEnd into two pieces so XML parser doesn't recognize it
+					.replace(cdataEnd, """]]${cdataEnd}${cdataStart}>""")
+		}
+
 		val lineEnding = getLineEnding(prettyFormat)
-		builder.append("$indent<![CDATA[$lineEnding$text$lineEnding]]>$lineEnding")
+		builder.append("$indent<![CDATA[$lineEnding${text.escapeCData()}$lineEnding]]>$lineEnding")
 	}
 }
 
