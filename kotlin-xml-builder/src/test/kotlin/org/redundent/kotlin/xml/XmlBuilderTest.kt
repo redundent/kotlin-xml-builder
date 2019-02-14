@@ -104,6 +104,15 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 	}
 
 	@Test
+	fun cdataNesting() {
+		val root = xml("root") {
+			cdata("<![CDATA[Some & xml]]>")
+		}
+
+		validate(root)
+	}
+
+	@Test
 	fun updateAttribute() {
 		val root = xml("root") {
 			attribute("key", "value")
