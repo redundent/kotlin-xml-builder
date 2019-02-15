@@ -355,6 +355,9 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 	fun parseCData() = parseTest()
 
 	@Test
+	fun parseCDataWhitespace() = parseTest()
+
+	@Test
 	fun parseCustomNamespaces() = parseTest()
 
 	@Test
