@@ -54,7 +54,7 @@ class CDATAElement internal constructor(text: String) : TextElement(text) {
 		}
 
 		val lineEnding = getLineEnding(prettyFormat)
-		builder.append("$indent<![CDATA[$lineEnding$text$lineEnding]]>$lineEnding")
+		builder.append("$indent<![CDATA[$text]]>$lineEnding")
 	}
 }
 
@@ -526,7 +526,7 @@ private fun copy(source: W3CNode, dest: Node) {
 					.forEach { copy(it, cur) }
 		}
 		W3CNode.CDATA_SECTION_NODE -> {
-			dest.cdata(source.nodeValue.trim { it.isWhitespace() || it == '\r' || it == '\n' })
+			dest.cdata(source.nodeValue)
 		}
 		W3CNode.TEXT_NODE -> {
  			dest.text(source.nodeValue.trim { it.isWhitespace() || it == '\r' || it == '\n' })
