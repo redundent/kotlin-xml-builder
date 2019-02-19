@@ -105,6 +105,12 @@ produces
 
 Release Notes
 =============
+Version 1.4.5
+-
+* Fixed incorrect handling of CDATA elements. `prettyFormat` should not alter the CDATA content.
+* Fixed nested CData elements\
+Big thanks to [@TWiStErRob](https://github.com/TWiStErRob) for finding and fixing both of these!
+
 Version 1.4.4
 -
 * Switched to Kotlin's `Charsets` instead of using `java.nio.charset.StandardCharsets`. `StandardCharsets` is not available in some versions of Android.\
