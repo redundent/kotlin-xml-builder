@@ -52,9 +52,15 @@ produces
 ```xml
 <people xmlns="http://example.com/people">
     <person id="1">
-        <firstName>John</firstName>
-        <lastName>Doe</lastName>
-        <phone>555-555-5555</phone>
+        <firstName>
+            John
+        </firstName>
+        <lastName>
+            Doe
+        </lastName>
+        <phone>
+            555-555-5555
+        </phone>
     </person>
 </people>
 ```
@@ -91,20 +97,64 @@ produces
 ```xml
 <people xmlns="http://example.com/people">
     <person id="1">
-        <firstName>John</firstName>
-        <lastName>Doe</lastName>
-        <phone>555-555-5555</phone>
+        <firstName>
+            John
+        </firstName>
+        <lastName
+            >Doe
+        </lastName>
+        <phone>
+            555-555-5555
+        </phone>
     </person>
     <person id="2">
-        <firstName>Jane</firstName>
-        <lastName>Doe</lastName>
-        <phone>555-555-6666</phone>
+        <firstName>
+            Jane
+        </firstName>
+        <lastName>
+            Doe
+        </lastName>
+        <phone>
+            555-555-6666
+        </phone>
     </person>
 </people>
 ```
 
+## Print Options
+You can use the new PrintOptions class to control more of how your xml will look when rendered.
+
+`pretty` - This is the default and will produce the xml you see above.
+
+`singleLineTextElements` - This will render single text element nodes on a single line if `pretty` is true
+```xml
+<root>
+    <element>value</element>
+</root>
+```
+as opposed to:
+```xml
+<root>
+    <element>
+        value
+    </element>
+</root>
+```
+`useSelfClosingTags` - Use `<element/>` instead of `<element></element>` for empty tags
+
 Release Notes
 =============
+Version 1.5.0
+-
+* Added more robust PrintOptions class to allow for more control over how xml is structured.\
+Fixes issue #16
+* Attribute values are now fully escaped properly.\
+Thanks to [@pkulak](https://github.com/pkulak) for finding and fixing this!
+
+**BREAKING CHANGES**
+* Changed Element.render method signature to use kotlin.text.Appenable instead of kotlin.text.StringBuilder.
+Any custom element types created will need to be updated
+
 Version 1.4.5
 -
 * Fixed incorrect handling of CDATA elements. `prettyFormat` should not alter the CDATA content.
