@@ -202,6 +202,15 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 		validate(root)
 	}
 
+	@Test
+	fun specialCharInAttribute() {
+		val root = xml("root") {
+			attribute("attr", "& < > \" '")
+		}
+
+		validate(root)
+	}
+
 	@Test(expected = SAXException::class)
 	fun invalidElementName() {
 		val root = xml("invalid root")
