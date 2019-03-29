@@ -181,26 +181,16 @@ open class Node(val nodeName: String) : Element {
 			return ""
 		}
 
-		return " " + attributes.map {
-			"${it.key}=\"${escapeQuotes(it.value)}\""
-		}.joinToString(" ")
-	}
-
-	private fun escapeQuotes(value: Any?): String? {
-		val asString = value?.toString() ?: return null
-
-		val sb = StringBuilder()
-		for (c in asString) {
-			sb.append(when (c) {
-				'"' -> "&quot;"
-				'\'' -> "&apos;"
-				else -> c
-			})
+		fun escapeAttributeValue(value: Any?): String? {
+			val asString = value?.toString() ?: return null
+			return StringEscapeUtils.escapeXml11(asString)
 		}
 
-		return sb.toString()
+		return " " + attributes.map {
+			"${it.key}=\"${escapeAttributeValue(it.value)}\""
+		}.joinToString(" ")
 	}
-
+	
 	private fun getIndent(prettyFormat: Boolean, indent: String): String = if (!prettyFormat) "" else "$indent\t"
 
 	/**
