@@ -65,6 +65,29 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 	}
 
 	@Test
+	fun singleLineTextElement() {
+		val root = xml("root") {
+			element("element") {
+				-"Hello"
+			}
+			element("otherElement") {
+				-"Test"
+			}
+		}
+
+		validate(root, PrintOptions(pretty = true, singleLineTextElements = true))
+	}
+
+	@Test
+	fun noSelfClosingTag() {
+		val root = xml("root") {
+			element("element")
+		}
+
+		validate(root, PrintOptions(useSelfClosingTags = false))
+	}
+
+	@Test
 	fun multipleAttributes() {
 		val root = xml("root") {
 			element("test") {
