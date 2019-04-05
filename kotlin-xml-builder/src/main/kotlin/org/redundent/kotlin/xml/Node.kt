@@ -282,6 +282,15 @@ open class Node(val nodeName: String) : Element {
 	}
 
 	/**
+	 * Adds the supplied text as a processing instruction element
+	 *
+	 * @param text The inner text of the processing instruction element.
+	 */
+	fun processingInstruction(text: String) {
+		_children.add(ProcessingInstructionElement(text))
+	}
+
+	/**
 	 * Adds the specified namespace to the element.
 	 * <code>
 	 *     "url" {
