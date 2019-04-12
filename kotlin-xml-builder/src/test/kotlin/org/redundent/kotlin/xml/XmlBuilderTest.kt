@@ -136,6 +136,15 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 	}
 
 	@Test
+	fun processingInstruction() {
+		val root = xml("root") {
+			processingInstruction("SomeProcessingInstruction")
+		}
+
+		validate(root)
+	}
+
+	@Test
 	fun updateAttribute() {
 		val root = xml("root") {
 			attribute("key", "value")
