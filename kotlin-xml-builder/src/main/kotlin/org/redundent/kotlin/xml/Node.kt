@@ -177,6 +177,18 @@ open class Node(val nodeName: String) : Element {
 	}
 
 	/**
+	 * Adds an xml comment to the document.
+	 * <code>
+	 *     comment("my comment")
+	 * </code>
+	 *
+	 * @param text The text of the comment. This text will be rendenered unescaped except for replace "--" with "&#45;&#45;"]
+	 */
+	fun comment(text: String) {
+		_children.add(Comment(text))
+	}
+
+	/**
 	 * Adds a basic element with the specific name to the parent.
 	 * <code>
 	 *     element("url") {

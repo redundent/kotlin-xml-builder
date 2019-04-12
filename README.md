@@ -144,6 +144,13 @@ as opposed to:
 
 Release Notes
 =============
+Version 1.5.1
+-
+* Added ability to add processing instructions. Use the new `processingInstruction` method to do this.\
+Thanks to [@endofhome](https://github.com/endofhome) for adding this!
+* Added ability to add comments. Use the new `comment` method to do this.\
+Thanks to [@ejektaflex](https://github.com/ejektaflex) for requesting this!
+
 Version 1.5.0
 -
 * Added more robust PrintOptions class to allow for more control over how xml is structured.\

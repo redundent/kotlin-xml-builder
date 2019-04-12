@@ -79,6 +79,18 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 	}
 
 	@Test
+	fun comment() {
+		val root = xml("root") {
+			comment("my comment -->")
+			element("someNode") {
+				-"value"
+			}
+		}
+
+		validate(root)
+	}
+
+	@Test
 	fun noSelfClosingTag() {
 		val root = xml("root") {
 			element("element")
