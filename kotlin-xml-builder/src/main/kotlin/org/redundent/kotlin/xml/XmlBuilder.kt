@@ -13,15 +13,20 @@ internal fun getLineEnding(printOptions: PrintOptions) = if (printOptions.pretty
  * Creates a new xml document with the specified root element name
  *
  * @param root The root element name
- * @param prettyFormat Whether to format the xml with newlines and tabs or keep it all on a single line
  * @param encoding The encoding to use for the xml prolog
+ * @param version The XML specification version to use for the xml prolog and attribute encoding
  * @param init The block that defines the content of the xml
  */
-fun xml(root: String, encoding: String? = null, init: (Node.() -> Unit)? = null): Node {
+fun xml(root: String, encoding: String? = null, version: XmlVersion? = null, init: (Node.() -> Unit)? = null): Node {
 	val node = Node(root)
 	if (encoding != null) {
 		node.encoding = encoding
 	}
+
+	if (version != null) {
+		node.version = version
+	}
+
 	if (init != null) {
 		node.init()
 	}

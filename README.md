@@ -144,6 +144,11 @@ as opposed to:
 
 Release Notes
 =============
+Version 1.5.2
+-
+* Added ability to specify the xml version. This affects both the prolog and text escaping.\
+Thanks to [@ZR8C](https://github.com/ZR8C) for finding this!
+
 Version 1.5.1
 -
 * Added ability to add processing instructions. Use the new `processingInstruction` method to do this.\

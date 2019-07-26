@@ -1,6 +1,5 @@
 package org.redundent.kotlin.xml
 
-import org.apache.commons.lang3.StringEscapeUtils
 import java.util.ArrayList
 import java.util.LinkedHashMap
 import java.util.NoSuchElementException
@@ -27,6 +26,12 @@ open class Node(val nodeName: String) : Element {
 	 * Sets the encoding on the document. Setting this value will set [includeXmlProlog] to true
 	 */
 	var encoding: String = Charsets.UTF_8.name()
+		set(value) {
+			includeXmlProlog = true
+			field = value
+		}
+
+	var version: XmlVersion = XmlVersion.V10
 		set(value) {
 			includeXmlProlog = true
 			field = value
@@ -89,13 +94,13 @@ open class Node(val nodeName: String) : Element {
 
 	override fun render(builder: Appendable, indent: String, printOptions: PrintOptions) {
 		val lineEnding = getLineEnding(printOptions)
-		builder.append("$indent<$nodeName${renderAttributes()}")
+		builder.append("$indent<$nodeName${renderAttributes(printOptions)}")
 
 		if (_children.isNotEmpty()) {
 			if (printOptions.pretty && printOptions.singleLineTextElements
 					&& _children.size == 1 && _children[0] is TextElement) {
 				builder.append(">")
-				(_children[0] as TextElement).renderSingleLine(builder)
+				(_children[0] as TextElement).renderSingleLine(builder, printOptions)
 				builder.append("</$nodeName>$lineEnding")
 			} else {
 				builder.append(">$lineEnding")
@@ -128,18 +133,13 @@ open class Node(val nodeName: String) : Element {
 		}
 	}
 
-	private fun renderAttributes(): String {
+	private fun renderAttributes(printOptions: PrintOptions): String {
 		if (attributes.isEmpty()) {
 			return ""
 		}
 
-		fun escapeAttributeValue(value: Any?): String? {
-			val asString = value?.toString() ?: return null
-			return StringEscapeUtils.escapeXml11(asString)
-		}
-
 		return " " + attributes.map {
-			"${it.key}=\"${escapeAttributeValue(it.value)}\""
+			"${it.key}=\"${escapeValue(it.value, printOptions.xmlVersion)}\""
 		}.joinToString(" ")
 	}
 
@@ -163,8 +163,10 @@ open class Node(val nodeName: String) : Element {
 	fun writeTo(appendable: Appendable, printOptions: PrintOptions = PrintOptions()) {
 		val lineEnding = getLineEnding(printOptions)
 
+		printOptions.xmlVersion = version
+
 		if (includeXmlProlog) {
-			appendable.append("<?xml version=\"1.0\" encoding=\"$encoding\"?>$lineEnding")
+			appendable.append("<?xml version=\"${printOptions.xmlVersion.value}\" encoding=\"$encoding\"?>$lineEnding")
 		}
 
 		render(appendable, "", printOptions)
