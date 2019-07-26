@@ -423,7 +423,7 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 	fun parseCustomNamespaces() = parseTest()
 
 	@Test
-	fun praseMultipleAttributes() = parseTest()
+	fun parseMultipleAttributes() = parseTest()
 
 	@Test
 	fun parseBasicTest() = parseTest()
@@ -452,5 +452,13 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 		val xml = xml("test", encoding = "UTF-16").toString(prettyFormat = false)
 
 		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-16\"?><test/>", xml)
+	}
+
+	@Test
+	fun xmlVersion() {
+		for (version in XmlVersion.values()) {
+			val xml = xml("test", version = version).toString(prettyFormat = false)
+			assertEquals("<?xml version=\"${version.value}\" encoding=\"UTF-8\"?><test/>", xml)
+		}
 	}
 }
