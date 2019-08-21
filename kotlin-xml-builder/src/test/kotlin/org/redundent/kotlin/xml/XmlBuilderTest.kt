@@ -79,6 +79,28 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 	}
 
 	@Test
+	fun singleLineCDATAElement() {
+		val root = xml("root") {
+			element("element") {
+				cdata("Some & xml")
+			}
+		}
+
+		validate(root, PrintOptions(pretty = true, singleLineTextElements = true))
+	}
+
+	@Test
+	fun singleLineProcessingInstructionElement() {
+		val root = xml("root") {
+			element("element") {
+				processingInstruction("SomeProcessingInstruction")
+			}
+		}
+
+		validate(root, PrintOptions(pretty = true, singleLineTextElements = true))
+	}
+
+	@Test
 	fun comment() {
 		val root = xml("root") {
 			comment("my comment -->")
