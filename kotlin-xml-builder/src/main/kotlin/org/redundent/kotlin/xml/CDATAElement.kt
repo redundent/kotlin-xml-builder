@@ -4,11 +4,7 @@ package org.redundent.kotlin.xml
  * Similar to a [TextElement] except that the inner text is wrapped inside a <![CDATA[]]> tag.
  */
 class CDATAElement internal constructor(text: String) : TextElement(text) {
-	override fun render(builder: Appendable, indent: String, printOptions: PrintOptions) {
-		if (isEmpty()) {
-			return
-		}
-
+	override fun renderedText(printOptions: PrintOptions): String {
 		fun String.escapeCData(): String {
 			val cdataEnd = "]]>"
 			val cdataStart = "<![CDATA["
@@ -17,7 +13,6 @@ class CDATAElement internal constructor(text: String) : TextElement(text) {
 					.replace(cdataEnd, "]]$cdataEnd$cdataStart>")
 		}
 
-		val lineEnding = getLineEnding(printOptions)
-		builder.append("$indent<![CDATA[${text.escapeCData()}]]>$lineEnding")
+		return "<![CDATA[${text.escapeCData()}]]>"
 	}
 }

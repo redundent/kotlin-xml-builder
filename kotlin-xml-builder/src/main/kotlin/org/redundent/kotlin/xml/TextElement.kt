@@ -15,10 +15,13 @@ open class TextElement internal constructor(val text: String) : Element {
 
 		val lineEnding = getLineEnding(printOptions)
 
-		builder.append("$indent${escapeValue(text, printOptions.xmlVersion)}$lineEnding")
+		builder.append("$indent${renderedText(printOptions)}$lineEnding")
 	}
 
 	internal fun renderSingleLine(builder: Appendable, printOptions: PrintOptions) {
-		builder.append(escapeValue(text, printOptions.xmlVersion))
+		builder.append(renderedText(printOptions))
 	}
+
+	internal open fun renderedText(printOptions: PrintOptions): String? =
+		escapeValue(text, printOptions.xmlVersion)
 }
