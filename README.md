@@ -144,6 +144,11 @@ as opposed to:
 
 Release Notes
 =============
+Version 1.5.3
+-
+* Fixing single line text element rendering for processing instructures and CData elements.\
+Thanks to [@jonathan-yan](https://github.com/jonathan-yan) for fixing this!
+
 Version 1.5.2
 -
 * Added ability to specify the xml version. This affects both the prolog and text escaping.\
