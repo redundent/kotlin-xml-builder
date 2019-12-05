@@ -23,8 +23,8 @@ tasks {
 		classifier = null
 	}
 
-	"sourceJar"(Jar::class) {
-		from(java.sourceSets["main"].allSource)
+	register<Jar>("sourceJar") {
+		from(sourceSets["main"].allSource)
 		destinationDir = jar.destinationDir
 		classifier = "sources"
 	}
@@ -41,8 +41,8 @@ dependencies {
 }
 
 publishing {
-	(publications) {
-		"maven"(MavenPublication::class) {
+	publications {
+		register<MavenPublication>("maven") {
 			artifact(tasks["shadowJar"])
 
 			artifact(tasks["sourceJar"]) {

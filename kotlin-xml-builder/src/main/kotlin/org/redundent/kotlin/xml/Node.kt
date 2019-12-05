@@ -19,6 +19,8 @@ open class Node(val nodeName: String) : Element {
 
 	/**
 	 * Whether to include the xml prolog, i.e. <?xml version="1.0" encoding="UTS-8"?>
+	 *
+	 * <p>NOTE: this only applies to the root element. It is ignored an all children
 	 */
 	var includeXmlProlog = false
 
@@ -42,6 +44,8 @@ open class Node(val nodeName: String) : Element {
 	 * @sample [set]
 	 */
 	val attributes = LinkedHashMap<String, Any?>()
+
+	private val _globalLevelProcessingInstructions = ArrayList<ProcessingInstructionElement>()
 
 	private val _children = ArrayList<Element>()
 
@@ -138,9 +142,9 @@ open class Node(val nodeName: String) : Element {
 			return ""
 		}
 
-		return " " + attributes.map {
+		return " " + attributes.entries.joinToString(" ") {
 			"${it.key}=\"${escapeValue(it.value, printOptions.xmlVersion)}\""
-		}.joinToString(" ")
+		}
 	}
 
 	private fun getIndent(printOptions: PrintOptions, indent: String): String = if (!printOptions.pretty) "" else "$indent\t"
@@ -167,6 +171,10 @@ open class Node(val nodeName: String) : Element {
 
 		if (includeXmlProlog) {
 			appendable.append("<?xml version=\"${printOptions.xmlVersion.value}\" encoding=\"$encoding\"?>$lineEnding")
+		}
+
+		if (_globalLevelProcessingInstructions.isNotEmpty()) {
+			_globalLevelProcessingInstructions.forEach { it.render(appendable, "", printOptions) }
 		}
 
 		render(appendable, "", printOptions)
@@ -299,9 +307,21 @@ open class Node(val nodeName: String) : Element {
 	 * Adds the supplied text as a processing instruction element
 	 *
 	 * @param text The inner text of the processing instruction element.
+	 * @param attribtes Optional set of attributes to apply to this processing instruction.
 	 */
-	fun processingInstruction(text: String) {
-		_children.add(ProcessingInstructionElement(text))
+	fun processingInstruction(text: String, vararg attribtes: Pair<String, String>) {
+		_children.add(ProcessingInstructionElement(text, linkedMapOf(*attribtes)))
+	}
+
+
+	/**
+	 * Adds the supplied text as a processing instruction element to the root of the document.
+	 *
+	 * @param text The inner text of the processing instruction element.
+	 * @param attribtes Optional set of attributes to apply to this processing instruction.
+	 */
+	fun globalProcessingInstruction(text: String, vararg attribtes: Pair<String, String>) {
+		_globalLevelProcessingInstructions.add(ProcessingInstructionElement(text, linkedMapOf(*attribtes)))
 	}
 
 	/**

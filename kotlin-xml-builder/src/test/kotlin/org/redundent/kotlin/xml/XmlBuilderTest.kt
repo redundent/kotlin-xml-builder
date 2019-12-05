@@ -101,6 +101,31 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 	}
 
 	@Test
+	fun singleLineProcessingInstructionElementWithAttributes() {
+		val root = xml("root") {
+			element("element") {
+				processingInstruction("SomeProcessingInstruction", "key" to "value")
+			}
+		}
+
+		validate(root, PrintOptions(pretty = true, singleLineTextElements = true))
+	}
+
+	@Test
+	fun globalProcessingInstructionElement() {
+		val root = xml("root") {
+			globalProcessingInstruction("xml-stylesheet",
+					"key" to "value",
+					"href" to "http://blah")
+
+			element("element") {
+				globalProcessingInstruction("test")
+			}
+		}
+
+		validate(root, PrintOptions(pretty = true, singleLineTextElements = true))
+	}
+	@Test
 	fun comment() {
 		val root = xml("root") {
 			comment("my comment -->")

@@ -120,6 +120,36 @@ produces
     </person>
 </people>
 ```
+### Processing Instructions
+You can add processing instructions to any element by using the `processingInstruction` method.
+
+```kotlin
+xml("root") {
+    processingInstruction("instruction")
+}
+```
+
+```xml
+<root>
+    <?instruction?>
+</root>
+```
+
+#### Global Instructions
+Similarly you can add a global (top-level) instruction by call `globalProcessingInstruction` on the
+root node. This method only applies to the root. If it is called on any other element, it will be ignored.
+
+
+```kotlin
+xml("root") {
+    globalProcessingInstruction("xml-stylesheet", "type" to "text/xsl", "href" to "style.xsl")
+}
+```
+
+```xml
+<?xml-stylesheet type="text/xsl" href="style.xsl"?>
+<root/>
+```
 
 ## Print Options
 You can use the new PrintOptions class to control more of how your xml will look when rendered.
@@ -144,6 +174,11 @@ as opposed to:
 
 Release Notes
 =============
+Version 1.5.4
+-
+* Adding new global processing instructions.\
+Thanks to [@rjaros](https://github.com/rjaros) for requsting this!
+
 Version 1.5.3
 -
 * Fixing single line text element rendering for processing instructures and CData elements.\
