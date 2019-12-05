@@ -5,7 +5,7 @@ import com.jfrog.bintray.gradle.BintrayExtension
 
 plugins {
 	kotlin("jvm")
-	id("com.github.johnrengelman.shadow") version "2.0.2"
+	id("com.github.johnrengelman.shadow") version "5.2.0"
 	id("com.jfrog.bintray")
 	`maven-publish`
 }
