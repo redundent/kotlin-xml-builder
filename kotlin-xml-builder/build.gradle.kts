@@ -11,8 +11,8 @@ val kotlinVersion: String by rootProject.extra
 tasks {
 	val jar by getting(Jar::class)
 
-	"sourceJar"(Jar::class) {
-		from(java.sourceSets["main"].allSource)
+	register<Jar>("sourceJar") {
+		from(sourceSets["main"].allSource)
 		destinationDir = jar.destinationDir
 		classifier = "sources"
 	}
@@ -32,8 +32,8 @@ artifacts {
 }
 
 publishing {
-	(publications) {
-		"maven"(MavenPublication::class) {
+	publications {
+		register<MavenPublication>("maven") {
 			from(components["java"])
 
 			artifact(tasks["sourceJar"]) {
