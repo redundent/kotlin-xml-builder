@@ -23,8 +23,28 @@ repositories {
 }
 
 dependencies {
-    compile 'org.redundent:kotlin-xml-builder:[VERSION]'
+    compile("org.redundent:kotlin-xml-builder:[VERSION]")
 }
+```
+
+Similarly in Maven:
+```xml
+<repositories>
+    <repository>
+        <id>jcenter</id>
+        <url>https://jcenter.bintray.com</url>
+    </repository>
+</repositories>
+
+... 
+
+<dependencies>
+    <dependency>
+        <groupId>org.redundent</groupId>
+        <artifactId>kotlin-xml-builder</artifactId>
+        <version>[VERSION]</version>
+    </dependency>
+</dependencies>
 ```
 
 Example
@@ -172,8 +192,27 @@ as opposed to:
 ```
 `useSelfClosingTags` - Use `<element/>` instead of `<element></element>` for empty tags
 
+## Reading XML
+You can also read xml documents using the `parse` methods. They provide basic 
+xml parsing and will build a `Node` element to build upon.
+
+For more advanced consuming, check out [konsume-xml](https://gitlab.com/mvysny/konsume-xml).
+It includes many more features for consuming documents.
+
 Release Notes
 =============
+Version 1.6.0
+-
+* Updated README
+
+**BREAKING CHANGES**
+* The `kotlin-reflect` dependency has been removed from the transitive dependnecies.
+This module is only used for controlling element order using `@XmlType`.
+If your project depends on that feature, you will need to have `kotlin-reflect` on the 
+runtime classpath.\
+Thanks
+
+
 Version 1.5.4
 -
 * Adding new global processing instructions.\

@@ -13,18 +13,19 @@ tasks {
 
 	register<Jar>("sourceJar") {
 		from(sourceSets["main"].allSource)
-		destinationDir = jar.destinationDir
-		classifier = "sources"
+		destinationDirectory.set(jar.destinationDirectory)
+		archiveClassifier.set("sources")
 	}
 }
 
 dependencies {
 	compileOnly(kotlin("stdlib", kotlinVersion))
-	compile(kotlin("reflect", kotlinVersion))
-	compile("org.apache.commons:commons-lang3:3.5")
+	compileOnly(kotlin("reflect", kotlinVersion))
+	implementation("org.apache.commons:commons-lang3:3.5")
 
-	testCompile("junit:junit:4.12")
-	testCompile(kotlin("test-junit", kotlinVersion))
+	testImplementation("junit:junit:4.12")
+	testImplementation(kotlin("reflect", kotlinVersion))
+	testImplementation(kotlin("test-junit", kotlinVersion))
 }
 
 artifacts {

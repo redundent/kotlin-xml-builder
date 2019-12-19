@@ -8,6 +8,12 @@ import java.util.NoSuchElementException
  * Base type for all elements. This is what handles pretty much all the rendering and building.
  */
 open class Node(val nodeName: String) : Element {
+	private companion object {
+		private val isReflectionAvailable: Boolean by lazy {
+			Node::class.java.classLoader.getResource("kotlin/reflect/full") != null
+		}
+	}
+
 	/**
 	 * The default xmlns for the document. To add other namespaces, use the [namespace] method
 	 */
@@ -50,7 +56,13 @@ open class Node(val nodeName: String) : Element {
 	private val _children = ArrayList<Element>()
 
 	private val childOrderMap: Map<String, Int>? by lazy {
+		if (!isReflectionAvailable) {
+			return@lazy null
+		}
+
+		@Suppress("NO_REFLECTION_IN_CLASS_PATH") // Checked for reflection class above
 		val xmlTypeAnnotation = this::class.annotations.firstOrNull { it is XmlType } as? XmlType ?: return@lazy null
+
 		val childOrder = xmlTypeAnnotation.childOrder
 
 		childOrder.indices.associateBy { childOrder[it] }
