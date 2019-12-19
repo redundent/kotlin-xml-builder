@@ -49,9 +49,9 @@ fun node(name: String, init: (Node.() -> Unit)? = null): Node {
 
 fun parse(f: File): Node = parse(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(f))
 fun parse(uri: String): Node = parse(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(uri))
-fun parse(`is`: InputSource): Node = parse(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(`is`))
-fun parse(`is`: InputStream): Node = parse(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(`is`))
-fun parse(`is`: InputStream, systemId: String): Node = parse(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(`is`, systemId))
+fun parse(inputSource: InputSource): Node = parse(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputSource))
+fun parse(inputStream: InputStream): Node = parse(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputStream))
+fun parse(inputStream: InputStream, systemId: String): Node = parse(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputStream, systemId))
 
 private fun parse(document: Document): Node {
 	val root = document.documentElement

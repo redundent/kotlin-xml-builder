@@ -1,5 +1,5 @@
+
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import org.gradle.kotlin.dsl.get
 import com.jfrog.bintray.gradle.BintrayExtension
 
 
@@ -19,25 +19,25 @@ tasks {
 		}
 	}
 
-	val shadowJar by getting(ShadowJar::class) {
-		classifier = null
+	withType<ShadowJar> {
+		archiveClassifier.set(null as String?)
 	}
 
 	register<Jar>("sourceJar") {
 		from(sourceSets["main"].allSource)
-		destinationDir = jar.destinationDir
-		classifier = "sources"
+		destinationDirectory.set(jar.destinationDirectory)
+		archiveClassifier.set("sources")
 	}
 }
 
 dependencies {
-	compileOnly(kotlin("stdlib", kotlinVersion))
-	compile(kotlin("reflect", kotlinVersion))
-	compile("org.glassfish.jaxb:jaxb-xjc:2.3.0")
+	implementation(kotlin("stdlib", kotlinVersion))
+	implementation(kotlin("reflect", kotlinVersion))
+	implementation("org.glassfish.jaxb:jaxb-xjc:2.3.0")
 
-	testCompile(project(":kotlin-xml-builder"))
-	testCompile("junit:junit:4.12")
-	testCompile(kotlin("test-junit", kotlinVersion))
+	testImplementation(project(":kotlin-xml-builder"))
+	testImplementation("junit:junit:4.12")
+	testImplementation(kotlin("test-junit", kotlinVersion))
 }
 
 publishing {
