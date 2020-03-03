@@ -172,7 +172,7 @@ xml("root") {
 ```
 
 ## Print Options
-You can use the new PrintOptions class to control more of how your xml will look when rendered.
+You can now control how your xml will look when rendered by passing the new PrintOptions class as an argument to `toString`.
 
 `pretty` - This is the default and will produce the xml you see above.
 
