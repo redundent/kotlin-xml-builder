@@ -17,7 +17,7 @@ Usage
 Usage is similar to generating java code with XJC. Simply run:
 
 ```bash
-java -jar <path to kotlin-xml-gsl-generator.jar> -d <dest> -p <package> <path to schema>
+java -jar <path to kotlin-xml-dsl-generator.jar> -d <dest> -p <package> <path to schema>
 ```
 
 You can also use JAXB bindings files to customize some of the generator code. Note that this is
