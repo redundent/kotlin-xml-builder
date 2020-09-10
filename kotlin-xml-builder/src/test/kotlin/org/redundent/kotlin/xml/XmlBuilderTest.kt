@@ -508,4 +508,18 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 			assertEquals("<?xml version=\"${version.value}\" encoding=\"UTF-8\"?><test/>", xml)
 		}
 	}
+
+	@Test
+	fun characterReference() {
+		val root = xml("root") {
+			element("element") {
+				-"Hello & Goodbye"
+			}
+			element("otherElement") {
+				-"Test"
+			}
+		}
+
+		validate(root, PrintOptions(pretty = true, singleLineTextElements = true, useCharacterReference = true))
+	}
 }
