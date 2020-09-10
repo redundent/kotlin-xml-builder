@@ -41,7 +41,7 @@ class PrintOptions(
 	/**
 	 * Whether to use escaped character or character reference
 	 *
-	 * if false "'" becomes &quot;
+	 * if false "'" becomes &apos;
 	 *
 	 * vs
 	 *
