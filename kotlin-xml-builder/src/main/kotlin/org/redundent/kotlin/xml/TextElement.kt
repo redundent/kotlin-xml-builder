@@ -23,5 +23,5 @@ open class TextElement internal constructor(val text: String) : Element {
 	}
 
 	internal open fun renderedText(printOptions: PrintOptions): String? =
-		escapeValue(text, printOptions.xmlVersion)
+		escapeValue(text, printOptions.xmlVersion, printOptions.useCharacterReference)
 }

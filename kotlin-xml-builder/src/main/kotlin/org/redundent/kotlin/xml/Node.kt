@@ -114,7 +114,7 @@ open class Node(val nodeName: String) : Element {
 
 		if (_children.isNotEmpty()) {
 			if (printOptions.pretty && printOptions.singleLineTextElements
-					&& _children.size == 1 && _children[0] is TextElement) {
+				&& _children.size == 1 && _children[0] is TextElement) {
 				builder.append(">")
 				(_children[0] as TextElement).renderSingleLine(builder, printOptions)
 				builder.append("</$nodeName>$lineEnding")
@@ -155,7 +155,7 @@ open class Node(val nodeName: String) : Element {
 		}
 
 		return " " + attributes.entries.joinToString(" ") {
-			"${it.key}=\"${escapeValue(it.value, printOptions.xmlVersion)}\""
+			"${it.key}=\"${escapeValue(it.value, printOptions.xmlVersion, printOptions.useCharacterReference)}\""
 		}
 	}
 
@@ -174,7 +174,7 @@ open class Node(val nodeName: String) : Element {
 	fun toString(prettyFormat: Boolean): String = toString(PrintOptions(pretty = prettyFormat))
 
 	fun toString(printOptions: PrintOptions): String
-			= StringBuilder().also { writeTo(it, printOptions) }.toString().trim()
+		= StringBuilder().also { writeTo(it, printOptions) }.toString().trim()
 
 	fun writeTo(appendable: Appendable, printOptions: PrintOptions = PrintOptions()) {
 		val lineEnding = getLineEnding(printOptions)
