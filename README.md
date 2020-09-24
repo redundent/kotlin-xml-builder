@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/redundent/kotlin-xml-builder.svg?branch=master)](https://travis-ci.org/redundent/kotlin-xml-builder)
+![CI](https://github.com/redundent/kotlin-xml-builder/workflows/CI/badge.svg)
 [![Download](https://api.bintray.com/packages/redundent/maven/kotlin-xml-builder/images/download.svg)](https://bintray.com/redundent/maven/kotlin-xml-builder/_latestVersion)
 
 Kotlin XML Builder
