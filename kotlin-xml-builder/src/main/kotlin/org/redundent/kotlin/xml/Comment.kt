@@ -10,4 +10,8 @@ class Comment internal constructor(val text: String) : Element {
 
 		builder.append("$indent<!-- ${text.replace("--", "&#45;&#45;")} -->$lineEnding")
 	}
+
+	override fun equals(other: Any?): Boolean = other is Comment && other.text == text
+
+	override fun hashCode(): Int = text.hashCode()
 }
