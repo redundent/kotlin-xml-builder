@@ -203,6 +203,12 @@ It includes many more features for consuming documents.
 
 Release Notes
 =============
+Version 1.7
+-
+**POTENTIAL BREAKING CHANGES**
+* All node types override `equals` and `hashCode`. This could change the behavior of putting nodes in a Set or Map.\
+Thanks to [@cbartolome](https://github.com/cbartolome) for requesting this!
+
 Version 1.6.1
 -
 * Added new PrintOptions to use character references instead of HTML names.\
