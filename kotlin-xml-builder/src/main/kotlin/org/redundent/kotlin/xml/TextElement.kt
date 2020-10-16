@@ -6,7 +6,7 @@ package org.redundent.kotlin.xml
  * <loc>http://blog.redundent.org</loc>
  */
 open class TextElement internal constructor(val text: String) : Element {
-	internal fun isEmpty() = text.trim('\n', '\r').isBlank()
+	private fun isEmpty() = text.trim('\n', '\r').isBlank()
 
 	override fun render(builder: Appendable, indent: String, printOptions: PrintOptions) {
 		if (isEmpty()) {
@@ -24,4 +24,8 @@ open class TextElement internal constructor(val text: String) : Element {
 
 	internal open fun renderedText(printOptions: PrintOptions): String? =
 		escapeValue(text, printOptions.xmlVersion, printOptions.useCharacterReference)
+
+	override fun equals(other: Any?): Boolean = other is TextElement && other.text == text
+
+	override fun hashCode(): Int = text.hashCode()
 }

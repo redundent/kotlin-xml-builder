@@ -1,5 +1,7 @@
 package org.redundent.kotlin.xml
 
+import org.apache.commons.lang3.builder.EqualsBuilder
+import org.apache.commons.lang3.builder.HashCodeBuilder
 import java.util.ArrayList
 import java.util.LinkedHashMap
 import java.util.NoSuchElementException
@@ -114,7 +116,7 @@ open class Node(val nodeName: String) : Element {
 
 		if (_children.isNotEmpty()) {
 			if (printOptions.pretty && printOptions.singleLineTextElements
-				&& _children.size == 1 && _children[0] is TextElement) {
+					&& _children.size == 1 && _children[0] is TextElement) {
 				builder.append(">")
 				(_children[0] as TextElement).renderSingleLine(builder, printOptions)
 				builder.append("</$nodeName>$lineEnding")
@@ -463,4 +465,28 @@ open class Node(val nodeName: String) : Element {
 
 		return index
 	}
+
+	override fun equals(other: Any?): Boolean {
+		if (other !is Node) {
+			return false
+		}
+
+		return EqualsBuilder()
+				.append(nodeName, other.nodeName)
+				.append(encoding, other.encoding)
+				.append(version, other.version)
+				.append(attributes, other.attributes)
+				.append(_globalLevelProcessingInstructions, other._globalLevelProcessingInstructions)
+				.append(_children, other._children)
+				.isEquals
+	}
+
+	override fun hashCode(): Int = HashCodeBuilder()
+			.append(nodeName)
+			.append(encoding)
+			.append(version)
+			.append(attributes)
+			.append(_globalLevelProcessingInstructions)
+			.append(_children)
+			.toHashCode()
 }
