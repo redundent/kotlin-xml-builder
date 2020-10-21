@@ -65,6 +65,34 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 	}
 
 	@Test
+	fun zeroSpaceIndent() {
+		val root = xml("root") {
+			element("element") {
+				-"Hello"
+			}
+			element("otherElement") {
+				-"Test"
+			}
+		}
+
+		validate(root, PrintOptions(indent = ""))
+	}
+
+	@Test
+	fun zeroSpaceIndentNoPrettyFormatting() {
+		val root = xml("root") {
+			element("element") {
+				-"Hello"
+			}
+			element("otherElement") {
+				-"Test"
+			}
+		}
+
+		validate(root, PrintOptions(pretty = false, indent = ""))
+	}
+
+	@Test
 	fun singleLineTextElement() {
 		val root = xml("root") {
 			element("element") {
@@ -125,6 +153,7 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 
 		validate(root, PrintOptions(pretty = true, singleLineTextElements = true))
 	}
+
 	@Test
 	fun comment() {
 		val root = xml("root") {
