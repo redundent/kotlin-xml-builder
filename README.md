@@ -203,6 +203,11 @@ It includes many more features for consuming documents.
 
 Release Notes
 =============
+Version 1.7.1
+-
+* Added new PrintOptions to control the indent character(s) used. `indent` default is `\t`.\
+Thanks to [@vRallev](https://github.com/vRallev) for adding this!
+
 Version 1.7
 -
 **POTENTIAL BREAKING CHANGES**

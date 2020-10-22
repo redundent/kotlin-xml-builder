@@ -51,7 +51,7 @@ class PrintOptions(
 
 	/**
 	 * Changes the indent for new lines when [pretty] is enabled. The option has no effect when
-	 * [print] is set to `false`. The default uses one tab `\t`.
+	 * [pretty] is set to `false`. The default uses one tab `\t`.
 	 */
 	val indent: String = "\t"
 ) {
