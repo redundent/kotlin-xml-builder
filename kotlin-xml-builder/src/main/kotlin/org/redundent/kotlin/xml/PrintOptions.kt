@@ -47,7 +47,13 @@ class PrintOptions(
 	 *
 	 * if true "'" becomes &#39;
 	 */
-	val useCharacterReference: Boolean = false
+	val useCharacterReference: Boolean = false,
+
+	/**
+	 * Changes the indent for new lines when [pretty] is enabled. The option has no effect when
+	 * [print] is set to `false`. The default uses one tab `\t`.
+	 */
+	val indent: String = "\t"
 ) {
 	internal var xmlVersion: XmlVersion = XmlVersion.V10
 }

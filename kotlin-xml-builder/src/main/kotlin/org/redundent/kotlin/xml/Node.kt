@@ -161,7 +161,7 @@ open class Node(val nodeName: String) : Element {
 		}
 	}
 
-	private fun getIndent(printOptions: PrintOptions, indent: String): String = if (!printOptions.pretty) "" else "$indent\t"
+	private fun getIndent(printOptions: PrintOptions, indent: String): String = if (!printOptions.pretty) "" else "$indent${printOptions.indent}"
 
 	/**
 	 * Get the xml representation of this object with prettyFormat = true
