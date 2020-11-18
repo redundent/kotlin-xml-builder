@@ -203,6 +203,11 @@ It includes many more features for consuming documents.
 
 Release Notes
 =============
+Version 1.7.2
+-
+* Fixing issue where a text element that contains an empty string doesn't respect `useSelfClosingTags`.\
+Thanks to [@d-wojciechowski](https://github.com/d-wojciechowski) for finding this!
+
 Version 1.7.1
 -
 * Added new PrintOptions to control the indent character(s) used. `indent` default is `\t`.\
