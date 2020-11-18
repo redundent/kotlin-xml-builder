@@ -114,12 +114,12 @@ open class Node(val nodeName: String) : Element {
 		val lineEnding = getLineEnding(printOptions)
 		builder.append("$indent<$nodeName${renderAttributes(printOptions)}")
 
-		if (_children.isNotEmpty()) {
+		if (!isEmptyOrSingleEmptyTextElement()) {
 			if (printOptions.pretty && printOptions.singleLineTextElements
 					&& _children.size == 1 && _children[0] is TextElement) {
-				builder.append(">")
+					builder.append(">")
 				(_children[0] as TextElement).renderSingleLine(builder, printOptions)
-				builder.append("</$nodeName>$lineEnding")
+					builder.append("</$nodeName>$lineEnding")
 			} else {
 				builder.append(">$lineEnding")
 				for (c in sortedChildren()) {
@@ -131,6 +131,18 @@ open class Node(val nodeName: String) : Element {
 		} else {
 			builder.append("${getEmptyTagClosing(printOptions)}$lineEnding")
 		}
+	}
+
+	private fun isEmptyOrSingleEmptyTextElement(): Boolean {
+		if (_children.isEmpty()) {
+			return true
+		}
+
+		if (_children.size == 1 && _children[0] is TextElement) {
+			return (_children[0] as TextElement).text.isEmpty()
+		}
+
+		return false
 	}
 
 	private fun getEmptyTagClosing(printOptions: PrintOptions): String = if (printOptions.useSelfClosingTags)

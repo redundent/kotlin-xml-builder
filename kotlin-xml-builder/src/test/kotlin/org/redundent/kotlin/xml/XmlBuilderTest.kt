@@ -551,4 +551,19 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 
 		validate(root, PrintOptions(pretty = true, singleLineTextElements = true, useCharacterReference = true))
 	}
+
+	@Test
+	fun selfClosingTag() {
+		for (text in arrayOf("", null)) {
+			val root = xml("root") {
+				"element" {
+					if (text != null) {
+						-text
+					}
+				}
+			}
+
+			validate(root, PrintOptions(pretty = true, useSelfClosingTags = true))
+		}
+	}
 }
