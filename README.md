@@ -16,10 +16,10 @@ Apache 2.0
 
 Usage
 =
-To use in Gradle, simply add the jcenter repository and then add the following dependency.
+To use in Gradle, simply add the Maven Central repository and then add the following dependency.
 ```gradle
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
 dependencies {
@@ -29,15 +29,6 @@ dependencies {
 
 Similarly in Maven:
 ```xml
-<repositories>
-    <repository>
-        <id>jcenter</id>
-        <url>https://jcenter.bintray.com</url>
-    </repository>
-</repositories>
-
-... 
-
 <dependencies>
     <dependency>
         <groupId>org.redundent</groupId>

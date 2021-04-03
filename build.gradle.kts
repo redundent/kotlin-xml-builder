@@ -12,6 +12,6 @@ allprojects {
 	version = "1.7.2"
 
 	repositories {
-		jcenter()
+		mavenCentral()
 	}
 }
