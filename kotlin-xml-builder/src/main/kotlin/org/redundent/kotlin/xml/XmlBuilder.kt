@@ -53,7 +53,7 @@ fun parse(inputSource: InputSource): Node = parse(DocumentBuilderFactory.newInst
 fun parse(inputStream: InputStream): Node = parse(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputStream))
 fun parse(inputStream: InputStream, systemId: String): Node = parse(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputStream, systemId))
 
-private fun parse(document: Document): Node {
+fun parse(document: Document): Node {
 	val root = document.documentElement
 
 	val result = xml(root.tagName)
