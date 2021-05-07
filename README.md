@@ -194,6 +194,11 @@ It includes many more features for consuming documents.
 
 Release Notes
 =============
+Version 1.7.3
+-
+* Making `private fun parse(Document)` public.\
+Thanks to [@rkklai](https://github.com/rkklai) for requesting this!
+
 Version 1.7.2
 -
 * Fixing issue where a text element that contains an empty string doesn't respect `useSelfClosingTags`.\
