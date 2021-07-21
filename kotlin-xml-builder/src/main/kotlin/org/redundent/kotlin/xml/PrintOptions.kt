@@ -39,15 +39,18 @@ class PrintOptions(
 	val useSelfClosingTags: Boolean = true,
 
 	/**
-	 * Whether to use escaped character or character reference
+	 * The coding type to apply
 	 *
-	 * if false "'" becomes &apos;
+	 * CharacterCodingType.NAMED_CODING:
+	 * "'" becomes "&apos;"
 	 *
-	 * vs
+	 * CharacterCodingType.NUMERIC_CODING:
+	 * "'" becomes "&#39;"
 	 *
-	 * if true "'" becomes &#39;
+	 * CharacterCodingType.CDATA_CODING:
+	 * "'" becomes "<![CDATA[']]>"
 	 */
-	val useCharacterReference: Boolean = false,
+	val characterCoding: CharacterCodingType = CharacterCodingType.NAMED_CODING,
 
 	/**
 	 * Changes the indent for new lines when [pretty] is enabled. The option has no effect when

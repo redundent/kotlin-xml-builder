@@ -169,7 +169,7 @@ open class Node(val nodeName: String) : Element {
 		}
 
 		return " " + attributes.entries.joinToString(" ") {
-			"${it.key}=\"${escapeValue(it.value, printOptions.xmlVersion, printOptions.useCharacterReference)}\""
+			"${it.key}=\"${escapeValue(it.value, printOptions.xmlVersion, printOptions.characterCoding)}\""
 		}
 	}
 

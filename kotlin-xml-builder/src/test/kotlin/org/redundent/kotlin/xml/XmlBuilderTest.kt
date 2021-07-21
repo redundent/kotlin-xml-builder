@@ -539,7 +539,7 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 	}
 
 	@Test
-	fun characterReference() {
+	fun characterTypeNumeric() {
 		val root = xml("root") {
 			element("element") {
 				-"Hello & Goodbye"
@@ -549,7 +549,35 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 			}
 		}
 
-		validate(root, PrintOptions(pretty = true, singleLineTextElements = true, useCharacterReference = true))
+		validate(root, PrintOptions(pretty = true, singleLineTextElements = true, characterCoding = CharacterCodingType.NUMERIC_CODING))
+	}
+
+	@Test
+	fun characterTypeNamed() {
+		val root = xml("root") {
+			element("element") {
+				-"Hello & Goodbye"
+			}
+			element("otherElement") {
+				-"Test"
+			}
+		}
+
+		validate(root, PrintOptions(pretty = true, singleLineTextElements = true, characterCoding = CharacterCodingType.NAMED_CODING))
+	}
+
+	@Test
+	fun characterTypeCdata() {
+		val root = xml("root") {
+			element("element") {
+				-"Hello & Goodbye"
+			}
+			element("otherElement") {
+				-"Test"
+			}
+		}
+
+		validate(root, PrintOptions(pretty = true, singleLineTextElements = true, characterCoding = CharacterCodingType.CDATA_CODING))
 	}
 
 	@Test

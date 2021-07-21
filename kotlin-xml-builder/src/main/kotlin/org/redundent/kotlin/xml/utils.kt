@@ -3,16 +3,19 @@ package org.redundent.kotlin.xml
 import org.apache.commons.lang3.StringEscapeUtils
 import java.lang.StringBuilder
 
-internal fun escapeValue(value: Any?, xmlVersion: XmlVersion, useCharacterReference: Boolean = false): String? {
+internal fun escapeValue(value: Any?, xmlVersion: XmlVersion, characterCodingType: CharacterCodingType = CharacterCodingType.NAMED_CODING): String? {
 	val asString = value?.toString() ?: return null
 
-	if (useCharacterReference) {
-		return referenceCharacter(asString)
-	}
+	return when (characterCodingType) {
 
-	return when(xmlVersion) {
-		XmlVersion.V10 -> StringEscapeUtils.escapeXml10(asString)
-		XmlVersion.V11 -> StringEscapeUtils.escapeXml11(asString)
+		CharacterCodingType.NAMED_CODING -> when(xmlVersion) {
+			XmlVersion.V10 -> StringEscapeUtils.escapeXml10(asString)
+			XmlVersion.V11 -> StringEscapeUtils.escapeXml11(asString)
+		}
+
+		CharacterCodingType.NUMERIC_CODING -> referenceCharacter(asString)
+
+		CharacterCodingType.CDATA_CODING -> "<![CDATA[$asString]]>"
 	}
 }
 
