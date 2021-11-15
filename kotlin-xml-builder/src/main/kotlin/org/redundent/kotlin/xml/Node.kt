@@ -215,7 +215,6 @@ open class Node(val nodeName: String) : Element {
 
 		doctype?.apply {
 			render(appendable, "", printOptions)
-			appendable.appendln()
 		}
 
 		if (_globalLevelProcessingInstructions.isNotEmpty()) {
