@@ -162,6 +162,25 @@ xml("root") {
 <root/>
 ```
 
+## DOCTYPE
+
+As of version 1.7.4, you can specify a DTD (Document Type Declaration).
+
+```kotlin
+xml("root") {
+    doctype(systemId = "mydtd.dtd")
+}
+```
+
+```xml
+<!DOCTYPE root SYSTEM "mydtd.dtd">
+<root/>
+```
+
+### Limitations with DTD
+
+Complex DTDs are not supported.
+
 ## Print Options
 You can now control how your xml will look when rendered by passing the new PrintOptions class as an argument to `toString`.
 
@@ -194,6 +213,11 @@ It includes many more features for consuming documents.
 
 Release Notes
 =============
+Version 1.7.4
+-
+* Adding ability to add a DTD.\
+Thanks to [@anskotid](https://github.com/anskotid) for raising this!
+
 Version 1.7.3
 -
 * Making `private fun parse(Document)` public.\
