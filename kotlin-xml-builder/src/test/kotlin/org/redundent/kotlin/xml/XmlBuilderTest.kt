@@ -566,4 +566,30 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 			validate(root, PrintOptions(pretty = true, useSelfClosingTags = true))
 		}
 	}
+
+	@Test
+	fun doctypeSimple() {
+		val root = xml("root") {
+			doctype()
+		}
+
+		validate(root)
+	}
+
+	@Test
+	fun doctypeSystem() {
+		val root = xml("root") {
+			doctype(systemId = "test.dtd")
+		}
+
+		validate(root)
+	}
+	@Test
+	fun doctypePublic() {
+		val root = xml("root") {
+			doctype(publicId = "-//redundent//PUBLIC DOCTYPE//EN", systemId = "test.dtd")
+		}
+
+		validate(root)
+	}
 }

@@ -47,6 +47,12 @@ open class Node(val nodeName: String) : Element {
 			field = value
 		}
 
+	var standalone: Boolean? = null
+		set(value) {
+			includeXmlProlog = true
+			field = value
+		}
+
 	/**
 	 * Any attributes that belong to this element. You can either interact with this property directly or use the [get] and [set] operators
 	 * @sample [set]
@@ -54,6 +60,8 @@ open class Node(val nodeName: String) : Element {
 	val attributes = LinkedHashMap<String, Any?>()
 
 	private val _globalLevelProcessingInstructions = ArrayList<ProcessingInstructionElement>()
+
+	private var doctype: Doctype? = null
 
 	private val _children = ArrayList<Element>()
 
@@ -196,7 +204,18 @@ open class Node(val nodeName: String) : Element {
 		printOptions.xmlVersion = version
 
 		if (includeXmlProlog) {
-			appendable.append("<?xml version=\"${printOptions.xmlVersion.value}\" encoding=\"$encoding\"?>$lineEnding")
+			appendable.append("<?xml version=\"${printOptions.xmlVersion.value}\" encoding=\"$encoding\"")
+
+			standalone?.run {
+				appendable.append(" standalone=\"${if (this) "yes" else "no"}\"")
+			}
+
+			appendable.append("?>$lineEnding")
+		}
+
+		doctype?.apply {
+			render(appendable, "", printOptions)
+			appendable.appendln()
 		}
 
 		if (_globalLevelProcessingInstructions.isNotEmpty()) {
@@ -348,6 +367,21 @@ open class Node(val nodeName: String) : Element {
 	 */
 	fun globalProcessingInstruction(text: String, vararg attribtes: Pair<String, String>) {
 		_globalLevelProcessingInstructions.add(ProcessingInstructionElement(text, linkedMapOf(*attribtes)))
+	}
+
+	/**
+	 * Add a DTD to the document.
+	 *
+	 * @param name The name of the DTD element. Not supplying this or passing <code>null</code> will default to [nodeName].
+	 * @param publicId The public declaration of the DTD.
+	 * @param systemId The system declaration of the DTD.
+	 */
+	fun doctype(name: String? = null, publicId: String? = null, systemId: String? = null) {
+		if (publicId != null && systemId == null) {
+			throw IllegalStateException("systemId must be provided if publicId is provided")
+		}
+
+		doctype = Doctype(name ?: nodeName, publicId = publicId, systemId = systemId)
 	}
 
 	/**
