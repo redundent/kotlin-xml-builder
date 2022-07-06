@@ -32,3 +32,6 @@ internal fun referenceCharacter(asString: String): String {
 
 	return builder.toString()
 }
+
+internal fun buildName(name: String, namespace: Namespace?): String =
+	if (namespace == null) name else "${namespace.name}:$name"

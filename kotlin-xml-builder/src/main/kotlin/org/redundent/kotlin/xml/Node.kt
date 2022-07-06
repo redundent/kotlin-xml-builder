@@ -251,9 +251,12 @@ open class Node(val nodeName: String) : Element {
 	 * </code>
 	 *
 	 * @param name The name of the element.
+	 * @param namespace Optional namespace object to use to build the name of the attribute. Note this does NOT declare
+	 * the namespace. It simple uses it to build the node name.
 	 * @param init The block that defines the content of the element.
 	 */
-	fun element(name: String, init: (Node.() -> Unit)? = null): Node = initTag(Node(name), init)
+	fun element(name: String, namespace: Namespace? = null, init: (Node.() -> Unit)? = null): Node =
+		initTag(Node(buildName(name, namespace)), init)
 
 	/**
 	 * Adds a basic element with the specific name and value to the parent. This cannot be used for complex elements.
@@ -263,8 +266,10 @@ open class Node(val nodeName: String) : Element {
 	 *
 	 * @param name The name of the element.
 	 * @param value The inner text of the element
+	 * @param namespace Optional namespace object to use to build the name of the attribute. Note this does NOT declare
+	 * the namespace. It simple uses it to build the node name.
 	 */
-	fun element(name: String, value: String): Node = initTag(Node(name)) {
+	fun element(name: String, value: String, namespace: Namespace? = null): Node = initTag(Node(buildName(name, namespace))) {
 		-value
 	}
 
@@ -276,8 +281,10 @@ open class Node(val nodeName: String) : Element {
 	 *
 	 * @receiver The name of the element.
 	 * @param value The inner text of the element
+	 * @param namespace Optional namespace object to use to build the name of the attribute. Note this does NOT declare
+	 * the namespace. It simple uses it to build the node name.
 	 */
-	operator fun String.invoke(value: String): Node = element(this, value)
+	operator fun String.invoke(value: String, namespace: Namespace? = null): Node = element(this, value, namespace)
 
 	/**
 	 * Adds a basic element with the specific name to the parent. This method
@@ -293,7 +300,30 @@ open class Node(val nodeName: String) : Element {
 	 * @param init The block that defines the content of the element.
 	 */
 	operator fun String.invoke(vararg attributes: Pair<String, Any>, init: (Node.() -> Unit)? = null): Node {
-		val e = element(this) {
+		return addElement(this, attributes, null, init)
+	}
+
+	/**
+	 * Adds a basic element with the specific name to the parent. This method
+	 * allows you to specify optional attributes and content
+	 * <code>
+	 *     "url"("key" to "value") {
+	 *     		...
+	 *     }
+	 * </code>
+	 *
+	 * @receiver The name of the element.
+	 * @param namespace Optional namespace object to use to build the name of the attribute. Note this does NOT declare
+	 * the namespace. It simple uses it to build the node name.
+	 * @param attributes Any attributes to add to this element. Can be omited.
+	 * @param init The block that defines the content of the element.
+	 */
+	operator fun String.invoke(namespace: Namespace?, vararg attributes: Pair<String, Any>, init: (Node.() -> Unit)? = null): Node {
+		return addElement(this, attributes, namespace, init)
+	}
+
+	private fun addElement(name: String, attributes: Array<out Pair<String, Any>>, namespace: Namespace?, init: (Node.() -> Unit)?): Node {
+		val e = element(name, namespace) {
 			attributes(*attributes)
 		}
 
@@ -314,9 +344,11 @@ open class Node(val nodeName: String) : Element {
 	 *
 	 * @param name The name of the attribute. This is currenly no validation against the name.
 	 * @param value The attribute value.
+	 * @param namespace Optional namespace object to use to build the name of the attribute. Note this does NOT declare
+	 * the namespace. It simple uses it to build the attribute name.
 	 */
-	fun attribute(name: String, value: Any) {
-		attributes[name] = value.toString()
+	fun attribute(name: String, value: Any, namespace: Namespace? = null) {
+		attributes[buildName(name, namespace)] = value.toString()
 	}
 
 	/**
@@ -336,6 +368,27 @@ open class Node(val nodeName: String) : Element {
 	 */
 	fun attributes(vararg attrs: Pair<String, Any>) {
 		attrs.forEach { attribute(it.first, it.second) }
+	}
+
+	/**
+	 * Adds a set of attributes to the current element.
+	 * @see [attribute]
+	 *
+	 * <code>
+	 *     "url" {
+	 *         attributes(
+	 *             "key" to "value",
+	 *             "id" to "1"
+	 *         )
+	 *     }
+	 * </code>
+	 *
+	 * @param namespace Optional namespace object to use to build the name of the attribute. Note this does NOT declare
+	 * the namespace. It simple uses it to build the attribute name(s).
+	 * @param attrs Collection of the attributes to apply to this element.
+	 */
+	fun attributes(namespace: Namespace, vararg attrs: Pair<String, Any>) {
+		attrs.forEach { attribute(it.first, it.second, namespace) }
 	}
 
 	/**
@@ -392,10 +445,27 @@ open class Node(val nodeName: String) : Element {
 	 * </code>
 	 *
 	 * @param name The name of the namespace.
-	 * @param value The url or descriptor of the namespace
+	 * @param value The url or descriptor of the namespace.
 	 */
-	fun namespace(name: String, value: String) {
+	fun namespace(name: String, value: String): Namespace {
 		attributes["xmlns:$name"] = value
+
+		return Namespace(name, value)
+	}
+
+	/**
+	 * Adds the specified namespace to the element.
+	 * <code>
+	 *     val ns = Namespace("t", "http://someurl.org")
+	 *     "url" {
+	 *         namespace(ns)
+	 *     }
+	 * </code>
+	 *
+	 * @param namespace The namespace object to use for the element's namespace declaration.
+	 */
+	fun namespace(namespace: Namespace) {
+		namespace(namespace.name, namespace.value)
 	}
 
 	/**

@@ -1,0 +1,4 @@
+<t:root xmlns:k="https://otherns.org" xmlns:t="https://ns.org">
+	<k:node attr1="value" k:attr2="value"/>
+	<child xmlns:v="https://test.org" v:key1="value1" v:key2="value2"/>
+</t:root>
