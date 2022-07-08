@@ -15,10 +15,12 @@ internal fun getLineEnding(printOptions: PrintOptions) = if (printOptions.pretty
  * @param root The root element name
  * @param encoding The encoding to use for the xml prolog
  * @param version The XML specification version to use for the xml prolog and attribute encoding
+ * @param namespace Optional namespace object to use to build the name of the attribute. This will also an xmlns
+ * attribute for this value
  * @param init The block that defines the content of the xml
  */
-fun xml(root: String, encoding: String? = null, version: XmlVersion? = null, init: (Node.() -> Unit)? = null): Node {
-	val node = Node(root)
+fun xml(root: String, encoding: String? = null, version: XmlVersion? = null, namespace: Namespace? = null, init: (Node.() -> Unit)? = null): Node {
+	val node = Node(buildName(root, namespace))
 	if (encoding != null) {
 		node.encoding = encoding
 	}
@@ -30,6 +32,10 @@ fun xml(root: String, encoding: String? = null, version: XmlVersion? = null, ini
 	if (init != null) {
 		node.init()
 	}
+
+	if (namespace != null) {
+		node.namespace(namespace)
+	}
 	return node
 }
 
@@ -39,8 +45,8 @@ fun xml(root: String, encoding: String? = null, version: XmlVersion? = null, ini
  * @param name The name of the element
  * @param init The block that defines the content of the xml
  */
-fun node(name: String, init: (Node.() -> Unit)? = null): Node {
-	val node = Node(name)
+fun node(name: String, namespace: Namespace? = null, init: (Node.() -> Unit)? = null): Node {
+	val node = Node(buildName(name, namespace))
 	if (init != null) {
 		node.init()
 	}

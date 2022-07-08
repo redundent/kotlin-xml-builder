@@ -592,4 +592,27 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 
 		validate(root)
 	}
+
+	@Test
+	fun advancedNamespaces() {
+		val ns = Namespace("t", "https://ns.org")
+
+		val root = xml("root", namespace = ns) {
+			val otherNs = namespace("k", "https://otherns.org")
+			"node"(otherNs) {
+				attribute("attr1", "value")
+				attribute("attr2", "value", otherNs)
+			}
+
+			"child" {
+				val thirdNs = namespace("v", "https://test.org")
+				attributes(thirdNs,
+					"key1" to "value1",
+					"key2" to "value2")
+			}
+
+		}
+
+		validate(root)
+	}
 }

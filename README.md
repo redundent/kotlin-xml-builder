@@ -213,6 +213,11 @@ It includes many more features for consuming documents.
 
 Release Notes
 =============
+Version 1.8.0
+-
+* Adding more precise functionality for xml namespaces, allowing typesafe building of elements and attributes with namespaces.\
+Thanks to [@asm0dey](https://github.com/asm0dey) for requesting this!
+
 Version 1.7.4
 -
 * Adding ability to add a DTD.\
