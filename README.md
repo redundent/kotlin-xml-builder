@@ -131,6 +131,45 @@ produces
     </person>
 </people>
 ```
+
+### Namespaces
+Version 1.8.0 added more precise control over how namespaces are used. You can add a namespace to any element or attribute
+and the correct node/attribute name will be used automatically. When using the new namespace aware methods, you no longer
+need to manually add the namespace to the element.
+
+See examples of `< 1.8.0` and `>= 1.8.0` below to produce the following xml
+
+```xml
+<t:root xmlns:t="https://ns.org">
+    <t:element t:key="value"/>
+</t:root>
+```
+
+#### < 1.8.0
+```kotlin
+xml("t:root") {
+    namespace("t", "https://ns.org")
+    "t:element"("t:key" to "value")
+}
+```
+
+#### &gt;= 1.8.0
+```kotlin
+val ns = Namespace("t", "https://ns.org")
+xml("root", ns) {
+    "element"(ns, Attribute("key", "value", ns))
+}
+```
+
+You can also use the `Namespace("https://ns.org")` constructor to create a Namespace object that represents the default xmlns.
+
+#### Things to be aware of
+
+* Previously, all namespace declarations would get added to the attributes maps immediately. That no long happens. All
+namespaces get added at render time. To retrieve a list of the current namespaces of a node, use the `namespaces` property.
+* When a namespace is provided for a node or attribute, it will be declared on that element IF it is not already declared
+on the root element or one of the element's parents.
+
 ### Processing Instructions
 You can add processing instructions to any element by using the `processingInstruction` method.
 

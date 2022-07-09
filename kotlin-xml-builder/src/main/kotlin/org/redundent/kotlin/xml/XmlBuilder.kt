@@ -5,6 +5,7 @@ import org.xml.sax.InputSource
 import java.io.File
 import java.io.InputStream
 import javax.xml.parsers.DocumentBuilderFactory
+import kotlin.math.min
 import org.w3c.dom.Node as W3CNode
 
 internal fun getLineEnding(printOptions: PrintOptions) = if (printOptions.pretty) System.lineSeparator() else ""
@@ -103,5 +104,11 @@ private fun copyAttributes(source: W3CNode, dest: Node) {
 
 	(0 until attributes.length)
 			.map(attributes::item)
-			.forEach { dest.attribute(it.nodeName, it.nodeValue) }
+			.forEach {
+				if (it.nodeName.startsWith("xmlns")) {
+					dest.namespace(it.nodeName.substring(min(6, it.nodeName.length)), it.nodeValue)
+				} else {
+					dest.attribute(it.nodeName, it.nodeValue)
+				}
+			}
 }
