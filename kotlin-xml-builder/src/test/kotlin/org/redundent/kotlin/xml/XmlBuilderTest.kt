@@ -595,22 +595,31 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 
 	@Test
 	fun advancedNamespaces() {
-		val ns = Namespace("t", "https://ns.org")
+		val ns1 = Namespace("a", "https://ns1.org")
+		val ns2 = Namespace("https://ns2.org")
+		val ns3 = Namespace("b", "https://ns3.org")
+		val ns4 = Namespace("c", "https://ns4.org")
+		val ns5 = Namespace("d", "https://ns5.org")
+		val ns6 = Namespace("e", "https://ns6.org")
 
-		val root = xml("root", namespace = ns) {
-			val otherNs = namespace("k", "https://otherns.org")
-			"node"(otherNs) {
+		val root = xml("root", namespace = ns1) {
+			namespace(ns2)
+			"node"(ns3) {
 				attribute("attr1", "value")
-				attribute("attr2", "value", otherNs)
+				attribute("attr2", "value", ns4)
 			}
 
 			"child" {
-				val thirdNs = namespace("v", "https://test.org")
-				attributes(thirdNs,
+				attributes(ns5,
 					"key1" to "value1",
 					"key2" to "value2")
-			}
+				attributes(
+					Attribute("key3", "value3", ns6),
+					Attribute("key4", "value4", ns1)
+				)
 
+				"sub"(ns5, Attribute("key5", "value5", ns6))
+			}
 		}
 
 		validate(root)

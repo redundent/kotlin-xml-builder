@@ -16,13 +16,38 @@ open class Node(val nodeName: String) : Element {
 		}
 	}
 
+	private var parent: Node? = null
+	private val _globalLevelProcessingInstructions = ArrayList<ProcessingInstructionElement>()
+	private var doctype: Doctype? = null
+	private val _namespaces: MutableSet<Namespace> = LinkedHashSet()
+	private val _children = ArrayList<Element>()
+	private val childOrderMap: Map<String, Int>? by lazy {
+		if (!isReflectionAvailable) {
+			return@lazy null
+		}
+
+		@Suppress("NO_REFLECTION_IN_CLASS_PATH") // Checked for reflection class above
+		val xmlTypeAnnotation = this::class.annotations.firstOrNull { it is XmlType } as? XmlType ?: return@lazy null
+
+		val childOrder = xmlTypeAnnotation.childOrder
+
+		childOrder.indices.associateBy { childOrder[it] }
+	}
+
+	val namespaces: Collection<Namespace>
+		get() = LinkedHashSet(_namespaces)
+
 	/**
 	 * The default xmlns for the document. To add other namespaces, use the [namespace] method
 	 */
 	var xmlns: String?
-		get() = this["xmlns"]
+		get() = namespaces.firstOrNull(Namespace::isDefault)?.value
 		set(value) {
-			this["xmlns"] = value
+			if (value != null) {
+				addNamespace(Namespace(value))
+			} else {
+				_namespaces.removeIf(Namespace::isDefault)
+			}
 		}
 
 	/**
@@ -59,33 +84,25 @@ open class Node(val nodeName: String) : Element {
 	 */
 	val attributes = LinkedHashMap<String, Any?>()
 
-	private val _globalLevelProcessingInstructions = ArrayList<ProcessingInstructionElement>()
-
-	private var doctype: Doctype? = null
-
-	private val _children = ArrayList<Element>()
-
-	private val childOrderMap: Map<String, Int>? by lazy {
-		if (!isReflectionAvailable) {
-			return@lazy null
-		}
-
-		@Suppress("NO_REFLECTION_IN_CLASS_PATH") // Checked for reflection class above
-		val xmlTypeAnnotation = this::class.annotations.firstOrNull { it is XmlType } as? XmlType ?: return@lazy null
-
-		val childOrder = xmlTypeAnnotation.childOrder
-
-		childOrder.indices.associateBy { childOrder[it] }
-	}
-
 	val children: List<Element>
 		get() = _children
+
+	private fun getParentNamespaces(): Set<Namespace> {
+		return generateSequence(parent, Node::parent)
+			.flatMap { it.namespaces.asSequence() }
+			.toSet()
+	}
 
 	private fun <T : Element> initTag(tag: T, init: (T.() -> Unit)?): T {
 		if (init != null) {
 			tag.init()
 		}
 		_children.add(tag)
+
+		if (tag is Node) {
+			tag.parent = this
+		}
+
 		return tag
 	}
 
@@ -120,7 +137,7 @@ open class Node(val nodeName: String) : Element {
 
 	override fun render(builder: Appendable, indent: String, printOptions: PrintOptions) {
 		val lineEnding = getLineEnding(printOptions)
-		builder.append("$indent<$nodeName${renderAttributes(printOptions)}")
+		builder.append("$indent<$nodeName${renderNamespaces()}${renderAttributes(printOptions)}")
 
 		if (!isEmptyOrSingleEmptyTextElement()) {
 			if (printOptions.pretty && printOptions.singleLineTextElements
@@ -171,12 +188,28 @@ open class Node(val nodeName: String) : Element {
 		}
 	}
 
+	private fun renderNamespaces(): String {
+		if (namespaces.isEmpty()) {
+			return ""
+		}
+
+		val parentNamespaces = getParentNamespaces()
+		val namespacesNeeded = namespaces
+			.filterNot { parentNamespaces.contains(it) }
+
+		if (namespacesNeeded.isEmpty()) {
+			return ""
+		}
+
+		return namespacesNeeded.joinToString(" ", prefix = " ")
+	}
+
 	private fun renderAttributes(printOptions: PrintOptions): String {
 		if (attributes.isEmpty()) {
 			return ""
 		}
 
-		return " " + attributes.entries.joinToString(" ") {
+		return attributes.entries.joinToString(" ", prefix = " ") {
 			"${it.key}=\"${escapeValue(it.value, printOptions.xmlVersion, printOptions.useCharacterReference)}\""
 		}
 	}
@@ -251,12 +284,17 @@ open class Node(val nodeName: String) : Element {
 	 * </code>
 	 *
 	 * @param name The name of the element.
-	 * @param namespace Optional namespace object to use to build the name of the attribute. Note this does NOT declare
-	 * the namespace. It simple uses it to build the node name.
+	 * @param namespace Optional namespace object to use to build the name of the attribute.
 	 * @param init The block that defines the content of the element.
 	 */
-	fun element(name: String, namespace: Namespace? = null, init: (Node.() -> Unit)? = null): Node =
-		initTag(Node(buildName(name, namespace)), init)
+	fun element(name: String, namespace: Namespace? = null, init: (Node.() -> Unit)? = null): Node {
+		val node = Node(buildName(name, namespace))
+		if (namespace != null) {
+			node.addNamespace(namespace)
+		}
+		initTag(node, init)
+		return node
+	}
 
 	/**
 	 * Adds a basic element with the specific name and value to the parent. This cannot be used for complex elements.
@@ -266,11 +304,18 @@ open class Node(val nodeName: String) : Element {
 	 *
 	 * @param name The name of the element.
 	 * @param value The inner text of the element
-	 * @param namespace Optional namespace object to use to build the name of the attribute. Note this does NOT declare
-	 * the namespace. It simple uses it to build the node name.
+	 * @param namespace Optional namespace object to use to build the name of the attribute.
 	 */
-	fun element(name: String, value: String, namespace: Namespace? = null): Node = initTag(Node(buildName(name, namespace))) {
-		-value
+	fun element(name: String, value: String, namespace: Namespace? = null): Node {
+		val node = Node(buildName(name, namespace))
+		if (namespace != null) {
+			node.addNamespace(namespace)
+		}
+
+		initTag(node) {
+			-value
+		}
+		return node
 	}
 
 	/**
@@ -281,8 +326,7 @@ open class Node(val nodeName: String) : Element {
 	 *
 	 * @receiver The name of the element.
 	 * @param value The inner text of the element
-	 * @param namespace Optional namespace object to use to build the name of the attribute. Note this does NOT declare
-	 * the namespace. It simple uses it to build the node name.
+	 * @param namespace Optional namespace object to use to build the name of the attribute.
 	 */
 	operator fun String.invoke(value: String, namespace: Namespace? = null): Node = element(this, value, namespace)
 
@@ -300,29 +344,63 @@ open class Node(val nodeName: String) : Element {
 	 * @param init The block that defines the content of the element.
 	 */
 	operator fun String.invoke(vararg attributes: Pair<String, Any>, init: (Node.() -> Unit)? = null): Node {
-		return addElement(this, attributes, null, init)
+		return addElement(this, attributes.map { Attribute(it.first, it.second) }.toTypedArray(), null, init)
 	}
 
 	/**
 	 * Adds a basic element with the specific name to the parent. This method
-	 * allows you to specify optional attributes and content
+	 * allows you to specify the namespace of the element as well as optional attributes and content
 	 * <code>
-	 *     "url"("key" to "value") {
+	 *     "url"(ns, "key" to "value") {
 	 *     		...
 	 *     }
 	 * </code>
 	 *
 	 * @receiver The name of the element.
-	 * @param namespace Optional namespace object to use to build the name of the attribute. Note this does NOT declare
-	 * the namespace. It simple uses it to build the node name.
+	 * @param namespace Namespace object to use to build the name of the attribute.
 	 * @param attributes Any attributes to add to this element. Can be omited.
 	 * @param init The block that defines the content of the element.
 	 */
-	operator fun String.invoke(namespace: Namespace?, vararg attributes: Pair<String, Any>, init: (Node.() -> Unit)? = null): Node {
+	operator fun String.invoke(namespace: Namespace, vararg attributes: Pair<String, Any>, init: (Node.() -> Unit)? = null): Node {
+		return addElement(this, attributes.map { Attribute(it.first, it.second) }.toTypedArray(), namespace, init)
+	}
+
+	/**
+	 * Adds a basic element with the specific name to the parent. This method
+	 * allows you to specify the namespace of the element
+	 * <code>
+	 *     "url"(ns) {
+	 *     		...
+	 *     }
+	 * </code>
+	 *
+	 * @receiver The name of the element.
+	 * @param namespace Namespace object to use to build the name of the attribute.
+	 * @param init The block that defines the content of the element.
+	 */
+	operator fun String.invoke(namespace: Namespace, init: (Node.() -> Unit)? = null): Node {
+		return addElement(this, emptyArray(), namespace, init)
+	}
+
+	/**
+	 * Adds a basic element with the specific name to the parent. This method
+	 * allows you to specify namespace of the element as well as optional attributes (with namespaces) and content
+	 * <code>
+	 *     "url"(ns, Attribute("key", "value", otherNs)) {
+	 *     		...
+	 *     }
+	 * </code>
+	 *
+	 * @receiver The name of the element.
+	 * @param namespace Namespace object to use to build the name of the attribute.
+	 * @param attributes Any attributes to add to this element. Can be omited.
+	 * @param init The block that defines the content of the element.
+	 */
+	operator fun String.invoke(namespace: Namespace, vararg attributes: Attribute, init: (Node.() -> Unit)? = null): Node {
 		return addElement(this, attributes, namespace, init)
 	}
 
-	private fun addElement(name: String, attributes: Array<out Pair<String, Any>>, namespace: Namespace?, init: (Node.() -> Unit)?): Node {
+	private fun addElement(name: String, attributes: Array<out Attribute>, namespace: Namespace?, init: (Node.() -> Unit)?): Node {
 		val e = element(name, namespace) {
 			attributes(*attributes)
 		}
@@ -332,6 +410,14 @@ open class Node(val nodeName: String) : Element {
 		}
 
 		return e
+	}
+
+	private fun addNamespace(namespace: Namespace) {
+		if (namespace.isDefault) {
+			_namespaces.removeIf(Namespace::isDefault)
+		}
+
+		_namespaces.add(namespace)
 	}
 
 	/**
@@ -348,6 +434,9 @@ open class Node(val nodeName: String) : Element {
 	 * the namespace. It simple uses it to build the attribute name.
 	 */
 	fun attribute(name: String, value: Any, namespace: Namespace? = null) {
+		if (namespace != null) {
+			addNamespace(namespace)
+		}
 		attributes[buildName(name, namespace)] = value.toString()
 	}
 
@@ -368,6 +457,30 @@ open class Node(val nodeName: String) : Element {
 	 */
 	fun attributes(vararg attrs: Pair<String, Any>) {
 		attrs.forEach { attribute(it.first, it.second) }
+	}
+
+	/**
+	 * Adds a set of attributes to the current element.
+	 * @see [attribute]
+	 *
+	 * <code>
+	 *     "url" {
+	 *         attributes(
+	 *             Attribute("key", "value", namespace),
+	 *             Attribute("id", "1", namespace)
+	 *         )
+	 *     }
+	 * </code>
+	 *
+	 * @param attrs Collection of the attributes to apply to this element.
+	 */
+	fun attributes(vararg attrs: Attribute) {
+		for (attr in attrs) {
+			if (attr.namespace != null) {
+				addNamespace(attr.namespace)
+			}
+			attribute(buildName(attr.name, attr.namespace), attr.value)
+		}
 	}
 
 	/**
@@ -448,9 +561,9 @@ open class Node(val nodeName: String) : Element {
 	 * @param value The url or descriptor of the namespace.
 	 */
 	fun namespace(name: String, value: String): Namespace {
-		attributes["xmlns:$name"] = value
-
-		return Namespace(name, value)
+		val ns = Namespace(name, value)
+		namespace(ns)
+		return ns
 	}
 
 	/**
@@ -465,7 +578,7 @@ open class Node(val nodeName: String) : Element {
 	 * @param namespace The namespace object to use for the element's namespace declaration.
 	 */
 	fun namespace(namespace: Namespace) {
-		namespace(namespace.name, namespace.value)
+		addNamespace(namespace)
 	}
 
 	/**
@@ -473,6 +586,7 @@ open class Node(val nodeName: String) : Element {
 	 * @param node The node to append.
 	 */
 	fun addNode(node: Node) {
+		node.parent = this
 		_children.add(node)
 	}
 
@@ -485,6 +599,9 @@ open class Node(val nodeName: String) : Element {
 	 */
 	fun addNodeAfter(node: Node, after: Node) {
 		val index = findIndex(after)
+
+		node.parent = this
+
 		if (index + 1 == _children.size) {
 			_children.add(node)
 		} else {
@@ -500,6 +617,7 @@ open class Node(val nodeName: String) : Element {
 	 * @throws IllegalArgumentException If [before] can't be found
 	 */
 	fun addNodeBefore(node: Node, before: Node) {
+		node.parent = this
 		_children.add(findIndex(before), node)
 	}
 
@@ -524,6 +642,7 @@ open class Node(val nodeName: String) : Element {
 	fun replaceNode(existing: Node, newNode: Node) {
 		val index = findIndex(existing)
 
+		newNode.parent = this
 		_children.removeAt(index)
 		_children.add(index, newNode)
 	}

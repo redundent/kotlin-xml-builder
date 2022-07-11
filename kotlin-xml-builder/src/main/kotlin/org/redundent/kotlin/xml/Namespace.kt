@@ -3,7 +3,7 @@ package org.redundent.kotlin.xml
 /**
  * Represents an xml namespace (xmlns).
  */
-class Namespace(
+data class Namespace(
 	/**
 	 * The name or prefix of the namespace
 	 */
@@ -11,4 +11,15 @@ class Namespace(
 	/**
 	 * The value/uri/url of the namespace
 	 */
-	val value: String)
+	val value: String) {
+
+	constructor(value: String) : this("", value)
+
+	val isDefault: Boolean = name.isEmpty()
+
+	val fqName: String = if (isDefault) "xmlns" else "xmlns:$name"
+
+	override fun toString(): String {
+		return "$fqName=\"$value\""
+	}
+}
