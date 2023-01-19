@@ -220,6 +220,30 @@ xml("root") {
 
 Complex DTDs are not supported.
 
+## Unsafe
+You can now use unsafe text for element and attribute values.
+```kotlin
+xml("root") {
+	unsafeText("<xml/>")
+}
+```
+produces
+```xml
+<root>
+    <xml/>
+</root>
+```
+
+```kotlin
+xml("root") {
+	attribute("attr", unsafe("&#123;"))
+}
+```
+produces
+```xml
+<root attr="&amp;#123;"/>
+```
+
 ## Print Options
 You can now control how your xml will look when rendered by passing the new PrintOptions class as an argument to `toString`.
 
@@ -252,6 +276,15 @@ It includes many more features for consuming documents.
 
 Release Notes
 =============
+Version 1.9.0
+-
+* Adding `unsafe` and `unsafeText` methods to allow for unescaped values in elements and attributes.\
+Thanks to [@krzysztofsroga](https://github.com/krzysztofsroga) for requesting this!
+
+**BREAKING CHANGES**
+* The `attributes` property on a node will now return an immutable map (`Map` instead of `LinkedHashMap`). This property can no longer be used to\
+manipulate the attributes. Use `set`/`removeAttribute` for that.
+ 
 Version 1.8.0
 -
 * Adding more precise functionality for xml namespaces, allowing typesafe building of elements and attributes with namespaces.\

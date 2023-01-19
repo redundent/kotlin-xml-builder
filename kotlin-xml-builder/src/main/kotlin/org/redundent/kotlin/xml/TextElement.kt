@@ -5,7 +5,7 @@ package org.redundent.kotlin.xml
  * For example:
  * <loc>http://blog.redundent.org</loc>
  */
-open class TextElement internal constructor(val text: String) : Element {
+open class TextElement internal constructor(val text: String, private val unsafe: Boolean = false) : Element {
 	private fun isEmpty() = text.trim('\n', '\r').isBlank()
 
 	override fun render(builder: Appendable, indent: String, printOptions: PrintOptions) {
@@ -22,8 +22,13 @@ open class TextElement internal constructor(val text: String) : Element {
 		builder.append(renderedText(printOptions))
 	}
 
-	internal open fun renderedText(printOptions: PrintOptions): String? =
-		escapeValue(text, printOptions.xmlVersion, printOptions.useCharacterReference)
+	internal open fun renderedText(printOptions: PrintOptions): String? {
+		return if (unsafe) {
+			text
+		} else {
+			escapeValue(text, printOptions.xmlVersion, printOptions.useCharacterReference)
+		}
+	}
 
 	override fun equals(other: Any?): Boolean = other is TextElement && other.text == text
 

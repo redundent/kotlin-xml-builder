@@ -113,4 +113,26 @@ class NodeTest {
 		assertNotEquals(xml1, xml2)
 		assertNotEquals(xml2, xml1)
 	}
+
+	@Suppress("ReplaceGetOrSet")
+	@Test
+	fun set() {
+		val xml = xml("root")
+
+		xml.set("myAttr", "myValue")
+
+		assertEquals("myValue" as String?, xml.get("myAttr"))
+	}
+
+	@Suppress("ReplaceGetOrSet")
+	@Test
+	fun `set null`() {
+		val xml = xml("root")
+
+		xml.set("myAttr", "myValue")
+		assertEquals("myValue" as String?, xml.get("myAttr"))
+
+		xml.set("myAttr", null)
+		assertFalse(xml.hasAttribute("myAttr"))
+	}
 }

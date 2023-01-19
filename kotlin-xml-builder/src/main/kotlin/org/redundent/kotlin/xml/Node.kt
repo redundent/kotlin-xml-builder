@@ -3,8 +3,8 @@ package org.redundent.kotlin.xml
 import org.apache.commons.lang3.builder.EqualsBuilder
 import org.apache.commons.lang3.builder.HashCodeBuilder
 import java.util.ArrayList
-import java.util.LinkedHashMap
 import java.util.NoSuchElementException
+import kotlin.collections.LinkedHashMap
 
 /**
  * Base type for all elements. This is what handles pretty much all the rendering and building.
@@ -20,6 +20,7 @@ open class Node(val nodeName: String) : Element {
 	private val _globalLevelProcessingInstructions = ArrayList<ProcessingInstructionElement>()
 	private var doctype: Doctype? = null
 	private val _namespaces: MutableSet<Namespace> = LinkedHashSet()
+	private val _attributes: LinkedHashMap<String, Any?> = LinkedHashMap()
 	private val _children = ArrayList<Element>()
 	private val childOrderMap: Map<String, Int>? by lazy {
 		if (!isReflectionAvailable) {
@@ -79,10 +80,14 @@ open class Node(val nodeName: String) : Element {
 		}
 
 	/**
-	 * Any attributes that belong to this element. You can either interact with this property directly or use the [get] and [set] operators
+	 * Any attributes that belong to this element. This will always return a copy of the attribute map.
 	 * @sample [set]
 	 */
-	val attributes = LinkedHashMap<String, Any?>()
+	val attributes: Map<String, Any?>
+		get() = _attributes.mapValues {
+			val value = it.value
+			if (value is Unsafe) value.value else it.value
+		}
 
 	val children: List<Element>
 		get() = _children
@@ -114,12 +119,14 @@ open class Node(val nodeName: String) : Element {
 	 * </code>
 	 */
 	operator fun <T> get(attributeName: String): T? {
+		val value = _attributes[attributeName]
 		@Suppress("UNCHECKED_CAST")
-		return attributes[attributeName] as T?
+		return (if (value is Unsafe) value.value else value) as T?
 	}
 
 	/**
-	 * Allows for easy access of adding/updating this node's attributes
+	 * Allows for easy access of adding/updating this node's attributes. Setting the value of an attribute to "null"
+	 * will remove the attribute .
 	 *
 	 * <code>
 	 *     element["key"] = "value"
@@ -127,13 +134,20 @@ open class Node(val nodeName: String) : Element {
 	 */
 	operator fun set(attributeName: String, value: Any?) {
 		if (value == null) {
-			attributes.remove(attributeName)
+			removeAttribute(attributeName)
 		} else {
-			attributes[attributeName] = value
+			_attributes[attributeName] = value
 		}
 	}
 
-	fun hasAttribute(attributeName: String): Boolean = attributes.containsKey(attributeName)
+	fun hasAttribute(attributeName: String): Boolean = _attributes.containsKey(attributeName)
+
+	/**
+	 * Removes the specified attribute from the attributes map.
+	 */
+	fun removeAttribute(attributeName: String) {
+		_attributes.remove(attributeName)
+	}
 
 	override fun render(builder: Appendable, indent: String, printOptions: PrintOptions) {
 		val lineEnding = getLineEnding(printOptions)
@@ -205,12 +219,13 @@ open class Node(val nodeName: String) : Element {
 	}
 
 	private fun renderAttributes(printOptions: PrintOptions): String {
-		if (attributes.isEmpty()) {
+		if (_attributes.isEmpty()) {
 			return ""
 		}
 
-		return attributes.entries.joinToString(" ", prefix = " ") {
-			"${it.key}=\"${escapeValue(it.value, printOptions.xmlVersion, printOptions.useCharacterReference)}\""
+		return _attributes.entries.joinToString(" ", prefix = " ") {
+			val value = it.value
+			"${it.key}=\"${if (value is Unsafe) value.value?.toString() else escapeValue(it.value, printOptions.xmlVersion, printOptions.useCharacterReference)}\""
 		}
 	}
 
@@ -258,6 +273,10 @@ open class Node(val nodeName: String) : Element {
 	}
 
 	operator fun String.unaryMinus() = text(this)
+
+	fun unsafeText(text: String) {
+		_children.add(TextElement(text, unsafe = true))
+	}
 
 	fun text(text: String) {
 		_children.add(TextElement(text))
@@ -437,7 +456,7 @@ open class Node(val nodeName: String) : Element {
 		if (namespace != null) {
 			addNamespace(namespace)
 		}
-		attributes[buildName(name, namespace)] = value.toString()
+		_attributes[buildName(name, namespace)] = value
 	}
 
 	/**
@@ -709,7 +728,7 @@ open class Node(val nodeName: String) : Element {
 				.append(nodeName, other.nodeName)
 				.append(encoding, other.encoding)
 				.append(version, other.version)
-				.append(attributes, other.attributes)
+				.append(_attributes, other._attributes)
 				.append(_globalLevelProcessingInstructions, other._globalLevelProcessingInstructions)
 				.append(_children, other._children)
 				.isEquals
@@ -719,7 +738,7 @@ open class Node(val nodeName: String) : Element {
 			.append(nodeName)
 			.append(encoding)
 			.append(version)
-			.append(attributes)
+			.append(_attributes)
 			.append(_globalLevelProcessingInstructions)
 			.append(_children)
 			.toHashCode()
