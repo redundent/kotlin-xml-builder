@@ -6,6 +6,7 @@ import org.w3c.dom.Document
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.StringWriter
+import java.util.MissingResourceException
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
@@ -27,6 +28,7 @@ open class XmlBuilderTestBase {
 	protected fun getInputStream(): InputStream {
 		val resName = "/test-results/${javaClass.simpleName}/${testName.methodName}.xml"
 		return javaClass.getResourceAsStream(resName)
+			?: throw MissingResourceException("Cannot find expected xml resource: $resName. Did you forget to create it?", javaClass.name, testName.methodName)
 	}
 
 	protected fun validate(xml: Node, prettyFormat: Boolean = true) {

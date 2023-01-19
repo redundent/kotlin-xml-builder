@@ -624,4 +624,14 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 
 		validate(root)
 	}
+
+	@Test
+	fun unsafeAttributeValue() {
+		val root = xml("root") {
+			unsafeText("&#123;")
+			attribute("test", unsafe("&#456;"))
+		}
+
+		validate(root)
+	}
 }
