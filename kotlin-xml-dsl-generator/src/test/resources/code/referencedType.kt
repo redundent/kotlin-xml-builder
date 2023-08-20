@@ -1,13 +1,21 @@
-@file:Suppress("PropertyName", "ReplaceArrayOfWithLiteral", "LocalVariableName", "FunctionName", "RemoveRedundantBackticks")
+@file:Suppress("PropertyName", "LocalVariableName", "FunctionName", "RedundantVisibilityModifier")
 
 package org.redundent.generated
 
-import org.redundent.kotlin.xml.*
+import kotlin.String
+import kotlin.Suppress
+import org.redundent.kotlin.xml.Node
 
-open class `RootType`(nodeName: String) : Node(nodeName) {
-	var `id`: kotlin.String? by attributes
+public open class RootType(
+  nodeName: String,
+) : Node(nodeName) {
+  public var id: String?
+    get() = get("id")
+    set(`value`) {
+      set("id", `value`)
+    }
 }
 
-fun `RootType`.`comments`(value: kotlin.String) {
-	"comments"(value)
+public fun RootType.comments(`value`: String) {
+  "comments"(`value`)
 }

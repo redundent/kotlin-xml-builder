@@ -1,27 +1,37 @@
-@file:Suppress("PropertyName", "ReplaceArrayOfWithLiteral", "LocalVariableName", "FunctionName", "RemoveRedundantBackticks")
+@file:Suppress("PropertyName", "LocalVariableName", "FunctionName", "RedundantVisibilityModifier")
 
 package org.redundent.generated
 
-import org.redundent.kotlin.xml.*
+import kotlin.String
+import kotlin.Suppress
+import kotlin.Unit
+import org.redundent.kotlin.xml.Node
+import org.redundent.kotlin.xml.XmlType
 
 @XmlType(childOrder = arrayOf("comments",
 		"sub-type"))
-open class `MemberType`(nodeName: String) : Node(nodeName) {
-	var `id`: kotlin.String? by attributes
+public open class MemberType(
+  nodeName: String,
+) : Node(nodeName) {
+  public var id: String?
+    get() = get("id")
+    set(`value`) {
+      set("id", `value`)
+    }
 
-	fun `comments`(value: kotlin.String) {
-		"comments"(value)
-	}
+  public fun comments(`value`: String) {
+    "comments"(`value`)
+  }
 
-	fun `sub-type`(__block__: `MemberType`.`SubType`.() -> Unit): `SubType` {
-		val `sub-type` = `SubType`()
-		`sub-type`.apply(__block__)
-		return `sub-type`
-	}
+  public fun `sub-type`(__block__: SubType.() -> Unit): SubType {
+    val `sub-type` = SubType()
+    `sub-type`.apply(__block__)
+    return `sub-type`
+  }
 
-	inner class `SubType` : Node("SubType") {
-		fun `sub-type-element`(value: kotlin.String) {
-			"sub-type-element"(value)
-		}
-	}
+  public inner class SubType : Node("SubType") {
+    public fun `sub-type-element`(`value`: String) {
+      "sub-type-element"(`value`)
+    }
+  }
 }

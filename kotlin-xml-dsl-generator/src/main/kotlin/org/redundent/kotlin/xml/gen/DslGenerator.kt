@@ -17,7 +17,7 @@ fun main(args: Array<String>) {
 
 		println("\nGenerating schema to ${output.absolutePath}")
 
-		val generated = DslGenerator(opts).generate()
+		val generated = DslGenerator(opts, output).generate()
 
 		output.parentFile.mkdirs()
 
@@ -48,30 +48,51 @@ Options:
 	)
 }
 
-class DslGenerator(private val opts: ExOptions) {
+class DslGenerator(private val opts: ExOptions, private val output: File) {
 	fun generate(): String {
 		val model = ModelLoader.load(opts, JCodeModel(), ErrReceiver())
 				?: throw BadCommandLineException("Something failed generating the code model")
 
 		val outline = BeanGenerator.generate(model, ErrReceiver())
 
-		val codeWriter = CodeWriter(outline)
+		val codeWriter = CodeWriter(outline, opts.defaultPackage, output.absolutePath)
 		val schemaOutline = SchemaOutline(outline, opts)
 
 		codeWriter.writeSuppress {
-			addAll(listOf("PropertyName", "ReplaceArrayOfWithLiteral", "LocalVariableName", "FunctionName", "RemoveRedundantBackticks"))
+			addAll(
+				listOf(
+					"PropertyName",
+					"LocalVariableName",
+					"FunctionName",
+					"RedundantVisibilityModifier"
+				)
+			)
 
 			if (schemaOutline.enums.isNotEmpty()) {
 				add("EnumEntryName")
 			}
 		}
 
-		codeWriter.writePackage(opts.defaultPackage)
-		codeWriter.writeImport("org.redundent.kotlin.xml.*\n")
+		schemaOutline.enums
+			.map { it.build(outline) }
+			.forEach { codeWriter.kotlinFile.addType(it) }
 
-		schemaOutline.enums.forEach { it.write(codeWriter) }
+		for (kls in schemaOutline.classes) {
+			codeWriter.kotlinFile.addType(kls.build(outline))
 
-		schemaOutline.classes.forEach { it.write(codeWriter) }
+			if (!opts.useMemberFunctions) {
+				val allMembers = kls.innerClasses.flatMap { it.memberElements } +
+						kls.memberElements
+
+				allMembers
+					.map { it.build(outline) }
+					.forEach { codeWriter.kotlinFile.addFunction(it) }
+			}
+
+			if (kls.rootElement != null) {
+				codeWriter.kotlinFile.addFunction(kls.rootElement!!.build(outline))
+			}
+		}
 
 		return codeWriter.asText()
 	}

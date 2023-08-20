@@ -34,6 +34,8 @@
 			<xsd:attribute name="unsignedInt" type="xsd:unsignedInt"/>
 			<xsd:attribute name="unsignedLong" type="xsd:unsignedLong"/>
 			<xsd:attribute name="unsignedShort" type="xsd:unsignedShort"/>
+			<xsd:anyAttribute namespace="ref">
+			</xsd:anyAttribute>
 		</xsd:complexType>
 	</xsd:element>
 </xsd:schema>

@@ -1,17 +1,22 @@
-@file:Suppress("PropertyName", "ReplaceArrayOfWithLiteral", "LocalVariableName", "FunctionName", "RemoveRedundantBackticks")
+@file:Suppress("PropertyName", "LocalVariableName", "FunctionName", "RedundantVisibilityModifier")
 
 package org.redundent.generated
 
-import org.redundent.kotlin.xml.*
+import kotlin.String
+import kotlin.Suppress
+import kotlin.Unit
+import org.redundent.kotlin.xml.Node
 
-open class `Root`(nodeName: String) : Node(nodeName)
+public open class Root(
+  nodeName: String,
+) : Node(nodeName)
 
-fun `Root`.`name`(value: kotlin.String) {
-	"name"(value)
+public fun Root.name(`value`: String) {
+  "name"(`value`)
 }
 
-fun `root`(__block__: `Root`.() -> Unit): `Root` {
-	val `root` = `Root`("root")
-	`root`.apply(__block__)
-	return `root`
+public fun root(__block__: Root.() -> Unit): Root {
+  val root = Root("root")
+  root.apply(__block__)
+  return root
 }

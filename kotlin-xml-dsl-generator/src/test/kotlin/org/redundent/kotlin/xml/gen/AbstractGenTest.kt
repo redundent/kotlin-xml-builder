@@ -37,7 +37,7 @@ abstract class AbstractGenTest {
 			opts.addBindFile(bindingFile)
 		}
 
-		val text = cleanText(DslGenerator(opts).generate().replace(System.lineSeparator(), "\n"))
+		val text = cleanText(DslGenerator(opts, File(".")).generate().replace(System.lineSeparator(), "\n"))
 
 		assertEquals(code, text, "generated code is not the same")
 	}

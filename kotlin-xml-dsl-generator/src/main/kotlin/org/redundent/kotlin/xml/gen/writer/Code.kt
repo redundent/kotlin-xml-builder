@@ -1,5 +1,7 @@
 package org.redundent.kotlin.xml.gen.writer
 
-interface Code {
-	fun write(codeWriter: CodeWriter)
+import com.sun.tools.xjc.outline.Outline
+
+interface Code<T> {
+	fun build(outline: Outline): T
 }

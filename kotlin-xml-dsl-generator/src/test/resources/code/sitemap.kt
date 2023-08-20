@@ -1,8 +1,14 @@
-@file:Suppress("PropertyName", "ReplaceArrayOfWithLiteral", "LocalVariableName", "FunctionName", "RemoveRedundantBackticks", "EnumEntryName")
+@file:Suppress("PropertyName", "LocalVariableName", "FunctionName", "RedundantVisibilityModifier",
+    "EnumEntryName")
 
 package org.redundent.generated
 
-import org.redundent.kotlin.xml.*
+import java.math.BigDecimal
+import kotlin.String
+import kotlin.Suppress
+import kotlin.Unit
+import org.redundent.kotlin.xml.Node
+import org.redundent.kotlin.xml.XmlType
 
 /**
  * OPTIONAL: Indicates how frequently the content at a particular URL is
@@ -12,40 +18,42 @@ import org.redundent.kotlin.xml.*
  * crawlers may not necessarily crawl pages marked "always" more often.
  * Consider this element as a friendly suggestion and not a command.
  */
-enum class `TChangeFreq` {
-	`always`,
-	`hourly`,
-	`daily`,
-	`weekly`,
-	`monthly`,
-	`yearly`,
-	`never`
+public enum class TChangeFreq {
+  always,
+  hourly,
+  daily,
+  weekly,
+  monthly,
+  yearly,
+  never,
 }
 
 /**
  * Container for a set of up to 50,000 document elements.
  * This is the root element of the XML file.
  */
-open class `Urlset`(nodeName: String) : Node(nodeName) {
-	init {
-		xmlns = "http://www.sitemaps.org/schemas/sitemap/0.9"
-	}
+public open class Urlset(
+  nodeName: String,
+) : Node(nodeName) {
+  init {
+    xmlns = "http://www.sitemaps.org/schemas/sitemap/0.9"
+  }
 }
 
-fun `Urlset`.`url`(__block__: `TUrl`.() -> Unit) {
-	val `url` = `TUrl`("url")
-	`url`.apply(__block__)
-	this.addNode(`url`)
+public fun Urlset.url(__block__: TUrl.() -> Unit) {
+  val url = TUrl("url")
+  url.apply(__block__)
+  this.addNode(url)
 }
 
 /**
  * Container for a set of up to 50,000 document elements.
  * This is the root element of the XML file.
  */
-fun `urlset`(__block__: `Urlset`.() -> Unit): `Urlset` {
-	val `urlset` = `Urlset`("urlset")
-	`urlset`.apply(__block__)
-	return `urlset`
+public fun urlset(__block__: Urlset.() -> Unit): Urlset {
+  val urlset = Urlset("urlset")
+  urlset.apply(__block__)
+  return urlset
 }
 
 /**
@@ -55,20 +63,22 @@ fun `urlset`(__block__: `Urlset`.() -> Unit): `Urlset` {
 		"lastmod",
 		"changefreq",
 		"priority"))
-open class `TUrl`(nodeName: String) : Node(nodeName)
+public open class TUrl(
+  nodeName: String,
+) : Node(nodeName)
 
-fun `TUrl`.`loc`(value: kotlin.String) {
-	"loc"(value)
+public fun TUrl.loc(`value`: String) {
+  "loc"(`value`)
 }
 
-fun `TUrl`.`lastmod`(value: kotlin.String) {
-	"lastmod"(value)
+public fun TUrl.lastmod(`value`: String) {
+  "lastmod"(`value`)
 }
 
-fun `TUrl`.`changefreq`(value: org.redundent.generated.TChangeFreq) {
-	"changefreq"(value.toString())
+public fun TUrl.changefreq(`value`: TChangeFreq) {
+  "changefreq"(`value`.toString())
 }
 
-fun `TUrl`.`priority`(value: java.math.BigDecimal) {
-	"priority"(value.toString())
+public fun TUrl.priority(`value`: BigDecimal) {
+  "priority"(`value`.toString())
 }

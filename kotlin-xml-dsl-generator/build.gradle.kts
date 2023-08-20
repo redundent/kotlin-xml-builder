@@ -34,9 +34,10 @@ dependencies {
 	implementation(kotlin("stdlib", kotlinVersion))
 	implementation(kotlin("reflect", kotlinVersion))
 	implementation("org.glassfish.jaxb:jaxb-xjc:2.3.0")
+	implementation("com.squareup:kotlinpoet:1.14.2")
 
 	testImplementation(project(":kotlin-xml-builder"))
-	testImplementation("junit:junit:4.12")
+	testImplementation("junit:junit:4.13.1")
 	testImplementation(kotlin("test-junit", kotlinVersion))
 }
 

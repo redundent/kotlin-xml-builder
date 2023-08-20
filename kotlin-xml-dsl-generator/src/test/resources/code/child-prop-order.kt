@@ -1,28 +1,34 @@
-@file:Suppress("PropertyName", "ReplaceArrayOfWithLiteral", "LocalVariableName", "FunctionName", "RemoveRedundantBackticks")
+@file:Suppress("PropertyName", "LocalVariableName", "FunctionName", "RedundantVisibilityModifier")
 
 package org.redundent.generated
 
-import org.redundent.kotlin.xml.*
+import kotlin.String
+import kotlin.Suppress
+import kotlin.Unit
+import org.redundent.kotlin.xml.Node
+import org.redundent.kotlin.xml.XmlType
 
 @XmlType(childOrder = arrayOf("Child1",
 		"child2",
 		"CHILD3"))
-open class `ChildPropOrder`(nodeName: String) : Node(nodeName)
+public open class ChildPropOrder(
+  nodeName: String,
+) : Node(nodeName)
 
-fun `ChildPropOrder`.`Child1`(value: kotlin.String) {
-	"Child1"(value)
+public fun ChildPropOrder.Child1(`value`: String) {
+  "Child1"(`value`)
 }
 
-fun `ChildPropOrder`.`child2`(value: kotlin.String) {
-	"child2"(value)
+public fun ChildPropOrder.child2(`value`: String) {
+  "child2"(`value`)
 }
 
-fun `ChildPropOrder`.`CHILD3`(value: kotlin.String) {
-	"CHILD3"(value)
+public fun ChildPropOrder.CHILD3(`value`: String) {
+  "CHILD3"(`value`)
 }
 
-fun `ChildPropOrder`(__block__: `ChildPropOrder`.() -> Unit): `ChildPropOrder` {
-	val `ChildPropOrder` = `ChildPropOrder`("ChildPropOrder")
-	`ChildPropOrder`.apply(__block__)
-	return `ChildPropOrder`
+public fun ChildPropOrder(__block__: ChildPropOrder.() -> Unit): ChildPropOrder {
+  val ChildPropOrder = ChildPropOrder("ChildPropOrder")
+  ChildPropOrder.apply(__block__)
+  return ChildPropOrder
 }
