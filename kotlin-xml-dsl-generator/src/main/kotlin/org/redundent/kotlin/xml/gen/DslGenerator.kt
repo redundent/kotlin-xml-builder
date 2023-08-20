@@ -9,6 +9,7 @@ import com.sun.tools.xjc.generator.bean.BeanGenerator
 import org.redundent.kotlin.xml.gen.writer.CodeWriter
 import org.xml.sax.SAXParseException
 import java.io.File
+import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
 	try {
@@ -33,7 +34,7 @@ fun main(args: Array<String>) {
 		}
 
 		usage()
-		System.exit(-1)
+		exitProcess(-1)
 	}
 }
 

@@ -6,10 +6,14 @@ import org.redundent.kotlin.xml.*
 
 open class `Top`(nodeName: String) : Node(nodeName) {
 	inner class `First` : Node("First") {
-		var `Id`: kotlin.Long by attributes
+		var `Id`: kotlin.Long
+			get() = get("Id")!!
+			set(value) { set("Id", value) }
 
 		inner class `Second` : Node("Second") {
-			var `Name`: kotlin.String? by attributes
+			var `Name`: kotlin.String?
+				get() = get("Name")
+				set(value) { set("Name", value) }
 		}
 	}
 

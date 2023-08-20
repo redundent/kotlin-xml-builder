@@ -5,7 +5,9 @@ package org.redundent.generated
 import org.redundent.kotlin.xml.*
 
 open class `StringToByteArray`(nodeName: String) : Node(nodeName) {
-	var `value`: kotlin.ByteArray? by attributes
+	var `value`: kotlin.ByteArray?
+		get() = get("value")
+		set(value) { set("value", value) }
 }
 
 @JvmOverloads

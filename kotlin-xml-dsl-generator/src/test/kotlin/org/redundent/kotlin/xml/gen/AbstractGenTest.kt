@@ -29,7 +29,7 @@ abstract class AbstractGenTest {
 			val bindingFile = File.createTempFile("binding", ".jxb").apply {
 				writer().use { writer ->
 					binding.reader().forEachLine { line ->
-						writer.appendln(line.replace("@schema@", "file:/${file.absolutePath}"))
+						writer.appendLine(line.replace("@schema@", "file:/${file.absolutePath}"))
 					}
 				}
 			}

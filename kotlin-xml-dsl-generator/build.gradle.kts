@@ -1,13 +1,10 @@
-
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import com.jfrog.bintray.gradle.BintrayExtension
-
 
 plugins {
 	kotlin("jvm")
 	id("com.github.johnrengelman.shadow") version "5.2.0"
-	id("com.jfrog.bintray")
 	`maven-publish`
+	signing
 }
 
 val kotlinVersion: String by rootProject.extra
@@ -33,10 +30,10 @@ tasks {
 dependencies {
 	implementation(kotlin("stdlib", kotlinVersion))
 	implementation(kotlin("reflect", kotlinVersion))
-	implementation("org.glassfish.jaxb:jaxb-xjc:2.3.0")
+	implementation("org.glassfish.jaxb:jaxb-xjc:2.3.8")
 
 	testImplementation(project(":kotlin-xml-builder"))
-	testImplementation("junit:junit:4.12")
+	testImplementation("junit:junit:4.13.1")
 	testImplementation(kotlin("test-junit", kotlinVersion))
 }
 
@@ -49,20 +46,5 @@ publishing {
 				classifier = "sources"
 			}
 		}
-	}
-}
-
-if (rootProject.hasProperty("bintrayUser")) {
-	bintray {
-		user = rootProject.property("bintrayUser").toString()
-		key = rootProject.property("bintrayApiKey").toString()
-		setPublications("maven")
-		pkg(closureOf<BintrayExtension.PackageConfig> {
-			repo = "maven"
-			name = "kotlin-xml-dsl-generator"
-			userOrg = rootProject.property("bintrayUser").toString()
-			setLicenses("Apache-2.0")
-			vcsUrl = "https://github.com/redundent/kotlin-xml-builder.git"
-		})
 	}
 }

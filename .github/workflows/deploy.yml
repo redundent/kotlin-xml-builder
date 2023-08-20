@@ -1,0 +1,37 @@
+
+name: Deploy to central
+
+on: workflow_dispatch
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    uses: ./.github/workflows/ci.yml
+  deploy:
+    needs: build
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: 1.8
+
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v5
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PRIVATE_PASSWORD }}
+
+      - name: Gradle publish
+        uses: gradle/gradle-build-action@ce999babab2de1c4b649dc15f0ee67e6246c994f
+        with:
+          arguments: |
+            publish
+            closeSonatypeStagingRepository
+            -Psigning.gnupg.passphrase='${{secrets.GPG_PRIVATE_PASSWORD}}'
+            -Psigning.gnupg.keyName='${{secrets.GPG_PRIVATE_KEY_ID}}'
+            -PsonatypeUsername='${{secrets.SONATYPE_USERNAME}}'
+            -PsonatypePassword='${{secrets.SONATYPE_PASSWORD}}'

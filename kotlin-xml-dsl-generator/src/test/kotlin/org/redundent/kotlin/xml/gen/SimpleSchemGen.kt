@@ -40,5 +40,5 @@ class SimpleSchemGen : AbstractGenTest() {
 	fun `child-prop-order`() = run()
 
 	@Test
-	fun `member-functions`() = run(additionalArgs = *arrayOf("--use-member-functions"))
+	fun `member-functions`() = run(additionalArgs = arrayOf("--use-member-functions"))
 }

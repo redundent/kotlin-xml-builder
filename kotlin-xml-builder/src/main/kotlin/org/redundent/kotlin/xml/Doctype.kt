@@ -22,6 +22,6 @@ class Doctype @JvmOverloads constructor(
             builder.append(" \"$systemId\"")
         }
 
-        builder.appendln(">")
+        builder.appendLine(">")
     }
 }

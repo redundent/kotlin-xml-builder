@@ -5,37 +5,99 @@ package org.redundent.generated
 import org.redundent.kotlin.xml.*
 
 open class `Attributes`(nodeName: String) : Node(nodeName) {
-	var `uri`: kotlin.String? by attributes
-	var `base64Binary`: kotlin.ByteArray? by attributes
-	var `boolean`: kotlin.Boolean? by attributes
-	var `byte`: kotlin.Byte? by attributes
-	var `date`: java.util.Date? by attributes
-	var `dateTime`: java.util.Date? by attributes
-	var `decimal`: java.math.BigDecimal? by attributes
-	var `double`: kotlin.Double? by attributes
-	var `duration`: javax.xml.datatype.Duration? by attributes
-	var `float`: kotlin.Float? by attributes
-	var `gDay`: java.util.Date? by attributes
-	var `gMonth`: java.util.Date? by attributes
-	var `gMonthDay`: java.util.Date? by attributes
-	var `gYear`: java.util.Date? by attributes
-	var `gYearMonth`: java.util.Date? by attributes
-	var `hexBinary`: kotlin.ByteArray? by attributes
-	var `int`: kotlin.Int? by attributes
-	var `integer`: kotlin.Int? by attributes
-	var `long`: kotlin.Long? by attributes
-	var `negativeInteger`: kotlin.Int? by attributes
-	var `nonNegativeInteger`: kotlin.Int? by attributes
-	var `nonPositiveInteger`: kotlin.Int? by attributes
-	var `positiveInteger`: kotlin.Int? by attributes
-	var `string`: kotlin.String? by attributes
-	var `short`: kotlin.Short? by attributes
-	var `time`: java.util.Date? by attributes
-	var `token`: kotlin.String? by attributes
-	var `unsignedByte`: kotlin.Short? by attributes
-	var `unsignedInt`: kotlin.Long? by attributes
-	var `unsignedLong`: kotlin.Int? by attributes
-	var `unsignedShort`: kotlin.Int? by attributes
+	var `uri`: kotlin.String?
+		get() = get("uri")
+		set(value) { set("uri", value) }
+	var `base64Binary`: kotlin.ByteArray?
+		get() = get("base64Binary")
+		set(value) { set("base64Binary", value) }
+	var `boolean`: kotlin.Boolean?
+		get() = get("boolean")
+		set(value) { set("boolean", value) }
+	var `byte`: kotlin.Byte?
+		get() = get("byte")
+		set(value) { set("byte", value) }
+	var `date`: java.util.Date?
+		get() = get("date")
+		set(value) { set("date", value) }
+	var `dateTime`: java.util.Date?
+		get() = get("dateTime")
+		set(value) { set("dateTime", value) }
+	var `decimal`: java.math.BigDecimal?
+		get() = get("decimal")
+		set(value) { set("decimal", value) }
+	var `double`: kotlin.Double?
+		get() = get("double")
+		set(value) { set("double", value) }
+	var `duration`: javax.xml.datatype.Duration?
+		get() = get("duration")
+		set(value) { set("duration", value) }
+	var `float`: kotlin.Float?
+		get() = get("float")
+		set(value) { set("float", value) }
+	var `gDay`: java.util.Date?
+		get() = get("gDay")
+		set(value) { set("gDay", value) }
+	var `gMonth`: java.util.Date?
+		get() = get("gMonth")
+		set(value) { set("gMonth", value) }
+	var `gMonthDay`: java.util.Date?
+		get() = get("gMonthDay")
+		set(value) { set("gMonthDay", value) }
+	var `gYear`: java.util.Date?
+		get() = get("gYear")
+		set(value) { set("gYear", value) }
+	var `gYearMonth`: java.util.Date?
+		get() = get("gYearMonth")
+		set(value) { set("gYearMonth", value) }
+	var `hexBinary`: kotlin.ByteArray?
+		get() = get("hexBinary")
+		set(value) { set("hexBinary", value) }
+	var `int`: kotlin.Int?
+		get() = get("int")
+		set(value) { set("int", value) }
+	var `integer`: kotlin.Int?
+		get() = get("integer")
+		set(value) { set("integer", value) }
+	var `long`: kotlin.Long?
+		get() = get("long")
+		set(value) { set("long", value) }
+	var `negativeInteger`: kotlin.Int?
+		get() = get("negativeInteger")
+		set(value) { set("negativeInteger", value) }
+	var `nonNegativeInteger`: kotlin.Int?
+		get() = get("nonNegativeInteger")
+		set(value) { set("nonNegativeInteger", value) }
+	var `nonPositiveInteger`: kotlin.Int?
+		get() = get("nonPositiveInteger")
+		set(value) { set("nonPositiveInteger", value) }
+	var `positiveInteger`: kotlin.Int?
+		get() = get("positiveInteger")
+		set(value) { set("positiveInteger", value) }
+	var `string`: kotlin.String?
+		get() = get("string")
+		set(value) { set("string", value) }
+	var `short`: kotlin.Short?
+		get() = get("short")
+		set(value) { set("short", value) }
+	var `time`: java.util.Date?
+		get() = get("time")
+		set(value) { set("time", value) }
+	var `token`: kotlin.String?
+		get() = get("token")
+		set(value) { set("token", value) }
+	var `unsignedByte`: kotlin.Short?
+		get() = get("unsignedByte")
+		set(value) { set("unsignedByte", value) }
+	var `unsignedInt`: kotlin.Long?
+		get() = get("unsignedInt")
+		set(value) { set("unsignedInt", value) }
+	var `unsignedLong`: kotlin.Int?
+		get() = get("unsignedLong")
+		set(value) { set("unsignedLong", value) }
+	var `unsignedShort`: kotlin.Int?
+		get() = get("unsignedShort")
+		set(value) { set("unsignedShort", value) }
 }
 
 @JvmOverloads

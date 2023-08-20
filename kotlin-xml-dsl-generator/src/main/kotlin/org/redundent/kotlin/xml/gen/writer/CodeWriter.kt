@@ -8,8 +8,8 @@ import com.sun.tools.xjc.model.CTypeInfo
 import com.sun.tools.xjc.outline.Outline
 import com.sun.tools.xjc.reader.xmlschema.bindinfo.BindInfo
 import com.sun.xml.xsom.XSComponent
-import java.util.Comparator
 import java.util.Date
+import kotlin.math.floor
 
 class CodeWriter(private val outline: Outline) {
 	private var output = StringBuilder()
@@ -26,7 +26,7 @@ class CodeWriter(private val outline: Outline) {
 	}
 
 	fun writeKotlinDoc(doc: String?) {
-		if (doc == null || doc.isBlank()) {
+		if (doc.isNullOrBlank()) {
 			return
 		}
 
@@ -79,9 +79,9 @@ class CodeWriter(private val outline: Outline) {
 			return ""
 		}
 
-		val sortedAttributes = allAttributes.sortedWith(Comparator { o1, o2 -> Integer.compare(if (o1.isRequired) 0 else 1, if (o2.isRequired) 0 else 1) })
+		val sortedAttributes = allAttributes.sortedWith { o1, o2 -> (if (o1.isRequired) 0 else 1).compareTo(if (o2.isRequired) 0 else 1) }
 
-		val numOfTabs = Math.floor(indentLength.toDouble() / 4.0).toInt()
+		val numOfTabs = floor(indentLength.toDouble() / 4.0).toInt()
 		val numOfSpaces = indentLength % 4
 
 		val delimiter = ",\n${(0..numOfTabs).joinToString("\t") { "" }}${(0..numOfSpaces).joinToString(" ") { "" }}"
