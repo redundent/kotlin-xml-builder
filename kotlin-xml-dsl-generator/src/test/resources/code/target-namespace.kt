@@ -9,7 +9,9 @@ open class `Code`(nodeName: String) : Node(nodeName) {
 		xmlns = "http://code.redundent.org/schemas"
 	}
 
-	var `id`: kotlin.Long? by attributes
+	var `id`: kotlin.Long?
+		get() = get("id")
+		set(value) { set("id", value) }
 }
 
 @JvmOverloads

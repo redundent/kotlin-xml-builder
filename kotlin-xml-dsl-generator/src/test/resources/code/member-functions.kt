@@ -7,7 +7,9 @@ import org.redundent.kotlin.xml.*
 @XmlType(childOrder = arrayOf("comments",
 		"sub-type"))
 open class `MemberType`(nodeName: String) : Node(nodeName) {
-	var `id`: kotlin.String? by attributes
+	var `id`: kotlin.String?
+		get() = get("id")
+		set(value) { set("id", value) }
 
 	fun `comments`(value: kotlin.String) {
 		"comments"(value)

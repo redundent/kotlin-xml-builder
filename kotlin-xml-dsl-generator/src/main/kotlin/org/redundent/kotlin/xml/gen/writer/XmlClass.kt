@@ -35,7 +35,7 @@ class XmlClass(
 			val name = it.xmlName.localPart
 			val type = "${CodeWriter.mapType(field.rawType.fullName())}${if (!it.isRequired) "?" else ""}"
 
-			XmlAttribute(name, type)
+			XmlAttribute(name, type, it.isRequired)
 		}.forEach { attributes.add(it) }
 
 		clazz.target.elements.forEach { element ->

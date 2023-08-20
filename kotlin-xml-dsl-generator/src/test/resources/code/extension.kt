@@ -5,11 +5,15 @@ package org.redundent.generated
 import org.redundent.kotlin.xml.*
 
 abstract class `BaseType`(nodeName: String) : Node(nodeName) {
-	var `Name`: kotlin.String? by attributes
+	var `Name`: kotlin.String?
+		get() = get("Name")
+		set(value) { set("Name", value) }
 }
 
 open class `A`(nodeName: String) : org.redundent.generated.`BaseType`(nodeName) {
-	var `Top`: kotlin.String? by attributes
+	var `Top`: kotlin.String?
+		get() = get("Top")
+		set(value) { set("Top", value) }
 }
 
 @JvmOverloads
@@ -30,7 +34,9 @@ fun `a`(`Top`: kotlin.String? = null,
 }
 
 open class `B`(nodeName: String) : org.redundent.generated.`BaseType`(nodeName) {
-	var `Middle`: kotlin.String? by attributes
+	var `Middle`: kotlin.String?
+		get() = get("Middle")
+		set(value) { set("Middle", value) }
 }
 
 @JvmOverloads
