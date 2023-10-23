@@ -5,16 +5,17 @@ import java.util.*
 
 const val DEFAULT_URLSET_NAMESPACE = "http://www.sitemaps.org/schemas/sitemap/0.9"
 
-class UrlSet internal constructor(): Node("urlset") {
+class UrlSet internal constructor() : Node("urlset") {
 	init {
 		xmlns = DEFAULT_URLSET_NAMESPACE
 	}
 
 	fun url(
-			loc: String,
-			lastmod: Date? = null,
-			changefreq: ChangeFreq? = null,
-			priority: Double? = null) {
+		loc: String,
+		lastmod: Date? = null,
+		changefreq: ChangeFreq? = null,
+		priority: Double? = null
+	) {
 		"url" {
 			"loc"(loc)
 
@@ -33,14 +34,15 @@ class UrlSet internal constructor(): Node("urlset") {
 	}
 }
 
-class Sitemapindex internal constructor(): Node("sitemapindex") {
+class Sitemapindex internal constructor() : Node("sitemapindex") {
 	init {
 		xmlns = DEFAULT_URLSET_NAMESPACE
 	}
 
 	fun sitemap(
-			loc: String,
-			lastmod: Date? = null) {
+		loc: String,
+		lastmod: Date? = null
+	) {
 		"sitemap" {
 			"loc"(loc)
 
@@ -51,6 +53,7 @@ class Sitemapindex internal constructor(): Node("sitemapindex") {
 	}
 }
 
+@Suppress("EnumEntryName", "ktlint:enum-entry-name-case")
 enum class ChangeFreq {
 	always,
 	hourly,

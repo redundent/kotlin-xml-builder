@@ -16,11 +16,17 @@ internal fun getLineEnding(printOptions: PrintOptions) = if (printOptions.pretty
  * @param root The root element name
  * @param encoding The encoding to use for the xml prolog
  * @param version The XML specification version to use for the xml prolog and attribute encoding
- * @param namespace Optional namespace object to use to build the name of the attribute. This will also an xmlns
+ * @param namespace Optional namespace object to use to build the name of the attribute. This will also add an xmlns
  * attribute for this value
  * @param init The block that defines the content of the xml
  */
-fun xml(root: String, encoding: String? = null, version: XmlVersion? = null, namespace: Namespace? = null, init: (Node.() -> Unit)? = null): Node {
+fun xml(
+	root: String,
+	encoding: String? = null,
+	version: XmlVersion? = null,
+	namespace: Namespace? = null,
+	init: (Node.() -> Unit)? = null
+): Node {
 	val node = Node(buildName(root, namespace))
 	if (encoding != null) {
 		node.encoding = encoding
@@ -56,9 +62,14 @@ fun node(name: String, namespace: Namespace? = null, init: (Node.() -> Unit)? = 
 
 fun parse(f: File): Node = parse(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(f))
 fun parse(uri: String): Node = parse(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(uri))
-fun parse(inputSource: InputSource): Node = parse(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputSource))
-fun parse(inputStream: InputStream): Node = parse(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputStream))
-fun parse(inputStream: InputStream, systemId: String): Node = parse(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputStream, systemId))
+fun parse(inputSource: InputSource): Node =
+	parse(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputSource))
+
+fun parse(inputStream: InputStream): Node =
+	parse(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputStream))
+
+fun parse(inputStream: InputStream, systemId: String): Node =
+	parse(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputStream, systemId))
 
 fun parse(document: Document): Node {
 	val root = document.documentElement
@@ -69,8 +80,8 @@ fun parse(document: Document): Node {
 
 	val children = root.childNodes
 	(0 until children.length)
-			.map(children::item)
-			.forEach { copy(it, result) }
+		.map(children::item)
+		.forEach { copy(it, result) }
 
 	return result
 }
@@ -84,14 +95,16 @@ private fun copy(source: W3CNode, dest: Node) {
 
 			val children = source.childNodes
 			(0 until children.length)
-					.map(children::item)
-					.forEach { copy(it, cur) }
+				.map(children::item)
+				.forEach { copy(it, cur) }
 		}
+
 		W3CNode.CDATA_SECTION_NODE -> {
 			dest.cdata(source.nodeValue)
 		}
+
 		W3CNode.TEXT_NODE -> {
- 			dest.text(source.nodeValue.trim { it.isWhitespace() || it == '\r' || it == '\n' })
+			dest.text(source.nodeValue.trim { it.isWhitespace() || it == '\r' || it == '\n' })
 		}
 	}
 }
@@ -103,12 +116,12 @@ private fun copyAttributes(source: W3CNode, dest: Node) {
 	}
 
 	(0 until attributes.length)
-			.map(attributes::item)
-			.forEach {
-				if (it.nodeName.startsWith("xmlns")) {
-					dest.namespace(it.nodeName.substring(min(6, it.nodeName.length)), it.nodeValue)
-				} else {
-					dest.attribute(it.nodeName, it.nodeValue)
-				}
+		.map(attributes::item)
+		.forEach {
+			if (it.nodeName.startsWith("xmlns")) {
+				dest.namespace(it.nodeName.substring(min(6, it.nodeName.length)), it.nodeValue)
+			} else {
+				dest.attribute(it.nodeName, it.nodeValue)
 			}
+		}
 }

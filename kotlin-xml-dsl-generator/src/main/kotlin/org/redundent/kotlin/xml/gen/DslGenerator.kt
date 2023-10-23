@@ -14,7 +14,8 @@ import kotlin.system.exitProcess
 fun main(args: Array<String>) {
 	try {
 		val opts = ExOptions().apply { parseArguments(args) }
-		val output = File(opts.targetDir, "${opts.defaultPackage.replace(".", File.separator)}${File.separator}schema.kt")
+		val output =
+			File(opts.targetDir, "${opts.defaultPackage.replace(".", File.separator)}${File.separator}schema.kt")
 
 		println("\nGenerating schema to ${output.absolutePath}")
 
@@ -39,7 +40,8 @@ fun main(args: Array<String>) {
 }
 
 fun usage() {
-	println("""Usage: java -jar kotlin-xml-dsl-generator.jar [-options ...] <schema file> ... [-b <bindinfo>] ...
+	println(
+		"""Usage: java -jar kotlin-xml-dsl-generator.jar [-options ...] <schema file> ... [-b <bindinfo>] ...
 
 Options:
   -b <file>          :  specify external JAXB bindings files
@@ -52,7 +54,7 @@ Options:
 class DslGenerator(private val opts: ExOptions) {
 	fun generate(): String {
 		val model = ModelLoader.load(opts, JCodeModel(), ErrReceiver())
-				?: throw BadCommandLineException("Something failed generating the code model")
+			?: throw BadCommandLineException("Something failed generating the code model")
 
 		val outline = BeanGenerator.generate(model, ErrReceiver())
 
@@ -60,7 +62,15 @@ class DslGenerator(private val opts: ExOptions) {
 		val schemaOutline = SchemaOutline(outline, opts)
 
 		codeWriter.writeSuppress {
-			addAll(listOf("PropertyName", "ReplaceArrayOfWithLiteral", "LocalVariableName", "FunctionName", "RemoveRedundantBackticks"))
+			addAll(
+				listOf(
+					"PropertyName",
+					"ReplaceArrayOfWithLiteral",
+					"LocalVariableName",
+					"FunctionName",
+					"RemoveRedundantBackticks"
+				)
+			)
 
 			if (schemaOutline.enums.isNotEmpty()) {
 				add("EnumEntryName")

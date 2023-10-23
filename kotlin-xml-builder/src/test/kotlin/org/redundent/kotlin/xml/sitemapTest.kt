@@ -3,7 +3,7 @@ package org.redundent.kotlin.xml
 import org.junit.Test
 import java.text.SimpleDateFormat
 
-class sitemapTest : XmlBuilderTestBase() {
+class sitemapTest : TestBase() {
 	@Test
 	fun basicTest() {
 		val urlset = urlset {
@@ -18,10 +18,12 @@ class sitemapTest : XmlBuilderTestBase() {
 	@Test
 	fun allElements() {
 		val urlset = urlset {
-			url("http://blog.redundent.org",
-					SimpleDateFormat("yyyy-MM-dd").parse("2017-10-24"),
-					ChangeFreq.hourly,
-					14.0)
+			url(
+				"http://blog.redundent.org",
+				SimpleDateFormat("yyyy-MM-dd").parse("2017-10-24"),
+				ChangeFreq.hourly,
+				14.0
+			)
 		}
 		validate(urlset)
 	}

@@ -11,7 +11,8 @@ data class Namespace(
 	/**
 	 * The value/uri/url of the namespace
 	 */
-	val value: String) {
+	val value: String
+) {
 
 	constructor(value: String) : this("", value)
 

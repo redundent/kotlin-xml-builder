@@ -2,9 +2,9 @@ package org.redundent.kotlin.xml
 
 import org.apache.commons.lang3.builder.EqualsBuilder
 import org.apache.commons.lang3.builder.HashCodeBuilder
-import java.util.ArrayList
-import java.util.NoSuchElementException
+import java.util.*
 import kotlin.collections.LinkedHashMap
+import kotlin.collections.LinkedHashSet
 
 /**
  * Base type for all elements. This is what handles pretty much all the rendering and building.
@@ -27,7 +27,6 @@ open class Node(val nodeName: String) : Element {
 			return@lazy null
 		}
 
-		@Suppress("NO_REFLECTION_IN_CLASS_PATH") // Checked for reflection class above
 		val xmlTypeAnnotation = this::class.annotations.firstOrNull { it is XmlType } as? XmlType ?: return@lazy null
 
 		val childOrder = xmlTypeAnnotation.childOrder
@@ -104,9 +103,7 @@ open class Node(val nodeName: String) : Element {
 		}
 		_children.add(tag)
 
-		if (tag is Node) {
-			tag.parent = this
-		}
+		setParentIfNode(tag, this)
 
 		return tag
 	}
@@ -114,9 +111,9 @@ open class Node(val nodeName: String) : Element {
 	/**
 	 * Allows for easy access of this node's attributes
 	 *
-	 * <code>
-	 *     val attr = element["key"]
-	 * </code>
+	 * ```
+	 * val attr = element["key"]
+	 * ```
 	 */
 	operator fun <T> get(attributeName: String): T? {
 		val value = _attributes[attributeName]
@@ -128,9 +125,9 @@ open class Node(val nodeName: String) : Element {
 	 * Allows for easy access of adding/updating this node's attributes. Setting the value of an attribute to "null"
 	 * will remove the attribute .
 	 *
-	 * <code>
-	 *     element["key"] = "value"
-	 * </code>
+	 * ```
+	 * element["key"] = "value"
+	 * ```
 	 */
 	operator fun set(attributeName: String, value: Any?) {
 		if (value == null) {
@@ -154,11 +151,12 @@ open class Node(val nodeName: String) : Element {
 		builder.append("$indent<$nodeName${renderNamespaces()}${renderAttributes(printOptions)}")
 
 		if (!isEmptyOrSingleEmptyTextElement()) {
-			if (printOptions.pretty && printOptions.singleLineTextElements
-					&& _children.size == 1 && _children[0] is TextElement) {
-					builder.append(">")
+			if (printOptions.pretty && printOptions.singleLineTextElements &&
+				_children.size == 1 && _children[0] is TextElement
+			) {
+				builder.append(">")
 				(_children[0] as TextElement).renderSingleLine(builder, printOptions)
-					builder.append("</$nodeName>$lineEnding")
+				builder.append("</$nodeName>$lineEnding")
 			} else {
 				builder.append(">$lineEnding")
 				for (c in sortedChildren()) {
@@ -184,21 +182,22 @@ open class Node(val nodeName: String) : Element {
 		return false
 	}
 
-	private fun getEmptyTagClosing(printOptions: PrintOptions): String = if (printOptions.useSelfClosingTags)
+	private fun getEmptyTagClosing(printOptions: PrintOptions): String = if (printOptions.useSelfClosingTags) {
 		"/>"
-	else
+	} else {
 		"></$nodeName>"
+	}
 
 	private fun sortedChildren(): List<Element> {
 		return if (childOrderMap == null) {
 			_children
 		} else {
-			_children.sortedWith(Comparator { a, b ->
+			_children.sortedWith { a, b ->
 				val indexA = if (a is Node) childOrderMap!![a.nodeName] else 0
 				val indexB = if (b is Node) childOrderMap!![b.nodeName] else 0
 
 				compareValues(indexA, indexB)
-			})
+			}
 		}
 	}
 
@@ -225,11 +224,22 @@ open class Node(val nodeName: String) : Element {
 
 		return _attributes.entries.joinToString(" ", prefix = " ") {
 			val value = it.value
-			"${it.key}=\"${if (value is Unsafe) value.value?.toString() else escapeValue(it.value, printOptions.xmlVersion, printOptions.useCharacterReference)}\""
+			val text = if (value is Unsafe) {
+				value.value?.toString()
+			} else {
+				escapeValue(
+					it.value,
+					printOptions.xmlVersion,
+					printOptions.useCharacterReference
+				)
+			}
+
+			"${it.key}=\"$text\""
 		}
 	}
 
-	private fun getIndent(printOptions: PrintOptions, indent: String): String = if (!printOptions.pretty) "" else "$indent${printOptions.indent}"
+	private fun getIndent(printOptions: PrintOptions, indent: String): String =
+		if (!printOptions.pretty) { "" } else { "$indent${printOptions.indent}" }
 
 	/**
 	 * Get the xml representation of this object with prettyFormat = true
@@ -243,8 +253,8 @@ open class Node(val nodeName: String) : Element {
 	 */
 	fun toString(prettyFormat: Boolean): String = toString(PrintOptions(pretty = prettyFormat))
 
-	fun toString(printOptions: PrintOptions): String
-		= StringBuilder().also { writeTo(it, printOptions) }.toString().trim()
+	fun toString(printOptions: PrintOptions): String =
+		StringBuilder().also { writeTo(it, printOptions) }.toString().trim()
 
 	fun writeTo(appendable: Appendable, printOptions: PrintOptions = PrintOptions()) {
 		val lineEnding = getLineEnding(printOptions)
@@ -283,12 +293,12 @@ open class Node(val nodeName: String) : Element {
 	}
 
 	/**
-	 * Adds an xml comment to the document.
-	 * <code>
-	 *     comment("my comment")
-	 * </code>
+	 * Adds an XML comment to the document.
+	 * ```
+	 * comment("my comment")
+	 * ```
 	 *
-	 * @param text The text of the comment. This text will be rendenered unescaped except for replace "--" with "&#45;&#45;"]
+	 * @param text The text of the comment. This text will be rendered unescaped except for replace "--" with "&#45;&#45;"
 	 */
 	fun comment(text: String) {
 		_children.add(Comment(text))
@@ -296,11 +306,11 @@ open class Node(val nodeName: String) : Element {
 
 	/**
 	 * Adds a basic element with the specific name to the parent.
-	 * <code>
-	 *     element("url") {
-	 *     		...
-	 *     }
-	 * </code>
+	 * ```
+	 * element("url") {
+	 *     ...
+	 * }
+	 * ```
 	 *
 	 * @param name The name of the element.
 	 * @param namespace Optional namespace object to use to build the name of the attribute.
@@ -317,9 +327,9 @@ open class Node(val nodeName: String) : Element {
 
 	/**
 	 * Adds a basic element with the specific name and value to the parent. This cannot be used for complex elements.
-	 * <code>
-	 *     element("url", "https://google.com")
-	 * </code>
+	 * ```
+	 * element("url", "https://google.com")
+	 * ```
 	 *
 	 * @param name The name of the element.
 	 * @param value The inner text of the element
@@ -339,9 +349,9 @@ open class Node(val nodeName: String) : Element {
 
 	/**
 	 * Adds a basic element with the specific name and value to the parent. This cannot be used for complex elements.
-	 * <code>
-	 *     "url"("https://google.com")
-	 * </code>
+	 * ```
+	 * "url"("https://google.com")
+	 * ```
 	 *
 	 * @receiver The name of the element.
 	 * @param value The inner text of the element
@@ -352,14 +362,14 @@ open class Node(val nodeName: String) : Element {
 	/**
 	 * Adds a basic element with the specific name to the parent. This method
 	 * allows you to specify optional attributes and content
-	 * <code>
-	 *     "url"("key" to "value") {
-	 *     		...
-	 *     }
-	 * </code>
+	 * ```
+	 * "url"("key" to "value") {
+	 *    ...
+	 * }
+	 * ```
 	 *
 	 * @receiver The name of the element.
-	 * @param attributes Any attributes to add to this element. Can be omited.
+	 * @param attributes Any attributes to add to this element. Can be omitted.
 	 * @param init The block that defines the content of the element.
 	 */
 	operator fun String.invoke(vararg attributes: Pair<String, Any>, init: (Node.() -> Unit)? = null): Node {
@@ -369,29 +379,33 @@ open class Node(val nodeName: String) : Element {
 	/**
 	 * Adds a basic element with the specific name to the parent. This method
 	 * allows you to specify the namespace of the element as well as optional attributes and content
-	 * <code>
-	 *     "url"(ns, "key" to "value") {
-	 *     		...
-	 *     }
-	 * </code>
+	 * ```
+	 * "url"(ns, "key" to "value") {
+	 *     ...
+	 * }
+	 * ```
 	 *
 	 * @receiver The name of the element.
 	 * @param namespace Namespace object to use to build the name of the attribute.
-	 * @param attributes Any attributes to add to this element. Can be omited.
+	 * @param attributes Any attributes to add to this element. Can be omitted.
 	 * @param init The block that defines the content of the element.
 	 */
-	operator fun String.invoke(namespace: Namespace, vararg attributes: Pair<String, Any>, init: (Node.() -> Unit)? = null): Node {
+	operator fun String.invoke(
+		namespace: Namespace,
+		vararg attributes: Pair<String, Any>,
+		init: (Node.() -> Unit)? = null
+	): Node {
 		return addElement(this, attributes.map { Attribute(it.first, it.second) }.toTypedArray(), namespace, init)
 	}
 
 	/**
 	 * Adds a basic element with the specific name to the parent. This method
 	 * allows you to specify the namespace of the element
-	 * <code>
-	 *     "url"(ns) {
-	 *     		...
-	 *     }
-	 * </code>
+	 * ```
+	 * "url"(ns) {
+	 *     ...
+	 * }
+	 * ```
 	 *
 	 * @receiver The name of the element.
 	 * @param namespace Namespace object to use to build the name of the attribute.
@@ -404,22 +418,31 @@ open class Node(val nodeName: String) : Element {
 	/**
 	 * Adds a basic element with the specific name to the parent. This method
 	 * allows you to specify namespace of the element as well as optional attributes (with namespaces) and content
-	 * <code>
-	 *     "url"(ns, Attribute("key", "value", otherNs)) {
-	 *     		...
-	 *     }
-	 * </code>
+	 * ```
+	 * "url"(ns, Attribute("key", "value", otherNs)) {
+	 *    ...
+	 * }
+	 * ```
 	 *
 	 * @receiver The name of the element.
 	 * @param namespace Namespace object to use to build the name of the attribute.
-	 * @param attributes Any attributes to add to this element. Can be omited.
+	 * @param attributes Any attributes to add to this element. Can be omitted.
 	 * @param init The block that defines the content of the element.
 	 */
-	operator fun String.invoke(namespace: Namespace, vararg attributes: Attribute, init: (Node.() -> Unit)? = null): Node {
+	operator fun String.invoke(
+		namespace: Namespace,
+		vararg attributes: Attribute,
+		init: (Node.() -> Unit)? = null
+	): Node {
 		return addElement(this, attributes, namespace, init)
 	}
 
-	private fun addElement(name: String, attributes: Array<out Attribute>, namespace: Namespace?, init: (Node.() -> Unit)?): Node {
+	private fun addElement(
+		name: String,
+		attributes: Array<out Attribute>,
+		namespace: Namespace?,
+		init: (Node.() -> Unit)?
+	): Node {
 		val e = element(name, namespace) {
 			attributes(*attributes)
 		}
@@ -441,16 +464,16 @@ open class Node(val nodeName: String) : Element {
 
 	/**
 	 * Adds an attribute to the current element
-	 * <code>
-	 *     "url" {
-	 *         attribute("key", "value")
-	 *     }
-	 * </code>
+	 * ```
+	 * "url" {
+	 *    attribute("key", "value")
+	 * }
+	 * ```
 	 *
-	 * @param name The name of the attribute. This is currenly no validation against the name.
+	 * @param name The name of the attribute. This is currently no validation against the name.
 	 * @param value The attribute value.
 	 * @param namespace Optional namespace object to use to build the name of the attribute. Note this does NOT declare
-	 * the namespace. It simple uses it to build the attribute name.
+	 * the namespace. It simply uses it to build the attribute name.
 	 */
 	fun attribute(name: String, value: Any, namespace: Namespace? = null) {
 		if (namespace != null) {
@@ -463,14 +486,14 @@ open class Node(val nodeName: String) : Element {
 	 * Adds a set of attributes to the current element.
 	 * @see [attribute]
 	 *
-	 * <code>
-	 *     "url" {
-	 *         attributes(
-	 *             "key" to "value",
-	 *             "id" to "1"
-	 *         )
-	 *     }
-	 * </code>
+	 * ```
+	 * "url" {
+	 *     attributes(
+	 *         "key" to "value",
+	 *         "id" to "1"
+	 *     )
+	 * }
+	 * ```
 	 *
 	 * @param attrs Collection of the attributes to apply to this element.
 	 */
@@ -482,14 +505,14 @@ open class Node(val nodeName: String) : Element {
 	 * Adds a set of attributes to the current element.
 	 * @see [attribute]
 	 *
-	 * <code>
-	 *     "url" {
-	 *         attributes(
-	 *             Attribute("key", "value", namespace),
-	 *             Attribute("id", "1", namespace)
-	 *         )
-	 *     }
-	 * </code>
+	 * ```
+	 * "url" {
+	 *     attributes(
+	 *         Attribute("key", "value", namespace),
+	 *         Attribute("id", "1", namespace)
+	 *     )
+	 * }
+	 * ```
 	 *
 	 * @param attrs Collection of the attributes to apply to this element.
 	 */
@@ -506,17 +529,17 @@ open class Node(val nodeName: String) : Element {
 	 * Adds a set of attributes to the current element.
 	 * @see [attribute]
 	 *
-	 * <code>
-	 *     "url" {
-	 *         attributes(
-	 *             "key" to "value",
-	 *             "id" to "1"
-	 *         )
-	 *     }
-	 * </code>
+	 * ```
+	 * "url" {
+	 *     attributes(
+	 *         "key" to "value",
+	 *         "id" to "1"
+	 *     )
+	 * }
+	 * ```
 	 *
 	 * @param namespace Optional namespace object to use to build the name of the attribute. Note this does NOT declare
-	 * the namespace. It simple uses it to build the attribute name(s).
+	 * the namespace. It simply uses it to build the attribute name(s).
 	 * @param attrs Collection of the attributes to apply to this element.
 	 */
 	fun attributes(namespace: Namespace, vararg attrs: Pair<String, Any>) {
@@ -536,21 +559,20 @@ open class Node(val nodeName: String) : Element {
 	 * Adds the supplied text as a processing instruction element
 	 *
 	 * @param text The inner text of the processing instruction element.
-	 * @param attribtes Optional set of attributes to apply to this processing instruction.
+	 * @param attributes Optional set of attributes to apply to this processing instruction.
 	 */
-	fun processingInstruction(text: String, vararg attribtes: Pair<String, String>) {
-		_children.add(ProcessingInstructionElement(text, linkedMapOf(*attribtes)))
+	fun processingInstruction(text: String, vararg attributes: Pair<String, String>) {
+		_children.add(ProcessingInstructionElement(text, linkedMapOf(*attributes)))
 	}
-
 
 	/**
 	 * Adds the supplied text as a processing instruction element to the root of the document.
 	 *
 	 * @param text The inner text of the processing instruction element.
-	 * @param attribtes Optional set of attributes to apply to this processing instruction.
+	 * @param attributes Optional set of attributes to apply to this processing instruction.
 	 */
-	fun globalProcessingInstruction(text: String, vararg attribtes: Pair<String, String>) {
-		_globalLevelProcessingInstructions.add(ProcessingInstructionElement(text, linkedMapOf(*attribtes)))
+	fun globalProcessingInstruction(text: String, vararg attributes: Pair<String, String>) {
+		_globalLevelProcessingInstructions.add(ProcessingInstructionElement(text, linkedMapOf(*attributes)))
 	}
 
 	/**
@@ -570,11 +592,11 @@ open class Node(val nodeName: String) : Element {
 
 	/**
 	 * Adds the specified namespace to the element.
-	 * <code>
-	 *     "url" {
-	 *         namespace("t", "http://someurl.org")
-	 *     }
-	 * </code>
+	 * ```
+	 * "url" {
+	 *     namespace("t", "http://someurl.org")
+	 * }
+	 * ```
 	 *
 	 * @param name The name of the namespace.
 	 * @param value The url or descriptor of the namespace.
@@ -587,12 +609,12 @@ open class Node(val nodeName: String) : Element {
 
 	/**
 	 * Adds the specified namespace to the element.
-	 * <code>
-	 *     val ns = Namespace("t", "http://someurl.org")
-	 *     "url" {
-	 *         namespace(ns)
-	 *     }
-	 * </code>
+	 * ```
+	 * val ns = Namespace("t", "http://someurl.org")
+	 * "url" {
+	 *     namespace(ns)
+	 * }
+	 * ```
 	 *
 	 * @param namespace The namespace object to use for the element's namespace declaration.
 	 */
@@ -601,54 +623,199 @@ open class Node(val nodeName: String) : Element {
 	}
 
 	/**
-	 * Adds a node to the element.
+	 * Adds a node to the node.
 	 * @param node The node to append.
 	 */
-	fun addNode(node: Node) {
-		node.parent = this
-		_children.add(node)
+	@Deprecated(
+		message = "Use addElement instead",
+		replaceWith = ReplaceWith("addElement(node)")
+	)
+	fun addNode(node: Node) = addElement(node)
+
+	/**
+	 * Adds a element to the node.
+	 * @param element The element to append.
+	 */
+	fun addElement(element: Element) {
+		setParentIfNode(element, this)
+		_children.add(element)
 	}
 
 	/**
-	 * Adds a node to the element after the specific node.
+	 * Adds the provided elements to the node.
+	 * @param elements The elements to append.
+	 */
+	fun addElements(vararg elements: Element) = elements.forEach { addElement(it) }
+
+	/**
+	 * Adds the provided elements to the node.
+	 * @param elements The elements to append.
+	 */
+	fun <T : Element> addElements(elements: Iterable<T>) = elements.forEach { addElement(it) }
+
+	/**
+	 * Adds a node to the node after the specific node.
 	 * @param node The node to add
 	 * @param after The node to add [node] after
 	 *
 	 * @throws IllegalArgumentException If [after] can't be found
 	 */
-	fun addNodeAfter(node: Node, after: Node) {
+	@Deprecated(
+		message = "Use addElementAfter instead",
+		replaceWith = ReplaceWith("addElementAfter(node, after)")
+	)
+	fun addNodeAfter(node: Node, after: Node) = addElementAfter(node, after)
+
+	/**
+	 * Adds an element to the node after the specific element.
+	 * @param element The element to add
+	 * @param after The element to add [element] after
+	 *
+	 * @throws IllegalArgumentException If [after] can't be found
+	 */
+	fun addElementAfter(element: Element, after: Element) {
 		val index = findIndex(after)
 
-		node.parent = this
+		setParentIfNode(element, this)
 
 		if (index + 1 == _children.size) {
-			_children.add(node)
+			_children.add(element)
 		} else {
-			_children.add(index + 1, node)
+			_children.add(index + 1, element)
 		}
 	}
 
 	/**
-	 * Adds a node to the element before the specific node.
+	 * Adds elements to the node after the specific element.
+	 * @param elements The elements to add
+	 * @param after The element to add [elements] after
+	 *
+	 * @throws IllegalArgumentException If [after] can't be found
+	 */
+	fun <T : Element> addElementsAfter(elements: Iterable<T>, after: Element) {
+		val index = findIndex(after) + 1
+
+		if (index == _children.size) {
+			addElements(elements)
+		} else {
+			val firstPart = _children.take(index)
+			val lastPart = _children.drop(index)
+			_children.clear()
+			_children.addAll(firstPart)
+			addElements(elements)
+			_children.addAll(lastPart)
+		}
+	}
+
+	/**
+	 * Adds elements to the node after the specific element.
+	 * @param after The element to add [elements] after
+	 * @param elements The elements to add
+	 *
+	 * @throws IllegalArgumentException If [after] can't be found
+	 */
+	fun addElementsAfter(after: Element, vararg elements: Element) =
+		addElementsAfter(listOf(*elements), after)
+
+	/**
+	 * Adds a node to the node before the specific node.
 	 * @param node The node to add
 	 * @param before The node to add [node] before
 	 *
 	 * @throws IllegalArgumentException If [before] can't be found
 	 */
-	fun addNodeBefore(node: Node, before: Node) {
-		node.parent = this
-		_children.add(findIndex(before), node)
+	@Deprecated(
+		message = "Use addElementBefore instead",
+		replaceWith = ReplaceWith("addElementBefore(node, before)")
+	)
+	fun addNodeBefore(node: Node, before: Node) = addElementBefore(node, before)
+
+	/**
+	 * Adds an element to the node before the specific element.
+	 * @param element The element to add
+	 * @param before The element to add [element] before
+	 *
+	 * @throws IllegalArgumentException If [before] can't be found
+	 */
+	fun addElementBefore(element: Element, before: Element) {
+		val index = findIndex(before)
+		setParentIfNode(element, this)
+		_children.add(index, element)
 	}
 
 	/**
-	 * Removes a node from the element
+	 * Adds elements to the node before the specific element.
+	 * @param elements The elements to add
+	 * @param before The element to add [elements] before
+	 *
+	 * @throws IllegalArgumentException If [before] can't be found
+	 */
+	fun <T : Element> addElementsBefore(elements: Iterable<T>, before: Element) {
+		val index = findIndex(before)
+		val firstPart = _children.take(index)
+		val lastPart = _children.drop(index)
+		_children.clear()
+		_children.addAll(firstPart)
+		addElements(elements)
+		_children.addAll(lastPart)
+	}
+
+	/**
+	 * Adds elements to the node before the specific element.
+	 * @param before The element to add [elements] before
+	 * @param elements The elements to add
+	 *
+	 * @throws IllegalArgumentException If [before] can't be found
+	 */
+	fun addElementsBefore(before: Element, vararg elements: Element) =
+		addElementsBefore(listOf(*elements), before)
+
+	/**
+	 * Removes a node from the node
 	 * @param node The node to remove
 	 *
 	 * @throws IllegalArgumentException If [node] can't be found
 	 */
-	fun removeNode(node: Node) {
-		val index = findIndex(node)
-		_children.removeAt(index)
+	@Deprecated(
+		message = "Use removeElement instead",
+		replaceWith = ReplaceWith("removeElement(node)")
+	)
+	fun removeNode(node: Node) = removeElement(node)
+
+	/**
+	 * Removes an element from the node
+	 * @param element The element to remove
+	 *
+	 * @throws IllegalArgumentException If [element] can't be found
+	 */
+	fun removeElement(element: Element) {
+		val index = findIndex(element)
+		removeChildAt(index)
+	}
+
+	/**
+	 * Removes the elements from the node
+	 * @param elements The elements to remove
+	 *
+	 * @throws IllegalArgumentException If any [elements] can't be found
+	 */
+	fun removeElements(vararg elements: Element) = removeElements(listOf(*elements))
+
+	/**
+	 * Removes the elements from the node
+	 * @param elements The elements to remove
+	 *
+	 * @throws IllegalArgumentException If any [elements] can't be found
+	 */
+	fun <T : Element> removeElements(elements: Iterable<T>) =
+		elements
+			.map { findIndex(it) }
+			.sortedDescending()
+			.forEach { removeChildAt(it) }
+
+	private fun removeChildAt(index: Int) {
+		val child = _children.removeAt(index)
+		setParentIfNode(child, null)
 	}
 
 	/**
@@ -658,12 +825,26 @@ open class Node(val nodeName: String) : Element {
 	 *
 	 * @throws IllegalArgumentException If [existing] can't be found
 	 */
-	fun replaceNode(existing: Node, newNode: Node) {
+	@Deprecated(
+		message = "Use replaceElement instead",
+		replaceWith = ReplaceWith("replaceElement(exising, newNode)")
+	)
+	fun replaceNode(existing: Node, newNode: Node) = replaceElement(existing, newNode)
+
+	/**
+	 * Replaces an element with a different element
+	 * @param existing The existing element to replace
+	 * @param newElement The element to replace [existing] with
+	 *
+	 * @throws IllegalArgumentException If [existing] can't be found
+	 */
+	fun replaceElement(existing: Element, newElement: Element) {
 		val index = findIndex(existing)
 
-		newNode.parent = this
-		_children.removeAt(index)
-		_children.add(index, newNode)
+		setParentIfNode(newElement, this)
+		setParentIfNode(existing, null)
+
+		_children[index] = newElement
 	}
 
 	/**
@@ -710,13 +891,17 @@ open class Node(val nodeName: String) : Element {
 
 	private fun filterChildrenToNodes(): List<Node> = _children.filterIsInstance(Node::class.java)
 
-	private fun findIndex(node: Node): Int {
-		val index = _children.indexOf(node)
-		if (index == -1) {
-			throw IllegalArgumentException("Node with nodeName '${node.nodeName}' is not a child of '$nodeName'")
-		}
+	private fun findIndex(element: Element): Int {
+		return _children
+			.indexOfFirst { it === element }
+			.takeUnless { it == -1 }
+			?: throw IllegalArgumentException("Element (${element.javaClass} is not a child of '$nodeName'")
+	}
 
-		return index
+	private fun setParentIfNode(element: Element, newParent: Node?) {
+		if (element is Node) {
+			element.parent = newParent
+		}
 	}
 
 	override fun equals(other: Any?): Boolean {
@@ -725,21 +910,21 @@ open class Node(val nodeName: String) : Element {
 		}
 
 		return EqualsBuilder()
-				.append(nodeName, other.nodeName)
-				.append(encoding, other.encoding)
-				.append(version, other.version)
-				.append(_attributes, other._attributes)
-				.append(_globalLevelProcessingInstructions, other._globalLevelProcessingInstructions)
-				.append(_children, other._children)
-				.isEquals
+			.append(nodeName, other.nodeName)
+			.append(encoding, other.encoding)
+			.append(version, other.version)
+			.append(_attributes, other._attributes)
+			.append(_globalLevelProcessingInstructions, other._globalLevelProcessingInstructions)
+			.append(_children, other._children)
+			.isEquals
 	}
 
 	override fun hashCode(): Int = HashCodeBuilder()
-			.append(nodeName)
-			.append(encoding)
-			.append(version)
-			.append(_attributes)
-			.append(_globalLevelProcessingInstructions)
-			.append(_children)
-			.toHashCode()
+		.append(nodeName)
+		.append(encoding)
+		.append(version)
+		.append(_attributes)
+		.append(_globalLevelProcessingInstructions)
+		.append(_children)
+		.toHashCode()
 }

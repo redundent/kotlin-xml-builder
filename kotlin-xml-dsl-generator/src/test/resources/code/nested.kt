@@ -27,7 +27,7 @@ open class `Top`(nodeName: String) : Node(nodeName) {
 			}
 		}
 		`second`.apply(__block__)
-		this.addNode(`second`)
+		this.addElement(`second`)
 	}
 }
 
@@ -38,7 +38,7 @@ fun `Top`.`first`(`Id`: kotlin.Long,
 		this.`Id` = `Id`
 	}
 	`first`.apply(__block__)
-	this.addNode(`first`)
+	this.addElement(`first`)
 }
 
 fun `top`(__block__: `Top`.() -> Unit): `Top` {

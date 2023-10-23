@@ -11,7 +11,7 @@ open class `DuplicateNameContainer`(nodeName: String) : Node(nodeName) {
 fun `DuplicateNameContainer`.`DuplicateName`(__block__: `DuplicateNameContainer`.`DuplicateName`.() -> Unit) {
 	val `DuplicateName` = `DuplicateName`()
 	`DuplicateName`.apply(__block__)
-	this.addNode(`DuplicateName`)
+	this.addElement(`DuplicateName`)
 }
 
 open class `DuplicateNames`(nodeName: String) : org.redundent.generated.`DuplicateNameContainer`(nodeName)

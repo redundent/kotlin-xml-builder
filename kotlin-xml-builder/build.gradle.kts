@@ -2,6 +2,7 @@ plugins {
 	kotlin("jvm")
 	`maven-publish`
 	signing
+	id("org.jlleitschuh.gradle.ktlint")
 }
 
 val kotlinVersion: String by rootProject.extra

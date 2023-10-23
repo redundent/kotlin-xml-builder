@@ -4,15 +4,16 @@ import com.sun.tools.xjc.model.CClassInfo
 import com.sun.tools.xjc.model.CNonElement
 
 class XmlElement(
-		val name: String,
-		val type: CNonElement,
-		private val tagName: String,
-		private val documentation: String?,
-		private val parent: CClassInfo? = null) : Code {
+	val name: String,
+	val type: CNonElement,
+	private val tagName: String,
+	private val documentation: String?,
+	private val parent: CClassInfo? = null
+) : Code {
 
 	override fun write(codeWriter: CodeWriter) {
 		val rootElement = parent == null
-		with (codeWriter) {
+		with(codeWriter) {
 			writeKotlinDoc(documentation)
 
 			val funLine = "fun ${if (!rootElement) "`${parent!!.shortName}`." else ""}`$name`"
@@ -24,9 +25,13 @@ class XmlElement(
 			write(funLine)
 
 			if (type is CClassInfo) {
-				val blockParamType = "${((type.parent() as? CClassInfo)?.let { "`${it.shortName}`." } ?: "")}`${type.shortName}`"
+				val blockParamType =
+					"${((type.parent() as? CClassInfo)?.let { "`${it.shortName}`." } ?: "")}`${type.shortName}`"
 
-				writeln("(${type.attributesAsParameters(funLine.length + (currentIndex * 4) + 1)}__block__: $blockParamType.() -> Unit)${if (rootElement) ": `${type.shortName}`" else ""} {", false)
+				writeln(
+					"(${type.attributesAsParameters(funLine.length + (currentIndex * 4) + 1)}__block__: $blockParamType.() -> Unit)${if (rootElement) ": `${type.shortName}`" else ""} {",
+					false
+				)
 				indent()
 				writeln("val `$tagName` = `${type.shortName}`(${if (type.parent() is CClassInfo) "" else "\"$tagName\""})")
 				if (type.allAttributes.isNotEmpty()) {
@@ -50,7 +55,7 @@ class XmlElement(
 				if (rootElement) {
 					writeln("return `$tagName`")
 				} else {
-					writeln("this.addNode(`$tagName`)")
+					writeln("this.addElement(`$tagName`)")
 				}
 
 				dedent()

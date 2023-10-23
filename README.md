@@ -276,6 +276,14 @@ It includes many more features for consuming documents.
 
 Release Notes
 =============
+Version 1.9.1
+-
+* Adding `addElement`, `addElements`, `addElementsBefore`, `addElementsAfter`, `removeElement`,
+`removeElements`, and `replaceElement` to Node.\
+Thanks to [@csmile2](https://github.com/csmile2) for requesting this!
+* Deprecating `addNode`, `addNodeBefore`, `addNodeAfter`, `removeNode`, and `replaceNode` in favor of Element methods.
+* Adding ktlint checks
+
 Version 1.9.0
 -
 * Adding `unsafe` and `unsafeText` methods to allow for unescaped values in elements and attributes.\

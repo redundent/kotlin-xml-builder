@@ -5,6 +5,7 @@ plugins {
 	id("com.github.johnrengelman.shadow") version "5.2.0"
 	`maven-publish`
 	signing
+	id("org.jlleitschuh.gradle.ktlint")
 }
 
 val kotlinVersion: String by rootProject.extra
