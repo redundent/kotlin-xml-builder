@@ -10,7 +10,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class XmlBuilderTest : XmlBuilderTestBase() {
+class XmlBuilderTest : TestBase() {
 	@Test
 	fun basicTest() {
 		val urlset = xml("urlset") {
@@ -142,9 +142,11 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 	@Test
 	fun globalProcessingInstructionElement() {
 		val root = xml("root") {
-			globalProcessingInstruction("xml-stylesheet",
-					"key" to "value",
-					"href" to "http://blah")
+			globalProcessingInstruction(
+				"xml-stylesheet",
+				"key" to "value",
+				"href" to "http://blah"
+			)
 
 			element("element") {
 				globalProcessingInstruction("test")
@@ -184,8 +186,8 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 			}
 			element("attributes") {
 				attributes(
-						"test" to "value",
-						"key" to "pair"
+					"test" to "value",
+					"key" to "pair"
 				)
 			}
 		}
@@ -200,9 +202,11 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 
 	@Test
 	fun emptyElement() {
-		validate(xml("root") {
-			element("test")
-		})
+		validate(
+			xml("root") {
+				element("test")
+			}
+		)
 	}
 
 	@Test
@@ -272,18 +276,22 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 
 	@Test
 	fun elementAsStringWithAttributes() {
-		validate(xml("root") {
-			"name"("attr" to "value", "attr2" to "other")
-		})
+		validate(
+			xml("root") {
+				"name"("attr" to "value", "attr2" to "other")
+			}
+		)
 	}
 
 	@Test
 	fun elementAsStringWithAttributesAndContent() {
-		validate(xml("root") {
-			"name"("attr" to "value") {
-				-"Content"
+		validate(
+			xml("root") {
+				"name"("attr" to "value") {
+					-"Content"
+				}
 			}
-		})
+		)
 	}
 
 	@Test
@@ -300,11 +308,11 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 		assertNotNull(xml["attr"], "attr is not null")
 		assertEquals(value, xml["attr"]!!, "attr getting is correct")
 
-		//Update the attr value
+		// Update the attr value
 		xml["attr"] = "something else"
 		assertEquals("something else", xml["attr"]!!, "attr value is updated")
 
-		//Remove the
+		// Remove the
 		xml.xmlns = null
 		assertNull(xml.xmlns, "xmlns is removed")
 
@@ -379,92 +387,92 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 	}
 
 	@Test
-	fun addNode() {
+	fun addElement() {
 		val root = xml("root") {
 			"a"()
 		}
 
-		root.addNode(node("b"))
+		root.addElement(node("b"))
 
 		validate(root)
 	}
 
 	@Test
-	fun removeNode() {
+	fun removeElement() {
 		val root = xml("root") {
 			"a"()
 			"b"()
 		}
 
-		root.removeNode(root.first("b"))
+		root.removeElement(root.first("b"))
 
 		validate(root)
 	}
 
 	@Test
-	fun addNodeAfter() {
+	fun addElementAfter() {
 		val root = xml("root") {
 			"a"()
 			"b"()
 		}
 
-		root.addNodeAfter(node("c"), root.first("a"))
+		root.addElementAfter(node("c"), root.first("a"))
 
 		validate(root)
 	}
 
 	@Test
-	fun addNodeAfterLastChild() {
+	fun addElementAfterLastChild() {
 		val root = xml("root") {
 			"a"()
 			"b"()
 		}
 
-		root.addNodeAfter(node("c"), root.first("b"))
-
-		validate(root)
-	}
-
-	@Test(expected = IllegalArgumentException::class)
-	fun addNodeAfterNonExistent() {
-		val root = xml("root") {
-			"a"()
-			"b"()
-		}
-
-		root.addNodeAfter(node("c"), node("d"))
-	}
-
-	@Test
-	fun addNodeBefore() {
-		val root = xml("root") {
-			"a"()
-			"b"()
-		}
-
-		root.addNodeBefore(node("c"), root.first("b"))
+		root.addElementAfter(node("c"), root.first("b"))
 
 		validate(root)
 	}
 
 	@Test(expected = IllegalArgumentException::class)
-	fun addNodeBeforeNonExistent() {
+	fun addElementAfterNonExistent() {
 		val root = xml("root") {
 			"a"()
 			"b"()
 		}
 
-		root.addNodeBefore(node("c"), node("d"))
+		root.addElementAfter(node("c"), node("d"))
 	}
 
 	@Test
-	fun replaceNode() {
+	fun addElementBefore() {
 		val root = xml("root") {
 			"a"()
 			"b"()
 		}
 
-		root.replaceNode(root.first("b"), node("c"))
+		root.addElementBefore(node("c"), root.first("b"))
+
+		validate(root)
+	}
+
+	@Test(expected = IllegalArgumentException::class)
+	fun addElementBeforeNonExistent() {
+		val root = xml("root") {
+			"a"()
+			"b"()
+		}
+
+		root.addElementBefore(node("c"), node("d"))
+	}
+
+	@Test
+	fun replaceElement() {
+		val root = xml("root") {
+			"a"()
+			"b"()
+		}
+
+		root.replaceElement(root.first("b"), node("c"))
 
 		validate(root)
 	}
@@ -584,6 +592,7 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 
 		validate(root)
 	}
+
 	@Test
 	fun doctypePublic() {
 		val root = xml("root") {
@@ -610,9 +619,11 @@ class XmlBuilderTest : XmlBuilderTestBase() {
 			}
 
 			"child" {
-				attributes(ns5,
+				attributes(
+					ns5,
 					"key1" to "value1",
-					"key2" to "value2")
+					"key2" to "value2"
+				)
 				attributes(
 					Attribute("key3", "value3", ns6),
 					Attribute("key4", "value4", ns1)

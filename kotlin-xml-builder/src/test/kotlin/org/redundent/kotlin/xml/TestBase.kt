@@ -14,7 +14,7 @@ import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 import kotlin.test.assertEquals
 
-open class XmlBuilderTestBase {
+open class TestBase {
 	@get:Rule
 	val testName = TestName()
 
@@ -38,7 +38,7 @@ open class XmlBuilderTestBase {
 	protected fun validate(xml: Node, printOptions: PrintOptions) {
 		val actual = xml.toString(printOptions)
 
-		//Doing a replace to cater for different line endings.
+		// Doing a replace to cater for different line endings.
 		assertEquals(getExpectedXml(), actual.replace(System.lineSeparator(), "\n"), "actual xml matches what is expected")
 
 		validateXml(actual)

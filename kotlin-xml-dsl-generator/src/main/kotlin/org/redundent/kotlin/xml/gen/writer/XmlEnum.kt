@@ -4,7 +4,7 @@ import com.sun.tools.xjc.outline.EnumOutline
 
 class XmlEnum(private val enum: EnumOutline) : Code {
 	override fun write(codeWriter: CodeWriter) {
-		with (codeWriter) {
+		with(codeWriter) {
 			writeKotlinDoc(enum.target.documentation)
 			writeln("enum class `${enum.target.shortName}` {")
 			indent()

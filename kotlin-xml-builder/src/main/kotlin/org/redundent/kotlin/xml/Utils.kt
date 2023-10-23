@@ -10,7 +10,7 @@ internal fun escapeValue(value: Any?, xmlVersion: XmlVersion, useCharacterRefere
 		return referenceCharacter(asString)
 	}
 
-	return when(xmlVersion) {
+	return when (xmlVersion) {
 		XmlVersion.V10 -> StringEscapeUtils.escapeXml10(asString)
 		XmlVersion.V11 -> StringEscapeUtils.escapeXml11(asString)
 	}

@@ -5,7 +5,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder
 /**
  * Similar to a [TextElement] except that the inner text is wrapped inside <??> tag.
  */
-class ProcessingInstructionElement internal constructor(text: String, private val attributes: Map<String, String>) : TextElement(text) {
+class ProcessingInstructionElement internal constructor(text: String, private val attributes: Map<String, String>) :
+	TextElement(text) {
 	override fun renderedText(printOptions: PrintOptions): String {
 		return "<?$text${renderAttributes()}?>"
 	}
@@ -29,7 +30,7 @@ class ProcessingInstructionElement internal constructor(text: String, private va
 	}
 
 	override fun hashCode(): Int = HashCodeBuilder()
-			.appendSuper(super.hashCode())
-			.append(attributes)
-			.toHashCode()
+		.appendSuper(super.hashCode())
+		.append(attributes)
+		.toHashCode()
 }

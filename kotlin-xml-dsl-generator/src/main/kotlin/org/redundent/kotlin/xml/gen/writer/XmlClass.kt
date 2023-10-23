@@ -4,13 +4,16 @@ import com.sun.tools.xjc.outline.ClassOutline
 import org.redundent.kotlin.xml.gen.ExOptions
 
 class XmlClass(
-		val clazz: ClassOutline,
-		private val opts: ExOptions,
-		innerClass: Boolean = false) : Code {
+	val clazz: ClassOutline,
+	private val opts: ExOptions,
+	innerClass: Boolean = false
+) : Code {
 	val name: String = clazz.target.shortName
-	val xmlns: String? = if (clazz.target.isElement && clazz.target.elementName.namespaceURI.isNotBlank()) clazz.target.elementName.namespaceURI else null
+	val xmlns: String? =
+		if (clazz.target.isElement && clazz.target.elementName.namespaceURI.isNotBlank()) clazz.target.elementName.namespaceURI else null
 
-	private val superClassName: String = clazz.superClass?.target?.let { "${it.ownerPackage.name()}.`${it.shortName}`" } ?: "Node"
+	private val superClassName: String =
+		clazz.superClass?.target?.let { "${it.ownerPackage.name()}.`${it.shortName}`" } ?: "Node"
 	private val abstract: Boolean = clazz.target.isAbstract
 	private val attributes: MutableList<XmlAttribute> = ArrayList()
 	private val memberElements: MutableList<XmlElement> = ArrayList()
@@ -27,7 +30,7 @@ class XmlClass(
 	private val superClassConstructorArg = if (innerClass) "\"$name\"" else "nodeName"
 
 	private val hasBody: Boolean
-		get() = attributes.isNotEmpty() || xmlns != null  || innerClasses.isNotEmpty() || (opts.useMemberFunctions && memberElements.isNotEmpty())
+		get() = attributes.isNotEmpty() || xmlns != null || innerClasses.isNotEmpty() || (opts.useMemberFunctions && memberElements.isNotEmpty())
 
 	init {
 		clazz.target.attributes.map {
@@ -40,7 +43,15 @@ class XmlClass(
 
 		clazz.target.elements.forEach { element ->
 			element.types.forEach { type ->
-				memberElements.add(XmlElement(type.tagName.localPart, type.target, type.tagName.localPart, element.documentation, if (opts.useMemberFunctions) null else clazz.target))
+				memberElements.add(
+					XmlElement(
+						type.tagName.localPart,
+						type.target,
+						type.tagName.localPart,
+						element.documentation,
+						if (opts.useMemberFunctions) null else clazz.target
+					)
+				)
 			}
 		}
 
@@ -51,7 +62,7 @@ class XmlClass(
 	}
 
 	override fun write(codeWriter: CodeWriter) {
-		with (codeWriter) {
+		with(codeWriter) {
 			writeKotlinDoc(clazz.target.documentation)
 
 			if (clazz.target.isOrdered && clazz.target.elements.size > 1) {

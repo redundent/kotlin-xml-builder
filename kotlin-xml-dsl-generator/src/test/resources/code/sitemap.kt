@@ -35,7 +35,7 @@ open class `Urlset`(nodeName: String) : Node(nodeName) {
 fun `Urlset`.`url`(__block__: `TUrl`.() -> Unit) {
 	val `url` = `TUrl`("url")
 	`url`.apply(__block__)
-	this.addNode(`url`)
+	this.addElement(`url`)
 }
 
 /**

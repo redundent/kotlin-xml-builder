@@ -2,7 +2,7 @@ package org.redundent.kotlin.xml.gen
 
 import org.junit.Test
 
-class SimpleSchemGen : AbstractGenTest() {
+class SimpleSchemaGen : AbstractGenTest() {
 	@Test
 	fun sitemap() = run()
 

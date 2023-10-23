@@ -2,7 +2,7 @@ package org.redundent.kotlin.xml
 
 import org.junit.Test
 
-class OrderedNodesTest : XmlBuilderTestBase() {
+class OrderedNodesTest : TestBase() {
 	@Test
 	fun correctOrder() {
 		val xml = structured {

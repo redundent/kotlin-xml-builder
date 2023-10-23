@@ -3,6 +3,7 @@ package org.redundent.kotlin.xml.gen
 import org.junit.Rule
 import org.junit.rules.TestName
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.InputStream
 import java.io.InputStreamReader
 import kotlin.test.assertEquals
@@ -14,6 +15,7 @@ abstract class AbstractGenTest {
 
 	protected fun run(withBindingFile: Boolean = false, vararg additionalArgs: String) {
 		val schema = javaClass.getResourceAsStream("/schema/${testName.methodName}.xsd")
+			?: throw FileNotFoundException("/schema/${testName.methodName}.xsd as not found")
 		val code = getExpectedClassText()
 
 		val file = File.createTempFile("schema", ".xsd").apply {
@@ -26,6 +28,7 @@ abstract class AbstractGenTest {
 
 		if (withBindingFile) {
 			val binding = javaClass.getResourceAsStream("/schema/${testName.methodName}.jxb")
+				?: throw FileNotFoundException("/schema/${testName.methodName}.jxb as not found")
 			val bindingFile = File.createTempFile("binding", ".jxb").apply {
 				writer().use { writer ->
 					binding.reader().forEachLine { line ->
@@ -52,6 +55,7 @@ abstract class AbstractGenTest {
 	private fun getInputStream(): InputStream {
 		val resName = "/code/${testName.methodName}.kt"
 		return javaClass.getResourceAsStream(resName)
+			?: throw FileNotFoundException("$resName as not found")
 	}
 
 	private fun cleanText(text: String): String {
