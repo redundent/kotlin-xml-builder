@@ -1,19 +1,26 @@
 plugins {
 //	id("org.jlleitschuh.gradle.ktlint")
 	conventions.publishing
-	conventions.`kotlin-jvm`
+	conventions.`kotlin-multiplatform`
+//	id("com.goncalossilva.resources") version "0.4.1"
 }
 
-dependencies {
-	compileOnly(kotlin("reflect"))
-
-	testImplementation(kotlin("test"))
-}
-
-publishing {
-	publications {
-		register<MavenPublication>("maven") {
-			from(components["java"])
+kotlin {
+	sourceSets {
+		commonMain {
+			dependencies {
+				implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
+			}
+		}
+		commonTest {
+			dependencies {
+				implementation(kotlin("test"))
+			}
+		}
+		jvmMain {
+			dependencies {
+				compileOnly(kotlin("reflect"))
+			}
 		}
 	}
 }
