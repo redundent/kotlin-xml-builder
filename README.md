@@ -27,12 +27,17 @@ dependencies {
 }
 ```
 
-Similarly in Maven:
+Similarly, in Maven:
+
+> [!IMPORTANT]
+> Maven must add a `-jvm` suffix to the `kotlin-xml-builder` dependency.\
+> A suffix is not required for Gradle.
+
 ```xml
 <dependencies>
     <dependency>
         <groupId>org.redundent</groupId>
-        <artifactId>kotlin-xml-builder</artifactId>
+        <artifactId>kotlin-xml-builder-jvm</artifactId>
         <version>[VERSION]</version>
     </dependency>
 </dependencies>
@@ -276,6 +281,16 @@ It includes many more features for consuming documents.
 
 Release Notes
 =============
+Version 2.0.0
+-
+* `kotlin-xml-builder` has been updated to support Kotlin Multiplatform.
+
+**BREAKING CHANGES**
+* Maven users must add a `-jvm` suffix to the artifact ID to select the JVM variant.\
+Old: `<artifactId>kotlin-xml-builder</artifactId>`\
+New: `<artifactId>kotlin-xml-builder-jvm</artifactId>`.\
+No change is necessary for Gradle users.
+
 Version 1.9.1
 -
 * Adding `addElement`, `addElements`, `addElementsBefore`, `addElementsAfter`, `removeElement`,
