@@ -1,22 +1,28 @@
-
 name: Deploy to central
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: "Deploy: ${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}"
+  cancel-in-progress: false
+
 jobs:
+
   build:
     uses: ./.github/workflows/ci.yml
+
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     needs: build
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup Java JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 8
@@ -27,13 +33,22 @@ jobs:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.GPG_PRIVATE_PASSWORD }}
 
-      - name: Gradle publish
-        uses: gradle/gradle-build-action@ce999babab2de1c4b649dc15f0ee67e6246c994f
+      - name: Cache Kotlin Konan
+        id: cache-kotlin-konan
+        uses: actions/cache@v4
         with:
-          arguments: |
-            publish
-            closeSonatypeStagingRepository
-            -Psigning.gnupg.passphrase='${{secrets.GPG_PRIVATE_PASSWORD}}'
-            -Psigning.gnupg.keyName='${{secrets.GPG_PRIVATE_KEY_ID}}'
-            -PsonatypeUsername='${{secrets.SONATYPE_USERNAME}}'
-            -PsonatypePassword='${{secrets.SONATYPE_PASSWORD}}'
+          path: |
+            ~/.konan/**/*
+          key: kotlin-konan-${{ runner.os }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Check
+        run: >-
+          ./gradlew publish
+                    closeSonatypeStagingRepository
+                    -Psigning.gnupg.passphrase='${{secrets.GPG_PRIVATE_PASSWORD}}'
+                    -Psigning.gnupg.keyName='${{secrets.GPG_PRIVATE_KEY_ID}}'
+                    -PsonatypeUsername='${{secrets.SONATYPE_USERNAME}}'
+                    -PsonatypePassword='${{secrets.SONATYPE_PASSWORD}}'
