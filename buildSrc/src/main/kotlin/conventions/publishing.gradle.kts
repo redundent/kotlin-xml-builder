@@ -55,12 +55,25 @@ signing {
 	}
 }
 
-
 //region Fix Gradle warning about signing tasks using publishing task outputs without explicit dependencies
 // https://youtrack.jetbrains.com/issue/KT-46466
 val signingTasks = tasks.withType<Sign>()
 
 tasks.withType<AbstractPublishToMaven>().configureEach {
 	mustRunAfter(signingTasks)
+}
+//endregion
+
+//region Maven Publish limiter
+// Maven Central can't handle parallel uploads, which can break releases in ugly ways. So, limit parallel publications with a build service.
+abstract class MavenPublishLimiter : BuildService<BuildServiceParameters.None>
+
+val mavenPublishLimiter =
+	gradle.sharedServices.registerIfAbsent("mavenPublishLimiter", MavenPublishLimiter::class) {
+		maxParallelUsages = 1
+	}
+
+tasks.withType<PublishToMavenRepository>().configureEach {
+	usesService(mavenPublishLimiter)
 }
 //endregion

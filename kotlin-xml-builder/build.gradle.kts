@@ -2,7 +2,6 @@ plugins {
 //	id("org.jlleitschuh.gradle.ktlint")
 	conventions.publishing
 	conventions.`kotlin-multiplatform`
-//	id("com.goncalossilva.resources") version "0.4.1"
 }
 
 kotlin {
