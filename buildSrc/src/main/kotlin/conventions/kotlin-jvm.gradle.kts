@@ -18,3 +18,7 @@ kotlin {
 java {
 	withSourcesJar()
 }
+
+tasks.withType<Test>().configureEach {
+	useJUnitPlatform()
+}

@@ -1,7 +1,5 @@
 package org.redundent.kotlin.xml
 
-import org.apache.commons.lang3.builder.HashCodeBuilder
-
 /**
  * Similar to a [TextElement] except that the inner text is wrapped inside <??> tag.
  */
@@ -29,8 +27,9 @@ class ProcessingInstructionElement internal constructor(text: String, private va
 		return attributes == other.attributes
 	}
 
-	override fun hashCode(): Int = HashCodeBuilder()
-		.appendSuper(super.hashCode())
-		.append(attributes)
-		.toHashCode()
+	override fun hashCode(): Int {
+		var result = super.hashCode()
+		result = 31 * result + attributes.hashCode()
+		return result
+	}
 }

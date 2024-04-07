@@ -1,14 +1,14 @@
 package org.redundent.kotlin.xml
 
-import org.junit.Test
-import org.xml.sax.SAXException
 import java.io.ByteArrayInputStream
+import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import org.xml.sax.SAXException
 
 class XmlBuilderTest : TestBase() {
 	@Test
@@ -25,7 +25,7 @@ class XmlBuilderTest : TestBase() {
 			}
 		}
 
-		validate(urlset)
+		validate("basicTest", urlset)
 	}
 
 	@Test
@@ -47,7 +47,7 @@ class XmlBuilderTest : TestBase() {
 			}
 		}
 
-		validate(root)
+		validate("customNamespaces", root)
 	}
 
 	@Test
@@ -61,7 +61,7 @@ class XmlBuilderTest : TestBase() {
 			}
 		}
 
-		validate(root, prettyFormat = false)
+		validate("notPrettyFormatting", root, prettyFormat = false)
 	}
 
 	@Test
@@ -75,7 +75,7 @@ class XmlBuilderTest : TestBase() {
 			}
 		}
 
-		validate(root, PrintOptions(indent = ""))
+		validate("zeroSpaceIndent", root, PrintOptions(indent = ""))
 	}
 
 	@Test
@@ -89,7 +89,7 @@ class XmlBuilderTest : TestBase() {
 			}
 		}
 
-		validate(root, PrintOptions(pretty = false, indent = ""))
+		validate("zeroSpaceIndentNoPrettyFormatting", root, PrintOptions(pretty = false, indent = ""))
 	}
 
 	@Test
@@ -103,7 +103,7 @@ class XmlBuilderTest : TestBase() {
 			}
 		}
 
-		validate(root, PrintOptions(pretty = true, singleLineTextElements = true))
+		validate("singleLineTextElement", root, PrintOptions(pretty = true, singleLineTextElements = true))
 	}
 
 	@Test
@@ -114,7 +114,7 @@ class XmlBuilderTest : TestBase() {
 			}
 		}
 
-		validate(root, PrintOptions(pretty = true, singleLineTextElements = true))
+		validate("singleLineCDATAElement", root, PrintOptions(pretty = true, singleLineTextElements = true))
 	}
 
 	@Test
@@ -125,7 +125,7 @@ class XmlBuilderTest : TestBase() {
 			}
 		}
 
-		validate(root, PrintOptions(pretty = true, singleLineTextElements = true))
+		validate("singleLineProcessingInstructionElement", root, PrintOptions(pretty = true, singleLineTextElements = true))
 	}
 
 	@Test
@@ -136,7 +136,11 @@ class XmlBuilderTest : TestBase() {
 			}
 		}
 
-		validate(root, PrintOptions(pretty = true, singleLineTextElements = true))
+		validate(
+			"singleLineProcessingInstructionElementWithAttributes",
+			root,
+			PrintOptions(pretty = true, singleLineTextElements = true)
+		)
 	}
 
 	@Test
@@ -153,7 +157,7 @@ class XmlBuilderTest : TestBase() {
 			}
 		}
 
-		validate(root, PrintOptions(pretty = true, singleLineTextElements = true))
+		validate("globalProcessingInstructionElement", root, PrintOptions(pretty = true, singleLineTextElements = true))
 	}
 
 	@Test
@@ -165,7 +169,7 @@ class XmlBuilderTest : TestBase() {
 			}
 		}
 
-		validate(root)
+		validate("comment", root)
 	}
 
 	@Test
@@ -174,7 +178,7 @@ class XmlBuilderTest : TestBase() {
 			element("element")
 		}
 
-		validate(root, PrintOptions(useSelfClosingTags = false))
+		validate("noSelfClosingTag", root, PrintOptions(useSelfClosingTags = false))
 	}
 
 	@Test
@@ -192,17 +196,18 @@ class XmlBuilderTest : TestBase() {
 			}
 		}
 
-		validate(root)
+		validate("multipleAttributes", root)
 	}
 
 	@Test
 	fun emptyRoot() {
-		validate(xml("root"))
+		validate("emptyRoot", xml("root"))
 	}
 
 	@Test
 	fun emptyElement() {
 		validate(
+			"emptyElement",
 			xml("root") {
 				element("test")
 			}
@@ -215,7 +220,7 @@ class XmlBuilderTest : TestBase() {
 			cdata("Some & xml")
 		}
 
-		validate(root)
+		validate("cdata", root)
 	}
 
 	@Test
@@ -224,7 +229,7 @@ class XmlBuilderTest : TestBase() {
 			cdata("<![CDATA[Some & xml]]>")
 		}
 
-		validate(root)
+		validate("cdataNesting", root)
 	}
 
 	@Test
@@ -233,7 +238,7 @@ class XmlBuilderTest : TestBase() {
 			processingInstruction("SomeProcessingInstruction")
 		}
 
-		validate(root)
+		validate("processingInstruction", root)
 	}
 
 	@Test
@@ -244,7 +249,7 @@ class XmlBuilderTest : TestBase() {
 
 		root["key"] = "otherValue"
 
-		validate(root)
+		validate("updateAttribute", root)
 	}
 
 	@Test
@@ -253,7 +258,7 @@ class XmlBuilderTest : TestBase() {
 			-"&<>"
 		}
 
-		validate(root)
+		validate("xmlEncode", root)
 	}
 
 	@Test
@@ -262,7 +267,7 @@ class XmlBuilderTest : TestBase() {
 			element("name", "value")
 		}
 
-		validate(root)
+		validate("elementValue", root)
 	}
 
 	@Test
@@ -271,12 +276,13 @@ class XmlBuilderTest : TestBase() {
 			"name"("value")
 		}
 
-		validate(root)
+		validate("elementAsString", root)
 	}
 
 	@Test
 	fun elementAsStringWithAttributes() {
 		validate(
+			"elementAsStringWithAttributes",
 			xml("root") {
 				"name"("attr" to "value", "attr2" to "other")
 			}
@@ -286,6 +292,7 @@ class XmlBuilderTest : TestBase() {
 	@Test
 	fun elementAsStringWithAttributesAndContent() {
 		validate(
+			"elementAsStringWithAttributesAndContent",
 			xml("root") {
 				"name"("attr" to "value") {
 					-"Content"
@@ -327,7 +334,7 @@ class XmlBuilderTest : TestBase() {
 			attribute("attr", "My \" Attribute value '")
 		}
 
-		validate(root)
+		validate("quoteInAttribute", root)
 	}
 
 	@Test
@@ -336,23 +343,27 @@ class XmlBuilderTest : TestBase() {
 			attribute("attr", "& < > \" '")
 		}
 
-		validate(root)
+		validate("specialCharInAttribute", root)
 	}
 
-	@Test(expected = SAXException::class)
+	@Test
 	fun invalidElementName() {
 		val root = xml("invalid root")
 
-		validateXml(root.toString())
+		assertFailsWith<SAXException> {
+			validateXml(root.toString())
+		}
 	}
 
-	@Test(expected = SAXException::class)
+	@Test
 	fun invalidAttributeName() {
 		val root = xml("root") {
 			attribute("invalid name", "")
 		}
 
-		validateXml(root.toString())
+		assertFailsWith<SAXException> {
+			validateXml(root.toString())
+		}
 	}
 
 	@Test
@@ -394,7 +405,7 @@ class XmlBuilderTest : TestBase() {
 
 		root.addElement(node("b"))
 
-		validate(root)
+		validate("addElement", root)
 	}
 
 	@Test
@@ -406,7 +417,7 @@ class XmlBuilderTest : TestBase() {
 
 		root.removeElement(root.first("b"))
 
-		validate(root)
+		validate("removeElement", root)
 	}
 
 	@Test
@@ -418,7 +429,7 @@ class XmlBuilderTest : TestBase() {
 
 		root.addElementAfter(node("c"), root.first("a"))
 
-		validate(root)
+		validate("addElementAfter", root)
 	}
 
 	@Test
@@ -430,17 +441,19 @@ class XmlBuilderTest : TestBase() {
 
 		root.addElementAfter(node("c"), root.first("b"))
 
-		validate(root)
+		validate("addElementAfterLastChild", root)
 	}
 
-	@Test(expected = IllegalArgumentException::class)
+	@Test
 	fun addElementAfterNonExistent() {
 		val root = xml("root") {
 			"a"()
 			"b"()
 		}
 
-		root.addElementAfter(node("c"), node("d"))
+		assertFailsWith<IllegalArgumentException> {
+			root.addElementAfter(node("c"), node("d"))
+		}
 	}
 
 	@Test
@@ -452,17 +465,19 @@ class XmlBuilderTest : TestBase() {
 
 		root.addElementBefore(node("c"), root.first("b"))
 
-		validate(root)
+		validate("addElementBefore", root)
 	}
 
-	@Test(expected = IllegalArgumentException::class)
+	@Test
 	fun addElementBeforeNonExistent() {
 		val root = xml("root") {
 			"a"()
 			"b"()
 		}
 
-		root.addElementBefore(node("c"), node("d"))
+		assertFailsWith<IllegalArgumentException> {
+			root.addElementBefore(node("c"), node("d"))
+		}
 	}
 
 	@Test
@@ -474,7 +489,7 @@ class XmlBuilderTest : TestBase() {
 
 		root.replaceElement(root.first("b"), node("c"))
 
-		validate(root)
+		validate("replaceElement", root)
 	}
 
 	@Test
@@ -498,28 +513,28 @@ class XmlBuilderTest : TestBase() {
 	}
 
 	@Test
-	fun parseCData() = parseTest()
+	fun parseCData() = parseTest("parseCData")
 
 	@Test
-	fun parseCDataWhitespace() = parseTest()
+	fun parseCDataWhitespace() = parseTest("parseCDataWhitespace")
 
 	@Test
-	fun parseCustomNamespaces() = parseTest()
+	fun parseCustomNamespaces() = parseTest("parseCustomNamespaces")
 
 	@Test
-	fun parseMultipleAttributes() = parseTest()
+	fun parseMultipleAttributes() = parseTest("parseMultipleAttributes")
 
 	@Test
-	fun parseBasicTest() = parseTest()
+	fun parseBasicTest() = parseTest("parseBasicTest")
 
 	@Test
-	fun parseXmlEncode() = parseTest()
+	fun parseXmlEncode() = parseTest("parseXmlEncode")
 
-	private fun parseTest() {
-		val input = getInputStream()
+	private fun parseTest(testName: String) {
+		val input = getInputStream(testName)
 		val xml = parse(input)
 
-		validateTest(xml)
+		validateTest(testName, xml)
 	}
 
 	@Test
@@ -557,7 +572,11 @@ class XmlBuilderTest : TestBase() {
 			}
 		}
 
-		validate(root, PrintOptions(pretty = true, singleLineTextElements = true, useCharacterReference = true))
+		validate(
+			"characterReference",
+			root,
+			PrintOptions(pretty = true, singleLineTextElements = true, useCharacterReference = true)
+		)
 	}
 
 	@Test
@@ -571,7 +590,7 @@ class XmlBuilderTest : TestBase() {
 				}
 			}
 
-			validate(root, PrintOptions(pretty = true, useSelfClosingTags = true))
+			validate("selfClosingTag", root, PrintOptions(pretty = true, useSelfClosingTags = true))
 		}
 	}
 
@@ -581,7 +600,7 @@ class XmlBuilderTest : TestBase() {
 			doctype()
 		}
 
-		validate(root)
+		validate("doctypeSimple", root)
 	}
 
 	@Test
@@ -590,7 +609,7 @@ class XmlBuilderTest : TestBase() {
 			doctype(systemId = "test.dtd")
 		}
 
-		validate(root)
+		validate("doctypeSystem", root)
 	}
 
 	@Test
@@ -599,7 +618,7 @@ class XmlBuilderTest : TestBase() {
 			doctype(publicId = "-//redundent//PUBLIC DOCTYPE//EN", systemId = "test.dtd")
 		}
 
-		validate(root)
+		validate("doctypePublic", root)
 	}
 
 	@Test
@@ -633,7 +652,7 @@ class XmlBuilderTest : TestBase() {
 			}
 		}
 
-		validate(root)
+		validate("advancedNamespaces", root)
 	}
 
 	@Test
@@ -643,6 +662,6 @@ class XmlBuilderTest : TestBase() {
 			attribute("test", unsafe("&#456;"))
 		}
 
-		validate(root)
+		validate("unsafeAttributeValue", root)
 	}
 }

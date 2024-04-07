@@ -1,7 +1,5 @@
 package org.redundent.kotlin.xml
 
-import org.junit.Rule
-import org.junit.rules.TestName
 import org.w3c.dom.Document
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -15,31 +13,29 @@ import javax.xml.transform.stream.StreamResult
 import kotlin.test.assertEquals
 
 open class TestBase {
-	@get:Rule
-	val testName = TestName()
 
-	private fun getExpectedXml(): String {
-		val inputStream = getInputStream()
+	private fun getExpectedXml(testName: String): String {
+		val inputStream = getInputStream(testName)
 		inputStream.use {
 			return InputStreamReader(it).readText().replace(System.lineSeparator(), "\n")
 		}
 	}
 
-	protected fun getInputStream(): InputStream {
-		val resName = "/test-results/${javaClass.simpleName}/${testName.methodName}.xml"
+	protected fun getInputStream(testName: String): InputStream {
+		val resName = "/test-results/${javaClass.simpleName}/$testName.xml"
 		return javaClass.getResourceAsStream(resName)
-			?: throw MissingResourceException("Cannot find expected xml resource: $resName. Did you forget to create it?", javaClass.name, testName.methodName)
+			?: throw MissingResourceException("Cannot find expected xml resource: $resName. Did you forget to create it?", javaClass.name, testName)
 	}
 
-	protected fun validate(xml: Node, prettyFormat: Boolean = true) {
-		validate(xml, PrintOptions(pretty = prettyFormat))
+	protected fun validate(testName: String, xml: Node, prettyFormat: Boolean = true) {
+		validate(testName, xml, PrintOptions(pretty = prettyFormat))
 	}
 
-	protected fun validate(xml: Node, printOptions: PrintOptions) {
+	protected fun validate(testName: String, xml: Node, printOptions: PrintOptions) {
 		val actual = xml.toString(printOptions)
 
 		// Doing a replace to cater for different line endings.
-		assertEquals(getExpectedXml(), actual.replace(System.lineSeparator(), "\n"), "actual xml matches what is expected")
+		assertEquals(getExpectedXml(testName), actual.replace(System.lineSeparator(), "\n"), "actual xml matches what is expected")
 
 		validateXml(actual)
 	}
@@ -50,9 +46,9 @@ open class TestBase {
 		}
 	}
 
-	protected fun validateTest(xml: Node) {
+	protected fun validateTest(testName: String, xml: Node) {
 		val actual = validateXml(xml.toString())
-		val expected = getInputStream().use {
+		val expected = getInputStream(testName).use {
 			DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it)
 		}
 

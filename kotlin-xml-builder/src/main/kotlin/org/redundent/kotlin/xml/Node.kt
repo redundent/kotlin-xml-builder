@@ -1,18 +1,17 @@
 package org.redundent.kotlin.xml
 
-import org.apache.commons.lang3.builder.EqualsBuilder
-import org.apache.commons.lang3.builder.HashCodeBuilder
-import java.util.*
-import kotlin.collections.LinkedHashMap
-import kotlin.collections.LinkedHashSet
-
 /**
  * Base type for all elements. This is what handles pretty much all the rendering and building.
  */
 open class Node(val nodeName: String) : Element {
-	private companion object {
-		private val isReflectionAvailable: Boolean by lazy {
-			Node::class.java.classLoader.getResource("kotlin/reflect/full") != null
+	internal companion object {
+		internal val isReflectionAvailable: Boolean by lazy {
+			try {
+				this::class.annotations.isEmpty()
+				true
+			} catch (ex: KotlinReflectionNotSupportedError) {
+				false
+			}
 		}
 	}
 
@@ -239,7 +238,11 @@ open class Node(val nodeName: String) : Element {
 	}
 
 	private fun getIndent(printOptions: PrintOptions, indent: String): String =
-		if (!printOptions.pretty) { "" } else { "$indent${printOptions.indent}" }
+		if (!printOptions.pretty) {
+			""
+		} else {
+			"$indent${printOptions.indent}"
+		}
 
 	/**
 	 * Get the xml representation of this object with prettyFormat = true
@@ -905,26 +908,26 @@ open class Node(val nodeName: String) : Element {
 	}
 
 	override fun equals(other: Any?): Boolean {
-		if (other !is Node) {
-			return false
-		}
+		if (this === other) return true
+		if (other !is Node) return false
 
-		return EqualsBuilder()
-			.append(nodeName, other.nodeName)
-			.append(encoding, other.encoding)
-			.append(version, other.version)
-			.append(_attributes, other._attributes)
-			.append(_globalLevelProcessingInstructions, other._globalLevelProcessingInstructions)
-			.append(_children, other._children)
-			.isEquals
+		if (nodeName != other.nodeName) return false
+		if (encoding != other.encoding) return false
+		if (version != other.version) return false
+		if (_attributes != other._attributes) return false
+		if (_globalLevelProcessingInstructions != other._globalLevelProcessingInstructions) return false
+		if (_children != other._children) return false
+
+		return true
 	}
 
-	override fun hashCode(): Int = HashCodeBuilder()
-		.append(nodeName)
-		.append(encoding)
-		.append(version)
-		.append(_attributes)
-		.append(_globalLevelProcessingInstructions)
-		.append(_children)
-		.toHashCode()
+	override fun hashCode(): Int {
+		var result = nodeName.hashCode()
+		result = 31 * result + encoding.hashCode()
+		result = 31 * result + version.hashCode()
+		result = 31 * result + _attributes.hashCode()
+		result = 31 * result + _globalLevelProcessingInstructions.hashCode()
+		result = 31 * result + _children.hashCode()
+		return result
+	}
 }

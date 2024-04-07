@@ -48,3 +48,7 @@ kotlin {
 		apiVersion = KotlinVersion.KOTLIN_1_6
 	}
 }
+
+tasks.withType<Test>().configureEach {
+	useJUnitPlatform()
+}

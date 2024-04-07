@@ -4,7 +4,7 @@ plugins {
 	conventions.publishing
 	conventions.`kotlin-jvm`
 	id("com.github.johnrengelman.shadow") version "8.1.1"
-	id("org.jlleitschuh.gradle.ktlint")
+//	id("org.jlleitschuh.gradle.ktlint")
 }
 
 tasks {
@@ -24,8 +24,7 @@ dependencies {
 	implementation("org.glassfish.jaxb:jaxb-xjc:2.3.8")
 
 	testImplementation(projects.kotlinXmlBuilder)
-	testImplementation("junit:junit:4.13.1")
-	testImplementation(kotlin("test-junit"))
+	testImplementation(kotlin("test"))
 }
 
 publishing {
