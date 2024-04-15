@@ -9,6 +9,7 @@ dependencies {
 	implementation("org.apache.commons:commons-lang3:3.5")
 
 	testImplementation("junit:junit:4.13.1")
+	testImplementation(kotlin("reflect"))
 	testImplementation(kotlin("test-junit"))
 }
 
