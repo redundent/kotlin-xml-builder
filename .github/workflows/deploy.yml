@@ -2,6 +2,11 @@ name: Deploy to central
 
 on:
   workflow_dispatch:
+    inputs:
+      checkout-ref:
+        description: "The branch, tag or SHA to checkout. See actions/checkout 'ref'."
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -16,39 +21,10 @@ jobs:
     uses: ./.github/workflows/ci.yml
 
   deploy:
-    runs-on: macos-latest
     needs: build
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Java JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 8
-
-      - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v5
-        with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.GPG_PRIVATE_PASSWORD }}
-
-      - name: Cache Kotlin Konan
-        id: cache-kotlin-konan
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.konan/**/*
-          key: kotlin-konan-${{ runner.os }}
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-
-      - name: Check
-        run: >-
-          ./gradlew publish
-                    closeSonatypeStagingRepository
-                    -Psigning.gnupg.passphrase='${{secrets.GPG_PRIVATE_PASSWORD}}'
-                    -Psigning.gnupg.keyName='${{secrets.GPG_PRIVATE_KEY_ID}}'
-                    -PsonatypeUsername='${{secrets.SONATYPE_USERNAME}}'
-                    -PsonatypePassword='${{secrets.SONATYPE_PASSWORD}}'
+    uses: ./.github/workflows/run_gradle.yml
+    with:
+      runs-on: macos-latest
+      ref: ${{ inputs.checkout-ref || github.ref }}
+      task: publish closeSonatypeStagingRepository
+      gpgKeyImport: true

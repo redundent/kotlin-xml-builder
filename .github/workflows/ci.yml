@@ -21,27 +21,8 @@ jobs:
           - os: ubuntu-latest
           - os: windows-latest
       fail-fast: false
-    runs-on: ${{ matrix.os }}
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Java JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 8
-
-      - name: Cache Kotlin Konan
-        id: cache-kotlin-konan
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.konan/**/*
-          key: kotlin-konan-${{ runner.os }}
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-
-      - name: Check
-        run: ./gradlew check
+    uses: ./.github/workflows/run_gradle.yml
+    with:
+      runs-on: ${{ matrix.os }}
+      ref: ${{ inputs.ref }}
+      task: check
