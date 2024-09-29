@@ -2,7 +2,7 @@ package org.redundent.kotlin.xml
 
 import kotlin.test.Test
 
-class OrderedNodesTest : TestBase() {
+class OrderedNodesTest {
 
 	@Test
 	fun correctOrder() {

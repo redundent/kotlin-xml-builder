@@ -1,6 +1,5 @@
 package org.redundent.kotlin.xml
 
-//import java.io.ByteArrayInputStream
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -8,9 +7,8 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
-//import org.xml.sax.SAXException
 
-class XmlBuilderTest : TestBase() {
+class XmlBuilderTest {
 	@Test
 	fun basicTest() {
 		val urlset = xml("urlset") {
@@ -346,26 +344,6 @@ class XmlBuilderTest : TestBase() {
 		validate(testResults.specialCharInAttribute, root)
 	}
 
-	// TODO test parsing on JVM
-//	@Test
-//	fun invalidElementName() {
-//		val root = xml("invalid root")
-//
-//		assertFailsWith<SAXException> {
-//			validateXml(root.toString())
-//		}
-//	}
-//
-//	@Test
-//	fun invalidAttributeName() {
-//		val root = xml("root") {
-//			attribute("invalid name", "")
-//		}
-//
-//		assertFailsWith<SAXException> {
-//			validateXml(root.toString())
-//		}
-//	}
 
 	@Test
 	fun filterFunctions() {
@@ -492,52 +470,6 @@ class XmlBuilderTest : TestBase() {
 
 		validate(testResults.replaceElement, root)
 	}
-
-	// TODO test parsing on JVM
-//	@Test
-//	fun parseAndVerify() {
-//		val xmlns = "http://blog.redundent.org"
-//		val value = "value"
-//		val input = ByteArrayInputStream("<root xmlns=\"$xmlns\"><child>$value</child></root>".toByteArray())
-//
-//		val root = parse(input)
-//
-//		assertEquals("root", root.nodeName, "root element nodeName is correct")
-//		assertEquals(xmlns, root.xmlns, "root xmlns is correct")
-//
-//		val children = root.children
-//		assertEquals(1, children.size, "root has 1 child")
-//		assertTrue(children[0] is Node, "child is a node")
-//
-//		val child = children.first() as Node
-//		assertTrue(child.children[0] is TextElement, "element is text")
-//		assertEquals(value, (child.children[0] as TextElement).text)
-//	}
-//
-//	@Test
-//	fun parseCData() = parseTest("parseCData")
-//
-//	@Test
-//	fun parseCDataWhitespace() = parseTest("parseCDataWhitespace")
-//
-//	@Test
-//	fun parseCustomNamespaces() = parseTest("parseCustomNamespaces")
-//
-//	@Test
-//	fun parseMultipleAttributes() = parseTest("parseMultipleAttributes")
-//
-//	@Test
-//	fun parseBasicTest() = parseTest("parseBasicTest")
-//
-//	@Test
-//	fun parseXmlEncode() = parseTest("parseXmlEncode")
-//
-//	private fun parseTest(testName: String) {
-//		val input = getInputStream(testName)
-//		val xml = parse(input)
-//
-//		validateTest(testName, xml)
-//	}
 
 	@Test
 	fun checkIncludeXmlPrologFlag() {

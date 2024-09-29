@@ -3,7 +3,7 @@ package org.redundent.kotlin.xml
 //import java.text.SimpleDateFormat
 import kotlin.test.Test
 
-class SitemapTest : TestBase() {
+class SitemapTest {
 	@Test
 	fun basicTest() {
 		val urlset = urlset {

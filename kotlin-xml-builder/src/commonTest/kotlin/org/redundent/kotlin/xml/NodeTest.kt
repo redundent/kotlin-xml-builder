@@ -7,7 +7,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertSame
 
-class NodeTest : TestBase() {
+class NodeTest {
 	@Test
 	fun equalsNull() {
 		val xml = xml("test")

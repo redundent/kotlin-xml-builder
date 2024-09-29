@@ -1,15 +1,27 @@
 package org.redundent.kotlin.xml
 
-import org.w3c.dom.Document
-import org.xml.sax.InputSource
+import org.w3c.dom.Node as W3CNode
 import java.io.File
 import java.io.InputStream
+import java.io.StringReader
 import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.math.min
-import org.w3c.dom.Node as W3CNode
+import org.intellij.lang.annotations.Language
+import org.w3c.dom.Document
+import org.xml.sax.InputSource
+
+
+fun parseXml(
+	@Language("XML")
+	xml: String
+): Node = parse(InputSource(StringReader(xml)))
 
 fun parse(f: File): Node = parse(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(f))
-fun parse(uri: String): Node = parse(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(uri))
+
+fun parse(
+	@Language("http-url-reference") uri: String): Node =
+	parse(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(uri))
+
 fun parse(inputSource: InputSource): Node =
 	parse(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputSource))
 
