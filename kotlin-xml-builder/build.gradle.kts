@@ -1,19 +1,20 @@
 plugins {
-	conventions.`kotlin-jvm`
+	conventions.`kotlin-multiplatform`
 	conventions.publishing
 	//id("org.jlleitschuh.gradle.ktlint")
 }
 
-dependencies {
-	compileOnly(kotlin("reflect"))
-
-	testImplementation(kotlin("test"))
-}
-
-publishing {
-	publications {
-		register<MavenPublication>("maven") {
-			from(components["java"])
+kotlin {
+	sourceSets {
+		commonMain {
+			dependencies {
+				//implementation(kotlin("reflect"))
+			}
+		}
+		commonTest {
+			dependencies {
+				implementation(kotlin("test"))
+			}
 		}
 	}
 }
