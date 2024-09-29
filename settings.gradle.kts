@@ -43,11 +43,6 @@ dependencyResolutionManagement {
 		ivy("https://download.jetbrains.com/kotlin/native/builds") {
 			name = "Kotlin Native"
 			patternLayout {
-
-				// example download URLs:
-				// https://download.jetbrains.com/kotlin/native/builds/releases/1.7.20/linux-x86_64/kotlin-native-prebuilt-linux-x86_64-1.7.20.tar.gz
-				// https://download.jetbrains.com/kotlin/native/builds/releases/1.7.20/windows-x86_64/kotlin-native-prebuilt-windows-x86_64-1.7.20.zip
-				// https://download.jetbrains.com/kotlin/native/builds/releases/1.7.20/macos-x86_64/kotlin-native-prebuilt-macos-x86_64-1.7.20.tar.gz
 				listOf(
 					"macos-x86_64",
 					"macos-aarch64",
