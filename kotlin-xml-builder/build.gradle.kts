@@ -1,7 +1,7 @@
 plugins {
 	conventions.`kotlin-jvm`
 	conventions.publishing
-	id("org.jlleitschuh.gradle.ktlint")
+	//id("org.jlleitschuh.gradle.ktlint")
 }
 
 dependencies {

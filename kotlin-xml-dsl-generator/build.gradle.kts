@@ -4,7 +4,7 @@ plugins {
 	conventions.publishing
 	conventions.`kotlin-jvm`
 	id("com.gradleup.shadow") version "8.3.2"
-	id("org.jlleitschuh.gradle.ktlint")
+	//id("org.jlleitschuh.gradle.ktlint")
 }
 
 tasks {
