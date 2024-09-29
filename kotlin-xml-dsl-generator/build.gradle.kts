@@ -3,7 +3,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 plugins {
 	conventions.publishing
 	conventions.`kotlin-jvm`
-	id("com.github.johnrengelman.shadow") version "8.1.1"
+	id("com.gradleup.shadow") version "8.3.2"
 //	id("org.jlleitschuh.gradle.ktlint")
 }
 
