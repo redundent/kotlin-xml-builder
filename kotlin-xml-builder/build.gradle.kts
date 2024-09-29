@@ -1,44 +1,83 @@
+import kotlin.io.path.createDirectories
+import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.name
+import kotlin.io.path.nameWithoutExtension
+import kotlin.io.path.readText
+import kotlin.io.path.writeText
+import org.gradle.api.tasks.PathSensitivity.RELATIVE
+
 plugins {
-	kotlin("jvm")
-	`maven-publish`
-	signing
-	id("org.jlleitschuh.gradle.ktlint")
+	conventions.`kotlin-multiplatform`
+	conventions.publishing
+	//id("org.jlleitschuh.gradle.ktlint")
 }
 
-val kotlinVersion: String by rootProject.extra
-
-tasks {
-	val jar by getting(Jar::class)
-
-	register<Jar>("sourceJar") {
-		from(sourceSets["main"].allSource)
-		destinationDirectory.set(jar.destinationDirectory)
-		archiveClassifier.set("sources")
+kotlin {
+	sourceSets {
+		commonMain {
+			dependencies {
+			}
+		}
+		commonTest {
+			dependencies {
+				implementation(kotlin("test"))
+			}
+		}
+		jvmMain {
+			dependencies {
+				compileOnly(kotlin("reflect"))
+			}
+		}
 	}
 }
 
-dependencies {
-	compileOnly(kotlin("stdlib", kotlinVersion))
-	compileOnly(kotlin("reflect", kotlinVersion))
-	implementation("org.apache.commons:commons-lang3:3.5")
+val generateTestResultAccessors by tasks.registering {
+	description = "Generate Kotlin classes so tests can access result data."
+	// KMP does not have common support for accessing resources.
 
-	testImplementation("junit:junit:4.13.1")
-	testImplementation(kotlin("reflect", kotlinVersion))
-	testImplementation(kotlin("test-junit", kotlinVersion))
-}
+	val testResultsDir = layout.projectDirectory.dir("test-results")
+	inputs.dir(testResultsDir).withPropertyName("testResultsDir")
+		.normalizeLineEndings()
+		.withPathSensitivity(RELATIVE)
 
-artifacts {
-	add("archives", tasks["sourceJar"])
-}
+	val outputDir = temporaryDir.toPath()
+	outputs.dir(outputDir).withPropertyName("outputDir")
 
-publishing {
-	publications {
-		register<MavenPublication>("maven") {
-			from(components["java"])
-
-			artifact(tasks["sourceJar"]) {
-				classifier = "sources"
+	doLast {
+		testResultsDir.asFile.toPath().listDirectoryEntries().forEach { dir ->
+			val clsName = dir.name
+			val testDataClsName = "${dir.name}Results"
+			val xmlData = dir.listDirectoryEntries("*.xml").joinToString("\n") { xmlFile ->
+				"""
+				|val ${xmlFile.nameWithoutExtension}: String
+				|  get() = ${"\"\"\""}${xmlFile.readText()}${"\"\"\""}
+				|
+				""".trimMargin()
+			}
+			outputDir.resolve("${testDataClsName}.kt").apply {
+				parent.createDirectories()
+				writeText(
+					"""
+					|package org.redundent.kotlin.xml
+					|
+					|internal object $testDataClsName {
+					|
+					|$xmlData
+					|
+					|}
+					|
+					|internal val ${clsName}.Companion.testResults: $testDataClsName 
+					|  get() = $testDataClsName
+					|
+					""".trimMargin()
+				)
 			}
 		}
+	}
+}
+
+kotlin {
+	sourceSets.commonTest {
+		kotlin.srcDir(generateTestResultAccessors)
 	}
 }

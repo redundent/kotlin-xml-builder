@@ -1,7 +1,5 @@
 package org.redundent.kotlin.xml.gen
 
-import org.junit.Rule
-import org.junit.rules.TestName
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.InputStream
@@ -9,14 +7,12 @@ import java.io.InputStreamReader
 import kotlin.test.assertEquals
 
 abstract class AbstractGenTest {
-	@Suppress("MemberVisibilityCanBePrivate")
-	@get:Rule
-	val testName = TestName()
+	protected fun run(testName: String, withBindingFile: Boolean = false, vararg additionalArgs: String) {
 
-	protected fun run(withBindingFile: Boolean = false, vararg additionalArgs: String) {
-		val schema = javaClass.getResourceAsStream("/schema/${testName.methodName}.xsd")
-			?: throw FileNotFoundException("/schema/${testName.methodName}.xsd as not found")
-		val code = getExpectedClassText()
+		val schema = javaClass.getResourceAsStream("/schema/$testName.xsd")
+			?: throw FileNotFoundException("/schema/$testName.xsd as not found")
+
+		val code = getExpectedClassText(testName)
 
 		val file = File.createTempFile("schema", ".xsd").apply {
 			outputStream().use {
@@ -24,17 +20,22 @@ abstract class AbstractGenTest {
 			}
 		}
 
-		val opts = ExOptions().apply { parseArguments(arrayOf("-p", "org.redundent.generated", file.absolutePath) + additionalArgs) }
+		val opts = ExOptions().apply {
+			parseArguments(
+				arrayOf("-p", "org.redundent.generated", file.absolutePath) +
+					additionalArgs,
+			)
+		}
 
 		if (withBindingFile) {
-			val binding = javaClass.getResourceAsStream("/schema/${testName.methodName}.jxb")
-				?: throw FileNotFoundException("/schema/${testName.methodName}.jxb as not found")
+			val binding = javaClass.getResourceAsStream("/schema/$testName.jxb")
+				?: throw FileNotFoundException("/schema/$testName.jxb as not found")
+
+			val bindingText = binding.bufferedReader().readText()
+				.replace("@schema@", "file:${file}")
+
 			val bindingFile = File.createTempFile("binding", ".jxb").apply {
-				writer().use { writer ->
-					binding.reader().forEachLine { line ->
-						writer.appendLine(line.replace("@schema@", "file:/${file.absolutePath}"))
-					}
-				}
+				writeText(bindingText)
 			}
 
 			opts.addBindFile(bindingFile)
@@ -45,15 +46,15 @@ abstract class AbstractGenTest {
 		assertEquals(code, text, "generated code is not the same")
 	}
 
-	private fun getExpectedClassText(): String {
-		val inputStream = getInputStream()
+	private fun getExpectedClassText(testName: String): String {
+		val inputStream = getInputStream(testName)
 		inputStream.use {
 			return InputStreamReader(it).readText().replace(System.lineSeparator(), "\n")
 		}
 	}
 
-	private fun getInputStream(): InputStream {
-		val resName = "/code/${testName.methodName}.kt"
+	private fun getInputStream(testName: String): InputStream {
+		val resName = "/code/$testName.kt"
 		return javaClass.getResourceAsStream(resName)
 			?: throw FileNotFoundException("$resName as not found")
 	}
