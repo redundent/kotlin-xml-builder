@@ -1,0 +1,98 @@
+# A re-usable workflow for running a Gradle task.
+# Should not be called directly, instead use it in other workflows.
+
+name: Gradle Task
+run-name: "Gradle Task ${{ inputs.task }}, ${{ inputs.runs-on }}, ${{ inputs.ref }}"
+
+on:
+  workflow_call:
+    inputs:
+      runs-on:
+        description: "The platform to run tests on"
+        required: true
+        type: string
+      ref:
+        description: "The git branch, tag or SHA to checkout"
+        required: false
+        type: string
+      task:
+        description: "The Gradle task to run"
+        required: true
+        type: string
+      gpgKeyImport:
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  run-tests:
+    runs-on: ${{ inputs.runs-on }}
+    name: "gradle ${{ inputs.gradle-task}}"
+    steps:
+      - name: "Redirect caches to fast D: drive for Windows runners"
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          mkdir D:\.konan
+          mklink /D C:\Users\runneradmin\.konan D:\.konan
+          echo KONAN_DATA_DIR=D:\.konan>>%GITHUB_ENV%
+
+      - name: "Set KONAN_DATA_DIR (bash)"
+        if: runner.os != 'Windows'
+        shell: bash
+        run: echo "KONAN_DATA_DIR=${HOME}/.konan" >> $GITHUB_ENV
+
+      - name: Checkout the repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref }}
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-cleanup: always
+          cache-encryption-key: ${{ secrets.GRADLE_CONFIGURATION_CACHE_ENCRYPTION_KEY }}
+
+      - name: Cache Kotlin Konan
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.KONAN_DATA_DIR }}
+          key: kotlin-konan-${{ runner.os }}
+          enableCrossOsArchive: true
+          restore-keys: |
+            kotlin-konan-
+
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v6
+        if: inputs.gpgKeyImport
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PRIVATE_PASSWORD }}
+
+      - name: Run task ${{ inputs.task }}
+        shell: bash
+        run: ./gradlew ${{ inputs.task }} --scan --stacktrace
+        env:
+          "ORG_GRADLE_PROJECT_signing.gnupg.passphrase": ${{ secrets.GPG_PRIVATE_PASSWORD }}
+          "ORG_GRADLE_PROJECT_signing.gnupg.keyName": ${{ secrets.GPG_PRIVATE_KEY_ID }}
+          ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.SONATYPE_USERNAME }}
+          ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.SONATYPE_PASSWORD }}
+
+      - name: Upload build reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-reports-${{ runner.os }}-${{ github.action }}-${{ github.run_id }}
+          path: |
+            **/build/reports/
+            **/*.hprof
+            **/*.log
+          if-no-files-found: ignore
