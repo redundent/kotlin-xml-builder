@@ -3,7 +3,7 @@ package org.redundent.kotlin.xml
 import org.apache.commons.lang3.builder.HashCodeBuilder
 
 /**
- * Similar to a [TextElement] except that the inner text is wrapped inside a <![CDATA[]]> tag.
+ * Similar to a [TextElement] except that the inner text is wrapped inside a `<![CDATA[]]>` tag.
  */
 class CDATAElement internal constructor(text: String) : TextElement(text) {
 	override fun renderedText(printOptions: PrintOptions): String {

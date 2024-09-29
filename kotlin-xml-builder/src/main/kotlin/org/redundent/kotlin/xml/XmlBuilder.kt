@@ -11,14 +11,14 @@ import org.w3c.dom.Node as W3CNode
 internal fun getLineEnding(printOptions: PrintOptions) = if (printOptions.pretty) System.lineSeparator() else ""
 
 /**
- * Creates a new xml document with the specified root element name
+ * Creates a new XML document with the specified root element name.
  *
  * @param root The root element name
- * @param encoding The encoding to use for the xml prolog
+ * @param encoding The encoding to use for the XML prolog
  * @param version The XML specification version to use for the xml prolog and attribute encoding
- * @param namespace Optional namespace object to use to build the name of the attribute. This will also add an xmlns
+ * @param namespace Optional namespace object to use to build the name of the attribute. This will also add an `xmlns`
  * attribute for this value
- * @param init The block that defines the content of the xml
+ * @param init The block that defines the content of the XML
  */
 fun xml(
 	root: String,
@@ -47,10 +47,10 @@ fun xml(
 }
 
 /**
- * Creates a new xml document with the specified root element name
+ * Creates a new XML document with the specified root element name.
  *
  * @param name The name of the element
- * @param init The block that defines the content of the xml
+ * @param init The block that defines the content of the XML
  */
 fun node(name: String, namespace: Namespace? = null, init: (Node.() -> Unit)? = null): Node {
 	val node = Node(buildName(name, namespace))

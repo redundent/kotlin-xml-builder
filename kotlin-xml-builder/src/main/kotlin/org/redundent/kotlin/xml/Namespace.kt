@@ -1,15 +1,15 @@
 package org.redundent.kotlin.xml
 
 /**
- * Represents an xml namespace (xmlns).
+ * Represents an xml namespace (`xmlns`).
  */
 data class Namespace(
 	/**
-	 * The name or prefix of the namespace
+	 * The name or prefix of the namespace.
 	 */
 	val name: String,
 	/**
-	 * The value/uri/url of the namespace
+	 * The value/uri/url of the namespace.
 	 */
 	val value: String
 ) {
