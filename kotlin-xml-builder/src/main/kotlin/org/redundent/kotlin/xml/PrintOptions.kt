@@ -41,11 +41,9 @@ class PrintOptions(
 	/**
 	 * Whether to use escaped character or character reference
 	 *
-	 * if false "'" becomes &apos;
+	 * If false: `'` becomes `&apos;`
 	 *
-	 * vs
-	 *
-	 * if true "'" becomes &#39;
+	 * If `true`: `'` becomes `&#39;`
 	 */
 	val useCharacterReference: Boolean = false,
 

@@ -2,8 +2,11 @@ package org.redundent.kotlin.xml
 
 /**
  * An element type that has some text in it.
+ *
  * For example:
+ * ```xml
  * <loc>http://blog.redundent.org</loc>
+ * ```
  */
 open class TextElement internal constructor(val text: String, private val unsafe: Boolean = false) : Element {
 	private fun isEmpty() = text.trim('\n', '\r').isBlank()

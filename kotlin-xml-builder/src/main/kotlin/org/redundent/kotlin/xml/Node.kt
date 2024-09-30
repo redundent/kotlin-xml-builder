@@ -38,7 +38,7 @@ open class Node(val nodeName: String) : Element {
 		get() = LinkedHashSet(_namespaces)
 
 	/**
-	 * The default xmlns for the document. To add other namespaces, use the [namespace] method
+	 * The default `xmlns` for the document. To add other namespaces, use the [namespace] method
 	 */
 	var xmlns: String?
 		get() = namespaces.firstOrNull(Namespace::isDefault)?.value
@@ -51,14 +51,14 @@ open class Node(val nodeName: String) : Element {
 		}
 
 	/**
-	 * Whether to include the xml prolog, i.e. <?xml version="1.0" encoding="UTS-8"?>
+	 * Whether to include the xml prolog, i.e. `<?xml version="1.0" encoding="UTS-8"?>`.
 	 *
-	 * <p>NOTE: this only applies to the root element. It is ignored an all children
+	 * NOTE: this only applies to the root element. It is ignored an all children.
 	 */
 	var includeXmlProlog = false
 
 	/**
-	 * Sets the encoding on the document. Setting this value will set [includeXmlProlog] to true
+	 * Sets the encoding on the document. Setting this value will set [includeXmlProlog] to `true`.
 	 */
 	var encoding: String = Charsets.UTF_8.name()
 		set(value) {
@@ -122,8 +122,8 @@ open class Node(val nodeName: String) : Element {
 	}
 
 	/**
-	 * Allows for easy access of adding/updating this node's attributes. Setting the value of an attribute to "null"
-	 * will remove the attribute .
+	 * Allows for easy access of adding/updating this node's attributes.
+	 * Setting the value of an attribute to `null` will remove the attribute.
 	 *
 	 * ```
 	 * element["key"] = "value"
@@ -242,14 +242,14 @@ open class Node(val nodeName: String) : Element {
 		if (!printOptions.pretty) { "" } else { "$indent${printOptions.indent}" }
 
 	/**
-	 * Get the xml representation of this object with prettyFormat = true
+	 * Get the XML representation of this object with `prettyFormat = true`.
 	 */
 	override fun toString() = toString(prettyFormat = true)
 
 	/**
-	 * Get the xml representation of this object
+	 * Get the XML representation of this object.
 	 *
-	 * @param [prettyFormat] true to format the xml with newlines and tabs; otherwise no formatting
+	 * @param [prettyFormat] true to format the XML with newlines and tabs; otherwise no formatting
 	 */
 	fun toString(prettyFormat: Boolean): String = toString(PrintOptions(pretty = prettyFormat))
 
@@ -298,7 +298,7 @@ open class Node(val nodeName: String) : Element {
 	 * comment("my comment")
 	 * ```
 	 *
-	 * @param text The text of the comment. This text will be rendered unescaped except for replace "--" with "&#45;&#45;"
+	 * @param text The text of the comment. This text will be rendered unescaped except for replace `--` with `&#45;&#45;`
 	 */
 	fun comment(text: String) {
 		_children.add(Comment(text))
@@ -308,7 +308,7 @@ open class Node(val nodeName: String) : Element {
 	 * Adds a basic element with the specific name to the parent.
 	 * ```
 	 * element("url") {
-	 *     ...
+	 *     // ...
 	 * }
 	 * ```
 	 *
@@ -364,7 +364,7 @@ open class Node(val nodeName: String) : Element {
 	 * allows you to specify optional attributes and content
 	 * ```
 	 * "url"("key" to "value") {
-	 *    ...
+	 *    // ...
 	 * }
 	 * ```
 	 *
@@ -381,7 +381,7 @@ open class Node(val nodeName: String) : Element {
 	 * allows you to specify the namespace of the element as well as optional attributes and content
 	 * ```
 	 * "url"(ns, "key" to "value") {
-	 *     ...
+	 *     // ...
 	 * }
 	 * ```
 	 *
@@ -484,8 +484,6 @@ open class Node(val nodeName: String) : Element {
 
 	/**
 	 * Adds a set of attributes to the current element.
-	 * @see [attribute]
-	 *
 	 * ```
 	 * "url" {
 	 *     attributes(
@@ -494,8 +492,8 @@ open class Node(val nodeName: String) : Element {
 	 *     )
 	 * }
 	 * ```
-	 *
 	 * @param attrs Collection of the attributes to apply to this element.
+	 * @see attribute
 	 */
 	fun attributes(vararg attrs: Pair<String, Any>) {
 		attrs.forEach { attribute(it.first, it.second) }
@@ -503,8 +501,6 @@ open class Node(val nodeName: String) : Element {
 
 	/**
 	 * Adds a set of attributes to the current element.
-	 * @see [attribute]
-	 *
 	 * ```
 	 * "url" {
 	 *     attributes(
@@ -515,6 +511,7 @@ open class Node(val nodeName: String) : Element {
 	 * ```
 	 *
 	 * @param attrs Collection of the attributes to apply to this element.
+	 * @see attribute
 	 */
 	fun attributes(vararg attrs: Attribute) {
 		for (attr in attrs) {
@@ -527,7 +524,6 @@ open class Node(val nodeName: String) : Element {
 
 	/**
 	 * Adds a set of attributes to the current element.
-	 * @see [attribute]
 	 *
 	 * ```
 	 * "url" {
@@ -541,6 +537,7 @@ open class Node(val nodeName: String) : Element {
 	 * @param namespace Optional namespace object to use to build the name of the attribute. Note this does NOT declare
 	 * the namespace. It simply uses it to build the attribute name(s).
 	 * @param attrs Collection of the attributes to apply to this element.
+	 * @see attribute
 	 */
 	fun attributes(namespace: Namespace, vararg attrs: Pair<String, Any>) {
 		attrs.forEach { attribute(it.first, it.second, namespace) }
@@ -771,7 +768,7 @@ open class Node(val nodeName: String) : Element {
 		addElementsBefore(listOf(*elements), before)
 
 	/**
-	 * Removes a node from the node
+	 * Removes a node from the node.
 	 * @param node The node to remove
 	 *
 	 * @throws IllegalArgumentException If [node] can't be found
@@ -783,7 +780,7 @@ open class Node(val nodeName: String) : Element {
 	fun removeNode(node: Node) = removeElement(node)
 
 	/**
-	 * Removes an element from the node
+	 * Removes an element from the node.
 	 * @param element The element to remove
 	 *
 	 * @throws IllegalArgumentException If [element] can't be found
@@ -794,7 +791,7 @@ open class Node(val nodeName: String) : Element {
 	}
 
 	/**
-	 * Removes the elements from the node
+	 * Removes the elements from the node.
 	 * @param elements The elements to remove
 	 *
 	 * @throws IllegalArgumentException If any [elements] can't be found
@@ -802,7 +799,7 @@ open class Node(val nodeName: String) : Element {
 	fun removeElements(vararg elements: Element) = removeElements(listOf(*elements))
 
 	/**
-	 * Removes the elements from the node
+	 * Removes the elements from the node.
 	 * @param elements The elements to remove
 	 *
 	 * @throws IllegalArgumentException If any [elements] can't be found
@@ -819,7 +816,7 @@ open class Node(val nodeName: String) : Element {
 	}
 
 	/**
-	 * Replaces a node with a different node
+	 * Replaces a node with a different node.
 	 * @param existing The existing node to replace
 	 * @param newNode The node to replace [existing] with
 	 *
@@ -832,7 +829,7 @@ open class Node(val nodeName: String) : Element {
 	fun replaceNode(existing: Node, newNode: Node) = replaceElement(existing, newNode)
 
 	/**
-	 * Replaces an element with a different element
+	 * Replaces an element with a different element.
 	 * @param existing The existing element to replace
 	 * @param newElement The element to replace [existing] with
 	 *

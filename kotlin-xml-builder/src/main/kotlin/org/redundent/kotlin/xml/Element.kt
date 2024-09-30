@@ -6,7 +6,7 @@ package org.redundent.kotlin.xml
  */
 interface Element {
 	/**
-	 * This method handles creating the xml. Used internally
+	 * This method handles creating the XML. Used internally.
 	 */
 	fun render(builder: Appendable, indent: String, printOptions: PrintOptions)
 }

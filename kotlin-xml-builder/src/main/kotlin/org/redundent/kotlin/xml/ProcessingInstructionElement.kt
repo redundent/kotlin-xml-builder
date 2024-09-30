@@ -3,7 +3,7 @@ package org.redundent.kotlin.xml
 import org.apache.commons.lang3.builder.HashCodeBuilder
 
 /**
- * Similar to a [TextElement] except that the inner text is wrapped inside <??> tag.
+ * Similar to a [TextElement] except that the inner text is wrapped inside `<??>` tag.
  */
 class ProcessingInstructionElement internal constructor(text: String, private val attributes: Map<String, String>) :
 	TextElement(text) {
