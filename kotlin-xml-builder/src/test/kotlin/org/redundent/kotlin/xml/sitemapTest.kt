@@ -1,7 +1,7 @@
 package org.redundent.kotlin.xml
 
-import org.junit.Test
 import java.text.SimpleDateFormat
+import kotlin.test.Test
 
 class sitemapTest : TestBase() {
 	@Test
@@ -12,7 +12,7 @@ class sitemapTest : TestBase() {
 			}
 		}
 
-		validate(urlset)
+		validate("basicTest", urlset)
 	}
 
 	@Test
@@ -25,7 +25,7 @@ class sitemapTest : TestBase() {
 				14.0
 			)
 		}
-		validate(urlset)
+		validate("allElements", urlset)
 	}
 
 	@Test
@@ -37,6 +37,6 @@ class sitemapTest : TestBase() {
 			sitemap("http://blog.redundent.org/sitemap3.xml")
 		}
 
-		validate(sitemapIndex)
+		validate("sitemapIndex", sitemapIndex)
 	}
 }

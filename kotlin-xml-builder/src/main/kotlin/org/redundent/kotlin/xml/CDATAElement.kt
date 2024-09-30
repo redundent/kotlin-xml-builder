@@ -1,7 +1,5 @@
 package org.redundent.kotlin.xml
 
-import org.apache.commons.lang3.builder.HashCodeBuilder
-
 /**
  * Similar to a [TextElement] except that the inner text is wrapped inside a `<![CDATA[]]>` tag.
  */
@@ -20,10 +18,12 @@ class CDATAElement internal constructor(text: String) : TextElement(text) {
 
 	override fun equals(other: Any?): Boolean = super.equals(other) && other is CDATAElement
 
-	// Need to use javaClass here to avoid a normal TextElement and a CDATAElement having the same hashCode if they have
+	// Need to use Class here to avoid a normal TextElement and a CDATAElement having the same hashCode if they have
 	// the same text
-	override fun hashCode(): Int = HashCodeBuilder()
-		.appendSuper(super.hashCode())
-		.append(javaClass.hashCode())
-		.toHashCode()
+	override fun hashCode(): Int {
+		var hash = 7
+		hash = 31 * hash + super.hashCode()
+		hash = 31 * hash + (this::class.qualifiedName?.hashCode() ?: 0)
+		return hash
+	}
 }

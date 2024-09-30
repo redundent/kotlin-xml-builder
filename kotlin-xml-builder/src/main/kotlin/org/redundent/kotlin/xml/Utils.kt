@@ -1,8 +1,5 @@
 package org.redundent.kotlin.xml
 
-import org.apache.commons.lang3.StringEscapeUtils
-import java.lang.StringBuilder
-
 internal fun escapeValue(value: Any?, xmlVersion: XmlVersion, useCharacterReference: Boolean = false): String? {
 	val asString = value?.toString() ?: return null
 
@@ -11,9 +8,60 @@ internal fun escapeValue(value: Any?, xmlVersion: XmlVersion, useCharacterRefere
 	}
 
 	return when (xmlVersion) {
-		XmlVersion.V10 -> StringEscapeUtils.escapeXml10(asString)
-		XmlVersion.V11 -> StringEscapeUtils.escapeXml11(asString)
+		XmlVersion.V10 -> {
+			buildString(asString.length) {
+				for (char in asString) {
+					when (char) {
+						'&' -> append("&amp;")
+						'<' -> append("&lt;")
+						'>' -> append("&gt;")
+						'"' -> append("&quot;")
+						'\'' -> append("&apos;")
+						else -> {
+							if (xml10ValidCharCodes.any { range -> char.code in range }) {
+								append(char)
+							}
+						}
+					}
+				}
+			}
+		}
+
+		XmlVersion.V11 -> {
+			buildString(asString.length) {
+				for (char in asString) {
+					when (char) {
+						'&' -> append("&amp;")
+						'<' -> append("&lt;")
+						'>' -> append("&gt;")
+						'"' -> append("&quot;")
+						'\'' -> append("&apos;")
+						'\u000b' -> append("&#11;")
+						'\u000c' -> append("&#12;")
+						else -> {
+							if (xml11ValidCharCodes.any { range -> char.code in range }) {
+								append(char)
+							}
+						}
+					}
+				}
+			}
+		}
 	}
+}
+
+private val xml10ValidCharCodes: Set<IntRange> = buildSet {
+	add(0x0009..0x0009)
+	add(0x000A..0x000A)
+	add(0x0020..0xD7FF)
+	add(0xE000..0xFFFD)
+	add(0x10000..0x10FFFF)
+}
+
+private val xml11ValidCharCodes: Set<IntRange> = buildSet {
+	add(0x0001..0xD7FF)
+	add(0xE000..0xFFFD)
+	add(0x10000..0x10FFFF)
 }
 
 internal fun referenceCharacter(asString: String): String {

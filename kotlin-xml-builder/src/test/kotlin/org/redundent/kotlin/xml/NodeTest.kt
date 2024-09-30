@@ -1,7 +1,8 @@
 package org.redundent.kotlin.xml
 
-import org.junit.Test
+import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertSame
@@ -163,7 +164,7 @@ class NodeTest : TestBase() {
 		assertSame(cdata, xml.children[1], "second child is cdata element")
 	}
 
-	@Test(expected = IllegalArgumentException::class)
+	@Test
 	fun `addElementsAfter not found`() {
 		val xml = xml("root")
 		val text = TextElement("test")
@@ -171,7 +172,9 @@ class NodeTest : TestBase() {
 
 		val after = CDATAElement("cdata")
 
-		xml.addElementsAfter(after, TextElement("new"))
+		assertFailsWith<IllegalArgumentException> {
+			xml.addElementsAfter(after, TextElement("new"))
+		}
 	}
 
 	@Test
@@ -193,6 +196,7 @@ class NodeTest : TestBase() {
 		)
 
 		validate(
+			"addElementsAfter",
 			xml,
 			PrintOptions(
 				singleLineTextElements = true,
@@ -201,7 +205,7 @@ class NodeTest : TestBase() {
 		)
 	}
 
-	@Test(expected = IllegalArgumentException::class)
+	@Test
 	fun `addElementsBefore not found`() {
 		val xml = xml("root")
 		val text = TextElement("test")
@@ -209,7 +213,9 @@ class NodeTest : TestBase() {
 
 		val before = CDATAElement("cdata")
 
-		xml.addElementsBefore(before, TextElement("new"))
+		assertFailsWith<IllegalArgumentException> {
+			xml.addElementsBefore(before, TextElement("new"))
+		}
 	}
 
 	@Test
@@ -231,6 +237,7 @@ class NodeTest : TestBase() {
 		)
 
 		validate(
+			"addElementsBefore",
 			xml,
 			PrintOptions(
 				singleLineTextElements = true,

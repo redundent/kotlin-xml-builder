@@ -1,6 +1,6 @@
 package org.redundent.kotlin.xml
 
-import org.junit.Test
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class UtilsKtTest {
