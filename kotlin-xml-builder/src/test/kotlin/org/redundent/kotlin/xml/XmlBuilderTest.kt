@@ -14,12 +14,12 @@ class XmlBuilderTest : TestBase() {
 	@Test
 	fun basicTest() {
 		val urlset = xml("urlset") {
-			xmlns = "http://www.sitemaps.org/schemas/sitemap/0.9"
+			xmlns = "https://www.sitemaps.org/schemas/sitemap/0.9"
 
 			for (i in 0..2) {
 				element("url") {
 					element("loc") {
-						-"http://google.com/$i"
+						-"https://google.com/$i"
 					}
 				}
 			}
@@ -31,19 +31,19 @@ class XmlBuilderTest : TestBase() {
 	@Test
 	fun customNamespaces() {
 		val root = xml("root") {
-			xmlns = "http://someurl.org"
-			namespace("t", "http://t.org")
+			xmlns = "https://someurl.org"
+			namespace("t", "https://t.org")
 
 			element("t:element") {
 				-"Test"
 			}
 
 			element("p") {
-				xmlns = "http://t.co"
+				xmlns = "https://t.co"
 			}
 
 			element("d:p") {
-				namespace("d", "http://b.co")
+				namespace("d", "https://b.co")
 			}
 		}
 
@@ -479,7 +479,7 @@ class XmlBuilderTest : TestBase() {
 
 	@Test
 	fun parseAndVerify() {
-		val xmlns = "http://blog.redundent.org"
+		val xmlns = "https://blog.redundent.org"
 		val value = "value"
 		val input = ByteArrayInputStream("<root xmlns=\"$xmlns\"><child>$value</child></root>".toByteArray())
 
@@ -644,5 +644,16 @@ class XmlBuilderTest : TestBase() {
 		}
 
 		validate(root)
+	}
+
+	@Test
+	fun emptyString() {
+		val root = xml("root") {
+			"a"()
+			-" "
+			"b"()
+		}
+
+		validate(root, prettyFormat = false)
 	}
 }

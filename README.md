@@ -276,6 +276,11 @@ It includes many more features for consuming documents.
 
 Release Notes
 =============
+Version 1.9.2
+-
+* Fixing issue where text elements are ignored when they are just whitespace\
+Thanks to [@fiddlededee](https://github.com/fiddlededee) for finding this!
+
 Version 1.9.1
 -
 * Adding `addElement`, `addElements`, `addElementsBefore`, `addElementsAfter`, `removeElement`,
