@@ -276,6 +276,10 @@ It includes many more features for consuming documents.
 
 Release Notes
 =============
+Version 1.9.3
+-
+* Re-fixing issue where text elements are ignored when they are just whitespace
+
 Version 1.9.2
 -
 * Fixing issue where text elements are ignored when they are just whitespace\
