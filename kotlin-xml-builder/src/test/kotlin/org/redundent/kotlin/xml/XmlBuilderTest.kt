@@ -656,4 +656,14 @@ class XmlBuilderTest : TestBase() {
 
 		validate(root, prettyFormat = false)
 	}
+
+	@Test
+	fun whitespace() {
+		val root = xml("root") {
+			"a"(" ")
+			"b"("\n")
+		}
+
+		validate(root, prettyFormat = false)
+	}
 }

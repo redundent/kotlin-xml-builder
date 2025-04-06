@@ -9,10 +9,8 @@ package org.redundent.kotlin.xml
  * ```
  */
 open class TextElement internal constructor(val text: String, private val unsafe: Boolean = false) : Element {
-	private fun isEmpty() = text.trim('\n', '\r').isEmpty()
-
 	override fun render(builder: Appendable, indent: String, printOptions: PrintOptions) {
-		if (isEmpty()) {
+		if (text.isEmpty()) {
 			return
 		}
 
