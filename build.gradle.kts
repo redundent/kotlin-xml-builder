@@ -9,7 +9,7 @@ extra["kotlinVersion"] = "1.6.20"
 
 allprojects {
 	group = "org.redundent"
-	version = "1.9.2"
+	version = "1.9.3"
 
 	repositories {
 		mavenCentral()
