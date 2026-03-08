@@ -1,43 +1,42 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+
 plugins {
-	kotlin("jvm")
+	kotlin("multiplatform")
 	`maven-publish`
 	signing
 	id("org.jlleitschuh.gradle.ktlint")
 }
 
-val kotlinVersion: String by rootProject.extra
-
-tasks {
-	val jar by getting(Jar::class)
-
-	register<Jar>("sourceJar") {
-		from(sourceSets["main"].allSource)
-		destinationDirectory.set(jar.destinationDirectory)
-		archiveClassifier.set("sources")
+kotlin {
+	jvm()
+	js(IR) {
+		browser()
+		nodejs()
 	}
-}
+	iosArm64()
+	linuxX64()
+	linuxArm64()
+	mingwX64()
+//
+//	val hostOs = System.getProperty("os.name")
+//	val isMingwX64 = hostOs.startsWith("Windows")
+//	val nativeTarget: KotlinNativeTarget
+//	when {
+//		hostOs == "Mac OS X" -> nativeTarget = macosX64("native")
+//		hostOs == "Linux" -> nativeTarget = linuxX64("native")
+//		isMingwX64 -> nativeTarget = mingwX64("native")
+//		else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
+//	}
 
-dependencies {
-	compileOnly(kotlin("stdlib", kotlinVersion))
-	compileOnly(kotlin("reflect", kotlinVersion))
-	implementation("org.apache.commons:commons-lang3:3.5")
-
-	testImplementation("junit:junit:4.13.1")
-	testImplementation(kotlin("reflect", kotlinVersion))
-	testImplementation(kotlin("test-junit", kotlinVersion))
-}
-
-artifacts {
-	add("archives", tasks["sourceJar"])
-}
-
-publishing {
-	publications {
-		register<MavenPublication>("maven") {
-			from(components["java"])
-
-			artifact(tasks["sourceJar"]) {
-				classifier = "sources"
+	sourceSets {
+		val commonTest by getting {
+			dependencies {
+				implementation(kotlin("test"))
+			}
+		}
+		val jvmTest by getting {
+			dependencies {
+				implementation(kotlin("test-junit"))
 			}
 		}
 	}

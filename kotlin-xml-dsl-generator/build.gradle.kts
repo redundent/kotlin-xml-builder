@@ -8,8 +8,6 @@ plugins {
 	id("org.jlleitschuh.gradle.ktlint")
 }
 
-val kotlinVersion: String by rootProject.extra
-
 tasks {
 	val jar by getting(Jar::class) {
 		manifest {
@@ -29,13 +27,13 @@ tasks {
 }
 
 dependencies {
-	implementation(kotlin("stdlib", kotlinVersion))
-	implementation(kotlin("reflect", kotlinVersion))
+	implementation(kotlin("stdlib"))
+	implementation(kotlin("reflect"))
 	implementation("org.glassfish.jaxb:jaxb-xjc:2.3.8")
 
 	testImplementation(project(":kotlin-xml-builder"))
 	testImplementation("junit:junit:4.13.1")
-	testImplementation(kotlin("test-junit", kotlinVersion))
+	testImplementation(kotlin("test-junit"))
 }
 
 publishing {

@@ -30,7 +30,11 @@ class XmlClass(
 	private val superClassConstructorArg = if (innerClass) "\"$name\"" else "nodeName"
 
 	private val hasBody: Boolean
-		get() = attributes.isNotEmpty() || xmlns != null || innerClasses.isNotEmpty() || (opts.useMemberFunctions && memberElements.isNotEmpty())
+		get() = attributes.isNotEmpty() ||
+			xmlns != null ||
+			innerClasses.isNotEmpty() ||
+			(opts.useMemberFunctions && memberElements.isNotEmpty()) ||
+			(clazz.target.isOrdered && clazz.target.elements.size > 1)
 
 	init {
 		clazz.target.attributes.map {
@@ -65,17 +69,23 @@ class XmlClass(
 		with(codeWriter) {
 			writeKotlinDoc(clazz.target.documentation)
 
-			if (clazz.target.isOrdered && clazz.target.elements.size > 1) {
-				writeln("@XmlType(childOrder = arrayOf(${clazz.target.elements.joinToString(",\n\t\t") { "\"${it.types.first().tagName.localPart}\"" }}))")
-			}
 			writeln("$modifier class `$name`$constructorArg : $superClassName($superClassConstructorArg)${if (hasBody) " {" else "\n"}")
 			indent()
+			
+			val initStatements = ArrayList<String>()
+			if (clazz.target.isOrdered && clazz.target.elements.size > 1) {
+				initStatements.add("childOrder = arrayOf(${clazz.target.elements.joinToString(",\n\t\t") { "\"${it.types.first().tagName.localPart}\"" }})")
+			}
 
 			if (xmlns != null) {
+				initStatements.add("xmlns = \"$xmlns\"")
+			}
+
+			if (initStatements.isNotEmpty()) {
 				writeBlock {
 					"""
 init {
-	xmlns = "$xmlns"
+	${initStatements.joinToString("\n\t")}
 }
 """
 				}
