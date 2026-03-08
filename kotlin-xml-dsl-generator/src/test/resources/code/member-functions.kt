@@ -4,9 +4,12 @@ package org.redundent.generated
 
 import org.redundent.kotlin.xml.*
 
-@XmlType(childOrder = arrayOf("comments",
-		"sub-type"))
 open class `MemberType`(nodeName: String) : Node(nodeName) {
+	init {
+		childOrder = arrayOf("comments",
+			"sub-type")
+	}
+
 	var `id`: kotlin.String?
 		get() = get("id")
 		set(value) { set("id", value) }
