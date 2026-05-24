@@ -1,5 +1,5 @@
 ![CI](https://github.com/redundent/kotlin-xml-builder/workflows/CI/badge.svg)
-[![Download](https://maven-badges.herokuapp.com/maven-central/org.redundent/kotlin-xml-builder/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.redundent/kotlin-xml-builder)
+![Latest Version](https://img.shields.io/maven-central/v/org.redundent/kotlin-xml-builder)
 
 Kotlin XML Builder
 =
