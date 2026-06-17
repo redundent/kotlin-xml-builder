@@ -1,11 +1,9 @@
 plugins {
-	kotlin("jvm") version "1.6.20" apply false
+	kotlin("multiplatform") version "1.9.20" apply false
 	id("com.bmuschko.nexus") version "2.3.1" apply false
 	id("io.github.gradle-nexus.publish-plugin") version "2.0.0-rc-1"
 	id("org.jlleitschuh.gradle.ktlint") version "11.6.1"
 }
-
-extra["kotlinVersion"] = "1.6.20"
 
 allprojects {
 	group = "org.redundent"

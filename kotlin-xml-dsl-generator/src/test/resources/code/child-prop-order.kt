@@ -4,10 +4,13 @@ package org.redundent.generated
 
 import org.redundent.kotlin.xml.*
 
-@XmlType(childOrder = arrayOf("Child1",
-		"child2",
-		"CHILD3"))
-open class `ChildPropOrder`(nodeName: String) : Node(nodeName)
+open class `ChildPropOrder`(nodeName: String) : Node(nodeName) {
+	init {
+		childOrder = arrayOf("Child1",
+			"child2",
+			"CHILD3")
+	}
+}
 
 fun `ChildPropOrder`.`Child1`(value: kotlin.String) {
 	"Child1"(value)

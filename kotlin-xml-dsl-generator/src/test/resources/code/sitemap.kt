@@ -51,11 +51,14 @@ fun `urlset`(__block__: `Urlset`.() -> Unit): `Urlset` {
 /**
  * Container for the data needed to describe a document to crawl.
  */
-@XmlType(childOrder = arrayOf("loc",
-		"lastmod",
-		"changefreq",
-		"priority"))
-open class `TUrl`(nodeName: String) : Node(nodeName)
+open class `TUrl`(nodeName: String) : Node(nodeName) {
+	init {
+		childOrder = arrayOf("loc",
+			"lastmod",
+			"changefreq",
+			"priority")
+	}
+}
 
 fun `TUrl`.`loc`(value: kotlin.String) {
 	"loc"(value)
