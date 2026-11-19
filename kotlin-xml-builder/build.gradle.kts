@@ -20,7 +20,7 @@ tasks {
 dependencies {
 	compileOnly(kotlin("stdlib", kotlinVersion))
 	compileOnly(kotlin("reflect", kotlinVersion))
-	implementation("org.apache.commons:commons-lang3:3.5")
+	implementation("org.apache.commons:commons-lang3:3.20.0")
 
 	testImplementation("junit:junit:4.13.1")
 	testImplementation(kotlin("reflect", kotlinVersion))
